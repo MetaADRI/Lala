@@ -1,11 +1,15 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-// SQLite Configuration for zero-setup local testing
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: './database.sqlite',
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'postgres',
   logging: false,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false, // Required for Neon cloud hosting
+    },
+  },
 });
 
 module.exports = sequelize;

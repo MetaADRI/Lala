@@ -28,26 +28,12 @@ const Listing = sequelize.define('Listing', {
     allowNull: false
   },
   photos: {
-    type: DataTypes.TEXT,
-    defaultValue: '[]',
-    get() {
-      const val = this.getDataValue('photos');
-      return val ? JSON.parse(val) : [];
-    },
-    set(val) {
-      this.setDataValue('photos', JSON.stringify(val));
-    }
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    defaultValue: []
   },
   amenities: {
-    type: DataTypes.TEXT,
-    defaultValue: '[]',
-    get() {
-      const val = this.getDataValue('amenities');
-      return val ? JSON.parse(val) : [];
-    },
-    set(val) {
-      this.setDataValue('amenities', JSON.stringify(val));
-    }
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    defaultValue: []
   },
   isApproved: {
     type: DataTypes.BOOLEAN,
