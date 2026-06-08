@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lala — Frontend Screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g-dark:#1B5E20;--g-mid:#2E7D32;--g-light:#E8F5E9;
+  --gold:#F9A825;--gold-lt:#FFF8E1;
+  --text:#1a1a1a;--muted:#6B7280;--bg:#F0F4ED;--card:#fff;
+  --border:rgba(0,0,0,0.09);--red:#C62828;
+  --r:14px;--rsm:10px;
+}
+body{font-family:'DM Sans',sans-serif;background:#E9EDE6;min-height:100vh;}
+
+/* ── PAGE WRAPPER ── */
+.page{max-width:1200px;margin:0 auto;padding:2.5rem 1.5rem 4rem;}
+.page-title{font-family:'Sora',sans-serif;font-weight:700;font-size:32px;color:var(--g-dark);letter-spacing:-1px;text-align:center;}
+.page-sub{text-align:center;color:var(--muted);font-size:14px;margin-top:4px;margin-bottom:2rem;}
+.logo-badge{display:inline-flex;align-items:baseline;gap:2px;}
+.logo-badge span{font-family:'Sora',sans-serif;font-weight:700;font-size:32px;color:var(--g-dark);}
+.logo-badge .dot{color:var(--gold);}
+
+/* ── NAV ── */
+.nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:2.5rem;}
+.nbtn{padding:9px 20px;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-family:'Sora',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;}
+.nbtn:hover,.nbtn.on{background:var(--g-dark);color:#fff;border-color:var(--g-dark);}
+
+/* ── SCREEN GROUPS ── */
+.sw{display:none;gap:32px;justify-content:center;flex-wrap:wrap;align-items:flex-start;}
+.sw.on{display:flex;}
+.sc-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;}
+.sc-label{font-family:'Sora',sans-serif;font-weight:600;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+
+/* ── PHONE FRAME ── */
+.phone{width:300px;background:var(--card);border-radius:34px;border:2.5px solid var(--g-dark);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 12px 48px rgba(27,94,32,.14);}
+.phone.gold-frame{border-color:var(--gold);box-shadow:0 12px 48px rgba(249,168,37,.16);}
+.phone.wa-frame{border-color:#075E54;box-shadow:0 12px 48px rgba(7,94,84,.14);}
+
+/* ── STATUS BAR ── */
+.sbar{background:var(--g-dark);padding:10px 18px 6px;display:flex;justify-content:space-between;align-items:center;}
+.sbar.gold-bar{background:#5D4037;}
+.sbar.wa-bar{background:#075E54;}
+.stime{color:#fff;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;}
+.sicons{display:flex;gap:5px;align-items:center;}
+.sicons i{color:#fff;font-size:13px;}
+
+/* ── HEADERS ── */
+.gh{background:var(--g-dark);padding:14px 18px 18px;color:#fff;}
+.logo-txt{font-family:'Sora',sans-serif;font-weight:700;font-size:24px;color:#fff;letter-spacing:-.5px;}
+.logo-txt .g{color:var(--gold);}
+.tagline{font-size:11px;color:rgba(255,255,255,.7);margin-top:1px;}
+
+/* ── SEARCH BAR ── */
+.sbar-field{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.22);border-radius:var(--rsm);padding:10px 13px;display:flex;align-items:center;gap:9px;}
+.sbar-field i{color:rgba(255,255,255,.8);font-size:16px;}
+.sbar-field span{color:rgba(255,255,255,.8);font-size:13px;}
+.sbar-white{background:var(--card);border:1.5px solid var(--border);border-radius:var(--rsm);padding:10px 13px;display:flex;align-items:center;gap:9px;}
+.sbar-white i{color:var(--muted);font-size:15px;}
+.sbar-white span{color:var(--muted);font-size:13px;}
+
+/* ── BODY ── */
+.sbody{flex:1;overflow:hidden;padding:14px;background:var(--bg);display:flex;flex-direction:column;gap:11px;}
+.stitle{font-family:'Sora',sans-serif;font-weight:600;font-size:13px;color:var(--text);}
+.ssub{font-size:11px;color:var(--muted);margin-top:1px;}
+
+/* ── DEST CHIPS ── */
+.drow{display:flex;gap:8px;}
+.dchip{flex:1;border-radius:11px;overflow:hidden;height:70px;cursor:pointer;}
+.dchip-bg{width:100%;height:100%;display:flex;align-items:flex-end;padding:7px;}
+.lusaka .dchip-bg{background:linear-gradient(160deg,#2E7D32 30%,#1B5E20);}
+.copperbelt .dchip-bg{background:linear-gradient(160deg,#E65100 30%,#BF360C);}
+.livingstone .dchip-bg{background:linear-gradient(160deg,#0277BD 30%,#01579B);}
+.dname{color:#fff;font-family:'Sora',sans-serif;font-size:10px;font-weight:600;line-height:1.2;}
+.dsub{color:rgba(255,255,255,.75);font-size:9px;}
+
+/* ── LISTING CARDS ── */
+.lcard{background:var(--card);border-radius:var(--rsm);border:1px solid var(--border);overflow:hidden;}
+.limg{height:92px;display:flex;align-items:center;justify-content:center;font-size:32px;}
+.green-room{background:linear-gradient(135deg,#A5D6A7,#66BB6A);}
+.warm-room{background:linear-gradient(135deg,#FFCC80,#FFA726);}
+.blue-room{background:linear-gradient(135deg,#90CAF9,#42A5F5);}
+.lbody{padding:9px 11px 11px;}
+.lname{font-family:'Sora',sans-serif;font-weight:600;font-size:12px;color:var(--text);}
+.lloc{font-size:10px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:2px;}
+.lloc i{font-size:11px;}
+.lrow{display:flex;justify-content:space-between;align-items:center;margin-top:7px;}
+.lprice{font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--g-dark);}
+.lprice-sub{font-size:9px;color:var(--muted);font-weight:400;}
+.star-badge{display:flex;align-items:center;gap:2px;font-size:10px;font-weight:600;color:var(--gold);background:var(--gold-lt);padding:3px 7px;border-radius:99px;font-family:'Sora',sans-serif;}
+.star-badge i{font-size:10px;}
+.vbadge{display:inline-flex;align-items:center;gap:2px;background:var(--g-light);color:var(--g-mid);font-size:9px;font-weight:600;padding:2px 7px;border-radius:99px;margin-top:5px;font-family:'Sora',sans-serif;}
+.vbadge i{font-size:11px;}
+
+/* ── MINI CARDS ── */
+.mcard-row{display:flex;gap:8px;overflow:hidden;}
+.mcard{flex:1;background:var(--card);border-radius:var(--rsm);border:1px solid var(--border);overflow:hidden;}
+.mimg{height:58px;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.mbody{padding:6px 7px 8px;}
+.mname{font-family:'Sora',sans-serif;font-weight:600;font-size:10px;color:var(--text);}
+.mloc{font-size:9px;color:var(--muted);}
+.mprice{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:var(--g-dark);margin-top:2px;}
+
+/* ── BUTTONS ── */
+.btn-g{width:100%;background:var(--g-dark);color:#fff;border:none;border-radius:var(--rsm);padding:11px;font-family:'Sora',sans-serif;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;}
+.btn-go{background:var(--gold);color:#3E2700;border:none;border-radius:var(--rsm);padding:11px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;width:100%;}
+.btn-ol{width:100%;background:transparent;color:var(--g-dark);border:1.5px solid var(--g-dark);border-radius:var(--rsm);padding:10px;font-family:'Sora',sans-serif;font-weight:600;font-size:13px;cursor:pointer;}
+.btn-sm{padding:7px 13px!important;font-size:11px!important;width:auto!important;}
+
+/* ── BOTTOM NAV ── */
+.bnav{background:var(--card);border-top:1px solid var(--border);padding:9px 0 13px;display:flex;justify-content:space-around;}
+.bni{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);font-size:9px;font-weight:500;font-family:'Sora',sans-serif;}
+.bni.on{color:var(--g-dark);}
+.bni i{font-size:19px;}
+
+/* ── FILTER CHIPS ── */
+.frow{display:flex;gap:5px;overflow:hidden;}
+.fchip{padding:4px 11px;border-radius:99px;font-family:'Sora',sans-serif;font-size:10px;font-weight:500;border:1.5px solid var(--border);background:rgba(255,255,255,.2);color:rgba(255,255,255,.8);white-space:nowrap;}
+.fchip.on{background:#fff;color:var(--g-dark);border-color:#fff;}
+
+/* ── AMENITY PILLS ── */
+.arow{display:flex;gap:5px;flex-wrap:wrap;}
+.apill{background:var(--g-light);color:var(--g-mid);font-size:10px;font-weight:500;padding:3px 9px;border-radius:99px;font-family:'Sora',sans-serif;display:flex;align-items:center;gap:3px;}
+.apill i{font-size:11px;}
+
+/* ── PAYMENT ── */
+.pprov{background:var(--card);border:2px solid var(--border);border-radius:var(--rsm);padding:11px 13px;display:flex;align-items:center;gap:11px;cursor:pointer;}
+.pprov.on{border-color:var(--g-dark);}
+.plogo{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;font-family:'Sora',sans-serif;color:#fff;flex-shrink:0;}
+.mtn{background:#FFCC00;color:#000;}
+.airtel{background:#E0001B;}
+.zamtel{background:#1B5E20;}
+.pname{font-family:'Sora',sans-serif;font-weight:600;font-size:12px;color:var(--text);}
+.psub{font-size:10px;color:var(--muted);}
+.pchk{color:var(--g-dark);font-size:17px;margin-left:auto;}
+
+/* ── HOST DASHBOARD ── */
+.srow{display:flex;gap:8px;}
+.scard{flex:1;background:var(--g-dark);border-radius:var(--rsm);padding:11px 9px;color:#fff;}
+.scard.blu{background:#1565C0;}
+.scard.gld{background:var(--gold);}
+.sval{font-family:'Sora',sans-serif;font-weight:700;font-size:20px;}
+.slbl{font-size:9px;opacity:.8;margin-top:1px;}
+.bitem{background:var(--card);border-radius:var(--rsm);border:1px solid var(--border);padding:9px 11px;display:flex;align-items:center;gap:9px;}
+.av{width:34px;height:34px;border-radius:50%;background:var(--g-light);color:var(--g-dark);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;font-family:'Sora',sans-serif;flex-shrink:0;}
+.bname{font-family:'Sora',sans-serif;font-weight:600;font-size:12px;color:var(--text);}
+.bdates{font-size:10px;color:var(--muted);}
+.bstat{margin-left:auto;font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;font-family:'Sora',sans-serif;}
+.conf{background:var(--g-light);color:var(--g-mid);}
+.pend{background:var(--gold-lt);color:#7B4F00;}
+
+/* ── REVIEWS ── */
+.rcard{background:var(--card);border-radius:var(--rsm);border:1px solid var(--border);padding:11px;}
+.rstars{color:var(--gold);font-size:12px;letter-spacing:1px;}
+.rtext{font-size:11px;color:var(--text);margin-top:4px;line-height:1.5;}
+.rauthor{font-size:10px;color:var(--muted);margin-top:3px;}
+
+/* ── WHATSAPP ── */
+.wa-hdr{background:#075E54;padding:11px 15px;display:flex;align-items:center;gap:9px;color:#fff;}
+.wa-av{width:34px;height:34px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+.wa-nm{font-family:'Sora',sans-serif;font-weight:600;font-size:13px;}
+.wa-ol{font-size:10px;color:rgba(255,255,255,.75);}
+.wa-body{flex:1;background:#ECE5DD;padding:11px;display:flex;flex-direction:column;gap:7px;}
+.wa-bbl{padding:8px 11px;border-radius:8px;font-size:11px;line-height:1.5;max-width:225px;}
+.sent{background:#DCF8C6;align-self:flex-end;border-bottom-right-radius:2px;color:#111;}
+.recv{background:#fff;align-self:flex-start;border-bottom-left-radius:2px;color:#111;}
+.wa-t{font-size:9px;color:rgba(0,0,0,.4);text-align:right;margin-top:2px;}
+.wa-bk{background:#fff;border-radius:8px;border-left:4px solid #25D366;padding:9px 11px;align-self:flex-start;max-width:225px;}
+.wa-bk-title{font-weight:700;font-size:11px;color:#075E54;font-family:'Sora',sans-serif;}
+.wa-bk-detail{font-size:10px;color:#555;margin-top:3px;line-height:1.5;}
+.wa-inp{background:#fff;padding:9px 11px;display:flex;gap:7px;align-items:center;border-top:1px solid var(--border);}
+.wa-inp-field{flex:1;background:var(--bg);border-radius:999px;padding:8px 13px;font-size:12px;color:var(--muted);}
+.wa-send-btn{width:34px;height:34px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;}
+.wa-send-btn i{color:#fff;font-size:15px;}
+
+/* ── ONBOARDING ── */
+.hero-il{flex:0 0 220px;display:flex;align-items:center;justify-content:center;font-size:72px;background:linear-gradient(160deg,#1B5E20,#2E7D32);}
+.ob-body{background:var(--card);border-radius:26px 26px 0 0;padding:22px 18px 18px;display:flex;flex-direction:column;gap:13px;margin-top:-22px;position:relative;z-index:2;}
+.ob-title{font-family:'Sora',sans-serif;font-weight:700;font-size:18px;color:var(--text);line-height:1.3;}
+.ob-sub{font-size:12px;color:var(--muted);line-height:1.6;}
+.feat-row{display:flex;gap:8px;}
+.feat{flex:1;background:var(--g-light);border-radius:9px;padding:9px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;}
+.feat i{font-size:19px;color:var(--g-dark);}
+.feat-txt{font-size:9px;font-weight:600;color:var(--g-dark);font-family:'Sora',sans-serif;line-height:1.3;}
+.step-ind{display:flex;gap:5px;align-items:center;}
+.sdot{height:4px;border-radius:99px;background:rgba(255,255,255,.35);}
+.sdot.on{background:#fff;width:22px;}
+.sdot:not(.on){width:7px;}
+
+/* ── OTP BOXES ── */
+.otp-row{display:flex;gap:8px;justify-content:center;}
+.obox{width:40px;height:48px;background:var(--card);border:2px solid var(--border);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:20px;color:var(--text);}
+.obox.filled{border-color:var(--g-dark);}
+
+/* ── GOLD HEADER ── */
+.gold-hdr{background:linear-gradient(135deg,#F9A825,#F57F17);padding:15px 18px 18px;}
+.gold-hdr .back{font-size:19px;color:#3E2700;}
+.gold-hdr-title{font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#3E2700;}
+.pay-summary{background:rgba(255,255,255,.25);border-radius:9px;padding:11px;margin-top:10px;}
+.pay-amount{font-family:'Sora',sans-serif;font-weight:700;font-size:26px;color:#3E2700;}
+.pay-detail{font-size:10px;color:rgba(62,39,0,.7);}
+
+/* ── INFO BOX ── */
+.info-box{background:var(--g-light);border-radius:8px;padding:9px 11px;font-size:10px;color:var(--g-mid);line-height:1.6;}
+
+/* ── PROMO BANNER ── */
+.promo{background:var(--gold-lt);border-radius:9px;padding:10px 13px;display:flex;gap:9px;align-items:center;}
+.promo i{font-size:20px;color:var(--gold);flex-shrink:0;}
+.promo-title{font-family:'Sora',sans-serif;font-weight:600;font-size:11px;color:#3E2700;}
+.promo-sub{font-size:10px;color:#7B4F00;}
+
+/* ── DETAIL IMG ── */
+.detail-img{height:150px;background:linear-gradient(135deg,#A5D6A7,#388E3C);display:flex;align-items:center;justify-content:center;font-size:52px;position:relative;}
+.detail-back{position:absolute;top:11px;left:11px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;}
+.detail-back i{color:#fff;font-size:15px;}
+.detail-save{position:absolute;top:11px;right:11px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;}
+.detail-save i{color:#fff;font-size:15px;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div style="text-align:center;margin-bottom:.5rem;">
+    <div class="logo-badge"><span>lala</span><span class="dot">.</span></div>
+  </div>
+  <div class="page-sub">Frontend Screens — Zambia's Low-Cost Accommodation Platform</div>
+
+  <nav class="nav">
+    <button class="nbtn on" onclick="show('home',this)">Home</button>
+    <button class="nbtn" onclick="show('search',this)">Search</button>
+    <button class="nbtn" onclick="show('listing',this)">Listing Detail</button>
+    <button class="nbtn" onclick="show('payment',this)">Payment</button>
+    <button class="nbtn" onclick="show('whatsapp',this)">WhatsApp Booking</button>
+    <button class="nbtn" onclick="show('host',this)">Host Dashboard</button>
+    <button class="nbtn" onclick="show('onboarding',this)">Onboarding</button>
+  </nav>
+
+  <!-- HOME -->
+  <div id="s-home" class="sw on">
+    <div class="sc-wrap">
+      <div class="sc-label">Home Screen</div>
+      <div class="phone">
+        <div class="sbar"><span class="stime">9:41</span><div class="sicons"><i class="ti ti-wifi"></i><i class="ti ti-battery-2"></i></div></div>
+        <div class="gh">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div><div class="logo-txt">lala<span class="g">.</span></div><div class="tagline">Affordable Stays. Anywhere in Zambia.</div></div>
+            <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;"><i class="ti ti-user" style="color:#fff;font-size:17px;"></i></div>
+          </div>
+          <div class="sbar-field"><i class="ti ti-map-pin"></i><span>Where are you going?</span></div>
+        </div>
+        <div class="sbody">
+          <div><div class="stitle">Popular Destinations</div><div class="ssub">Most booked this week</div></div>
+          <div class="drow">
+            <div class="dchip lusaka"><div class="dchip-bg"><div><div class="dname">Lusaka</div><div class="dsub">124 stays</div></div></div></div>
+            <div class="dchip copperbelt"><div class="dchip-bg"><div><div class="dname">Copperbelt</div><div class="dsub">87 stays</div></div></div></div>
+            <div class="dchip livingstone"><div class="dchip-bg"><div><div class="dname">Livingstone</div><div class="dsub">56 stays</div></div></div></div>
+          </div>
+          <div><div class="stitle">Near You — Kitwe</div><div class="ssub">Verified, affordable stays</div></div>
+          <div class="mcard-row">
+            <div class="mcard"><div class="mimg green-room">🏡</div><div class="mbody"><div class="mname">Sunrise Guesthouse</div><div class="mloc">Parklands</div><div class="mprice">K180<span style="font-size:9px;font-weight:400;color:var(--muted);">/night</span></div></div></div>
+            <div class="mcard"><div class="mimg warm-room">🏠</div><div class="mbody"><div class="mname">Copper Lodge</div><div class="mloc">Wusakile</div><div class="mprice">K250<span style="font-size:9px;font-weight:400;color:var(--muted);">/night</span></div></div></div>
+            <div class="mcard"><div class="mimg blue-room">🏘</div><div class="mbody"><div class="mname">City Rest House</div><div class="mloc">Town Centre</div><div class="mprice">K120<span style="font-size:9px;font-weight:400;color:var(--muted);">/night</span></div></div></div>
+          </div>
+          <div class="promo">
+            <i class="ti ti-bolt"></i>
+            <div><div class="promo-title">Book via WhatsApp</div><div class="promo-sub">Instant confirmation, no app needed</div></div>
+          </div>
+        </div>
+        <div class="bnav">
+          <div class="bni on"><i class="ti ti-home"></i><span>Home</span></div>
+          <div class="bni"><i class="ti ti-search"></i><span>Search</span></div>
+          <div class="bni"><i class="ti ti-heart"></i><span>Saved</span></div>
+          <div class="bni"><i class="ti ti-calendar"></i><span>Bookings</span></div>
+          <div class="bni"><i class="ti ti-user"></i><span>Profile</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div id="s-search" class="sw">
+    <div class="sc-wrap">
+      <div class="sc-label">Search Results</div>
+      <div class="phone">
+        <div class="sbar"><span class="stime">9:41</span><div class="sicons"><i class="ti ti-wifi"></i><i class="ti ti-battery-2"></i></div></div>
+        <div class="gh" style="padding-bottom:13px;">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:11px;">
+            <i class="ti ti-arrow-left" style="color:#fff;font-size:19px;"></i>
+            <div class="sbar-field" style="flex:1;"><i class="ti ti-search"></i><span style="color:#fff;font-weight:500;">Kitwe, Copperbelt</span></div>
+            <i class="ti ti-adjustments-horizontal" style="color:#fff;font-size:19px;"></i>
+          </div>
+          <div class="frow">
+            <div class="fchip on">All</div>
+            <div class="fchip">Guesthouse</div>
+            <div class="fchip">Lodge</div>
+            <div class="fchip">Hostel</div>
+            <div class="fchip">Rest House</div>
+          </div>
+        </div>
+        <div class="sbody">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="stitle">32 stays found</div>
+            <div style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:3px;"><i class="ti ti-arrows-sort" style="font-size:13px;"></i> Price: Low</div>
+          </div>
+          <div class="lcard">
+            <div class="limg green-room">🏡</div>
+            <div class="lbody">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div><div class="lname">Sunrise Guesthouse</div><div class="lloc"><i class="ti ti-map-pin"></i> Parklands, Kitwe</div></div>
+                <div class="star-badge"><i class="ti ti-star-filled"></i> 4.5</div>
+              </div>
+              <div class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified Host</div>
+              <div class="lrow"><div class="lprice">K180 <span class="lprice-sub">/night</span></div><button class="btn-g btn-sm">Book via WA</button></div>
+            </div>
+          </div>
+          <div class="lcard">
+            <div class="limg warm-room">🏠</div>
+            <div class="lbody">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div><div class="lname">Copper Lodge</div><div class="lloc"><i class="ti ti-map-pin"></i> Wusakile, Kitwe</div></div>
+                <div class="star-badge"><i class="ti ti-star-filled"></i> 4.2</div>
+              </div>
+              <div class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified Host</div>
+              <div class="lrow"><div class="lprice">K250 <span class="lprice-sub">/night</span></div><button class="btn-g btn-sm">Book via WA</button></div>
+            </div>
+          </div>
+          <div class="lcard">
+            <div class="limg blue-room">🏘</div>
+            <div class="lbody">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div><div class="lname">City Rest House</div><div class="lloc"><i class="ti ti-map-pin"></i> Town Centre, Kitwe</div></div>
+                <div class="star-badge"><i class="ti ti-star-filled"></i> 3.9</div>
+              </div>
+              <div class="lrow"><div class="lprice">K120 <span class="lprice-sub">/night</span></div><button class="btn-g btn-sm">Book via WA</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="bnav">
+          <div class="bni"><i class="ti ti-home"></i><span>Home</span></div>
+          <div class="bni on"><i class="ti ti-search"></i><span>Search</span></div>
+          <div class="bni"><i class="ti ti-heart"></i><span>Saved</span></div>
+          <div class="bni"><i class="ti ti-calendar"></i><span>Bookings</span></div>
+          <div class="bni"><i class="ti ti-user"></i><span>Profile</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LISTING DETAIL -->
+  <div id="s-listing" class="sw">
+    <div class="sc-wrap">
+      <div class="sc-label">Listing Detail</div>
+      <div class="phone">
+        <div class="sbar"><span class="stime">9:41</span><div class="sicons"><i class="ti ti-wifi"></i><i class="ti ti-battery-2"></i></div></div>
+        <div class="detail-img">🏡<div class="detail-back"><i class="ti ti-arrow-left"></i></div><div class="detail-save"><i class="ti ti-heart"></i></div></div>
+        <div class="sbody" style="padding-top:13px;">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div>
+                <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text);">Sunrise Guesthouse</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:2px;"><i class="ti ti-map-pin" style="font-size:12px;color:var(--g-dark);"></i> Parklands, Kitwe</div>
+              </div>
+              <div style="text-align:right;"><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:21px;color:var(--g-dark);">K180</div><div style="font-size:9px;color:var(--muted);">/night</div></div>
+            </div>
+            <div style="display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;">
+              <div class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified Host</div>
+              <div class="star-badge"><i class="ti ti-star-filled"></i> 4.5 (32 reviews)</div>
+            </div>
+          </div>
+          <div style="background:var(--card);border-radius:var(--rsm);border:1px solid var(--border);padding:11px;">
+            <div class="stitle" style="margin-bottom:7px;">Check-in / Check-out</div>
+            <div style="display:flex;gap:7px;">
+              <div style="flex:1;background:var(--bg);border-radius:8px;padding:7px;text-align:center;"><div style="font-size:9px;color:var(--muted);">Check-in</div><div style="font-family:'Sora',sans-serif;font-weight:600;font-size:12px;color:var(--text);">Mon, 26 May</div></div>
+              <div style="width:1px;background:var(--border);"></div>
+              <div style="flex:1;background:var(--bg);border-radius:8px;padding:7px;text-align:center;"><div style="font-size:9px;color:var(--muted);">Check-out</div><div style="font-family:'Sora',sans-serif;font-weight:600;font-size:12px;color:var(--text);">Wed, 28 May</div></div>
+            </div>
+          </div>
+          <div><div class="stitle" style="margin-bottom:6px;">Amenities</div>
+            <div class="arow">
+              <div class="apill"><i class="ti ti-wifi"></i> Wi-Fi</div>
+              <div class="apill"><i class="ti ti-parking"></i> Parking</div>
+              <div class="apill"><i class="ti ti-droplet"></i> Hot Water</div>
+              <div class="apill"><i class="ti ti-lock"></i> Security</div>
+            </div>
+          </div>
+          <div class="rcard">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
+              <div class="av" style="width:26px;height:26px;font-size:10px;">CM</div>
+              <div><div style="font-family:'Sora',sans-serif;font-weight:600;font-size:11px;">Chanda M.</div><div class="rstars">★★★★★</div></div>
+            </div>
+            <div class="rtext">"Very clean and affordable. The host responded on WhatsApp instantly."</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:7px;padding-bottom:4px;">
+            <button class="btn-g"><i class="ti ti-brand-whatsapp" style="font-size:17px;"></i> Book via WhatsApp</button>
+            <button class="btn-go"><i class="ti ti-device-mobile" style="font-size:17px;"></i> Pay with Mobile Money</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYMENT -->
+  <div id="s-payment" class="sw">
+    <div class="sc-wrap">
+      <div class="sc-label">Mobile Money Payment</div>
+      <div class="phone gold-frame">
+        <div class="sbar gold-bar"><span class="stime">9:41</span><div class="sicons"><i class="ti ti-wifi"></i><i class="ti ti-battery-2"></i></div></div>
+        <div class="gold-hdr">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;">
+            <i class="ti ti-arrow-left back"></i>
+            <div class="gold-hdr-title">Pay with Mobile Money</div>
+          </div>
+          <div class="pay-summary">
+            <div style="font-size:10px;color:rgba(62,39,0,.7);margin-bottom:3px;">Total to pay</div>
+            <div class="pay-amount">K360</div>
+            <div class="pay-detail">2 nights · Sunrise Guesthouse</div>
+          </div>
+        </div>
+        <div class="sbody">
+          <div class="stitle">Select your provider</div>
+          <div class="pprov on"><div class="plogo mtn">MTN</div><div><div class="pname">MTN Mobile Money</div><div class="psub">Send via USSD push</div></div><i class="ti ti-circle-check-filled pchk"></i></div>
+          <div class="pprov"><div class="plogo airtel">AIR</div><div><div class="pname">Airtel Money</div><div class="psub">Send via USSD push</div></div></div>
+          <div class="pprov"><div class="plogo zamtel">ZAM</div><div><div class="pname">Zamtel Money</div><div class="psub">Send via USSD push</div></div></div>
+          <div>
+            <div class="stitle" style="margin-bottom:5px;">Your MTN number</div>
+            <div style="background:var(--card);border:1.5px solid var(--g-dark);border-radius:var(--rsm);padding:10px 13px;display:flex;align-items:center;gap:7px;">
+              <span style="font-size:12px;color:var(--muted);">+260</span>
+              <span style="font-size:13px;color:var(--text);font-weight:500;">97 7654 321</span>
+            </div>
+          </div>
+          <div class="info-box"><strong>How it works:</strong> You will receive a USSD prompt. Enter your PIN to confirm. Booking confirmed instantly.</div>
+          <button class="btn-go"><i class="ti ti-send" style="font-size:17px;"></i> Send K360 via MTN</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHATSAPP -->
+  <div id="s-whatsapp" class="sw">
+    <div class="sc-wrap">
+      <div class="sc-label">WhatsApp Booking Flow</div>
+      <div class="phone wa-frame">
+        <div class="sbar wa-bar"><span class="stime">9:41</span><div class="sicons"><i class="ti ti-wifi"></i><i class="ti ti-battery-2"></i></div></div>
+        <div class="wa-hdr">
+          <div class="wa-av">🏡</div>
+          <div><div class="wa-nm">Sunrise Guesthouse</div><div class="wa-ol">Online · Kitwe</div></div>
+          <i class="ti ti-phone" style="color:#fff;font-size:19px;margin-left:auto;"></i>
+        </div>
+        <div class="wa-body">
+          <div class="wa-bbl recv">👋 Hello! Welcome to Sunrise Guesthouse. How can I help you?<div class="wa-t">9:30</div></div>
+          <div class="wa-bk">
+            <div class="wa-bk-title">📋 Booking Request via Lala</div>
+            <div class="wa-bk-detail">Property: Sunrise Guesthouse<br>Check-in: Mon, 26 May 2026<br>Check-out: Wed, 28 May 2026<br>Guests: 1 · 2 nights</div>
+            <div style="margin-top:5px;font-size:10px;font-weight:700;color:#075E54;font-family:'Sora',sans-serif;">Total: K360</div>
+          </div>
+          <div class="wa-bbl recv">✅ Rooms available! Please confirm and I'll send mobile money details.<div class="wa-t">9:33</div></div>
+          <div class="wa-bbl sent">I'll pay via MTN Mobile Money. Please confirm.<div class="wa-t">9:34</div></div>
+          <div class="wa-bbl recv">Perfect! Send K360 to MTN 0977 000 111. Send proof and your room is confirmed. 🙏<div class="wa-t">9:35</div></div>
+        </div>
+        <div class="wa-inp">
+          <div class="wa-inp-field">Type a message...</div>
+          <div class="wa-send-btn"><i class="ti ti-send"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOST DASHBOARD -->
+  <div id="s-host" class="sw">
+    <div class="sc-wrap">
+      <div class="sc-label">Host Dashboard</div>
+      <div class="phone">
+        <div class="sbar"><span class="stime">9:41</span><div class="sicons"><i class="ti ti-wifi"></i><i class="ti ti-battery-2"></i></div></div>
+        <div class="gh">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div><div style="font-size:10px;color:rgba(255,255,255,.7);">Welcome back</div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;">Bwalya Phiri 👋</div></div>
+            <div style="text-align:right;"><div style="font-size:9px;color:rgba(255,255,255,.7);">This month</div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:17px;color:var(--gold);">K4,320</div></div>
+          </div>
+        </div>
+        <div class="sbody">
+          <div class="srow">
+            <div class="scard"><div class="sval">24</div><div class="slbl">Bookings</div></div>
+            <div class="scard blu"><div class="sval">87%</div><div class="slbl">Occupancy</div></div>
+            <div class="scard gld" style="color:#3E2700;"><div class="sval" style="color:#3E2700;">4.5★</div><div class="slbl" style="color:#7B4F00;">Rating</div></div>
+          </div>
+          <div><div class="stitle" style="margin-bottom:7px;">Upcoming Bookings</div>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <div class="bitem"><div class="av">CM</div><div><div class="bname">Chanda Mulenga</div><div class="bdates">26–28 May · 2 nights</div></div><div class="bstat conf">Confirmed</div></div>
+              <div class="bitem"><div class="av">JB</div><div><div class="bname">Joseph Banda</div><div class="bdates">30 May–1 Jun · 2 nights</div></div><div class="bstat pend">Pending</div></div>
+              <div class="bitem"><div class="av">NT</div><div><div class="bname">Namwali Tembo</div><div class="bdates">4–6 Jun · 2 nights</div></div><div class="bstat conf">Confirmed</div></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:7px;">
+            <button class="btn-g" style="flex:1;font-size:11px;padding:9px 7px;"><i class="ti ti-plus" style="font-size:14px;"></i> Add Listing</button>
+            <button class="btn-ol" style="flex:1;font-size:11px;padding:9px 7px;">View Payouts</button>
+          </div>
+        </div>
+        <div class="bnav">
+          <div class="bni"><i class="ti ti-dashboard"></i><span>Overview</span></div>
+          <div class="bni"><i class="ti ti-building"></i><span>Listings</span></div>
+          <div class="bni on"><i class="ti ti-calendar"></i><span>Bookings</span></div>
+          <div class="bni"><i class="ti ti-chart-bar"></i><span>Analytics</span></div>
+          <div class="bni"><i class="ti ti-settings"></i><span>Settings</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONBOARDING -->
+  <div id="s-onboarding" class="sw">
+    <div class="sc-wrap">
+      <div class="sc-label">Welcome / Splash</div>
+      <div class="phone">
+        <div class="sbar"><span class="stime">9:41</span><div class="sicons"><i class="ti ti-wifi"></i><i class="ti ti-battery-2"></i></div></div>
+        <div class="hero-il">🏡</div>
+        <div style="background:var(--g-dark);padding:11px 18px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div class="logo-txt">lala<span class="g">.</span></div>
+            <div class="step-ind"><div class="sdot on"></div><div class="sdot"></div><div class="sdot"></div></div>
+          </div>
+        </div>
+        <div class="ob-body">
+          <div><div class="ob-title">Affordable stays anywhere in Zambia</div><div class="ob-sub">Find verified guesthouses, lodges, and township stays. Book via WhatsApp. Pay with mobile money.</div></div>
+          <div class="feat-row">
+            <div class="feat"><i class="ti ti-brand-whatsapp"></i><div class="feat-txt">WhatsApp Booking</div></div>
+            <div class="feat"><i class="ti ti-device-mobile"></i><div class="feat-txt">Mobile Money</div></div>
+            <div class="feat"><i class="ti ti-rosette-discount-check"></i><div class="feat-txt">Verified Hosts</div></div>
+            <div class="feat"><i class="ti ti-wifi-off"></i><div class="feat-txt">Low-Data Mode</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <button class="btn-g"><i class="ti ti-phone" style="font-size:16px;"></i> Sign up with phone number</button>
+            <div style="text-align:center;font-size:11px;color:var(--muted);">Already have an account? <span style="color:var(--g-dark);font-weight:600;">Sign in</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sc-wrap">
+      <div class="sc-label">OTP Verification</div>
+      <div class="phone">
+        <div class="sbar"><span class="stime">9:41</span><div class="sicons"><i class="ti ti-wifi"></i><i class="ti ti-battery-2"></i></div></div>
+        <div class="gh">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px;">
+            <i class="ti ti-arrow-left" style="color:#fff;font-size:19px;"></i>
+            <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fff;">Verify your number</div>
+          </div>
+          <div style="font-size:11px;color:rgba(255,255,255,.75);">We sent a 6-digit code to +260 97 765 4321</div>
+        </div>
+        <div class="sbody" style="justify-content:center;align-items:center;gap:22px;">
+          <div style="text-align:center;">
+            <i class="ti ti-message" style="font-size:44px;color:var(--g-dark);opacity:.25;"></i>
+            <div style="font-family:'Sora',sans-serif;font-weight:600;font-size:14px;color:var(--text);margin-top:11px;">Enter verification code</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px;">Check your SMS or WhatsApp</div>
+          </div>
+          <div class="otp-row">
+            <div class="obox filled">4</div>
+            <div class="obox filled">7</div>
+            <div class="obox filled">2</div>
+            <div class="obox">_</div>
+            <div class="obox"></div>
+            <div class="obox"></div>
+          </div>
+          <div style="width:100%;">
+            <button class="btn-g">Verify &amp; Continue</button>
+            <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:9px;">Didn't receive it? <span style="color:var(--g-dark);font-weight:600;">Resend via WhatsApp</span></div>
+          </div>
+          <div class="info-box" style="text-align:center;width:100%;">No email required. Your phone number is your account.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.sw').forEach(el => el.classList.remove('on'));
+  document.querySelectorAll('.nbtn').forEach(b => b.classList.remove('on'));
+  document.getElementById('s-' + id).classList.add('on');
+  btn.classList.add('on');
+}
+</script>
+</body>
+</html>

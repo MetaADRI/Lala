@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lala — Sunrise Guesthouse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="icon" href="data:,">
+  <style>
+    /* Local overrides for listing-detail.html */
+    body { background: var(--bg); }
+    
+    .detail-img {
+      height: 200px; background: linear-gradient(135deg, #A5D6A7, #388E3C);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 60px; position: relative;
+    }
+    .detail-back {
+      position: absolute; top: 16px; left: 16px; width: 34px; height: 34px;
+      border-radius: 50%; background: rgba(0,0,0,0.3); display: flex;
+      align-items: center; justify-content: center; color: #fff; text-decoration: none;
+    }
+    .detail-save {
+      position: absolute; top: 16px; right: 16px; width: 34px; height: 34px;
+      border-radius: 50%; background: rgba(0,0,0,0.3); display: flex;
+      align-items: center; justify-content: center; color: #fff;
+    }
+
+    .detail-body { padding: 20px 18px; display: flex; flex-direction: column; gap: 20px; }
+    
+    .info-card {
+      background: var(--card); border-radius: var(--rsm); border: 1px solid var(--border);
+      padding: 16px;
+    }
+    
+    .date-row { display: flex; gap: 10px; margin-top: 10px; }
+    .date-item {
+      flex: 1; background: var(--bg); border-radius: 8px; padding: 10px; text-align: center;
+    }
+    .date-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .date-val { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 13px; color: var(--text); margin-top: 2px; }
+
+    .arow { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    
+    .rcard {
+      background: var(--card); border-radius: var(--rsm); border: 1px solid var(--border);
+      padding: 14px; margin-top: 8px;
+    }
+    .rav {
+      width: 30px; height: 30px; border-radius: 50%; background: var(--g-light);
+      color: var(--g-dark); display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 11px; font-family: 'Sora', sans-serif;
+    }
+    .rstars { color: var(--gold); font-size: 12px; margin-top: 2px; }
+    .rtext { font-size: 13px; color: var(--text); margin-top: 8px; line-height: 1.5; }
+
+    .action-bar {
+      display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="detail-img">
+    <i class="ti ti-building-estate"></i>
+    <a href="search.html" class="detail-back"><i class="ti ti-arrow-left"></i></a>
+    <div style="position: absolute; top: 16px; left: 60px;">
+      <img src="logo-removebg-preview.png" alt="Lala Logo" style="height: 24px; filter: brightness(0) invert(1);">
+    </div>
+    <div class="detail-save"><i class="ti ti-heart"></i></div>
+  </div>
+
+  <div class="detail-body container" id="listingDetail">
+    <div class="fade-up" style="text-align: center; padding: 40px;">
+      <div class="sora">Loading details...</div>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    async function loadListingDetail() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+      const container = document.getElementById('listingDetail');
+
+      if (!id) {
+        container.innerHTML = '<div class="sora">No listing ID provided</div>';
+        return;
+      }
+
+      try {
+        const listing = await api.getListing(id);
+        
+        container.innerHTML = `
+          <div class="fade-up visible">
+            <div class="flex-between" style="align-items: flex-start;">
+              <div>
+                <h1 class="sora" style="font-size: 20px; font-weight: 700;">${listing.name}</h1>
+                <div class="lloc" style="margin-top: 4px; color: var(--muted); font-size: 13px;">
+                  <i class="ti ti-map-pin" style="color: var(--g-dark);"></i> ${listing.district}, ${listing.city}
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div class="sora" style="font-weight: 700; font-size: 24px; color: var(--g-dark);">K${listing.price}</div>
+                <div style="font-size: 11px; color: var(--muted);">/night</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+              <div class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified Host</div>
+              <div class="star-badge"><i class="ti ti-star-filled"></i> 4.5 (32 reviews)</div>
+            </div>
+          </div>
+
+          <div class="info-card fade-up visible">
+            <div class="sora" style="font-size: 14px; font-weight: 600;">Check-in / Check-out</div>
+            <div class="date-row">
+              <div class="date-item">
+                <div class="date-lbl">Check-in</div>
+                <div class="date-val">Mon, 26 May</div>
+              </div>
+              <div style="width: 1px; background: var(--border);"></div>
+              <div class="date-item">
+                <div class="date-lbl">Check-out</div>
+                <div class="date-val">Wed, 28 May</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fade-up visible">
+            <div class="sora" style="font-size: 14px; font-weight: 600;">Amenities</div>
+            <div class="arow">
+              ${listing.amenities.map(a => `<div class="apill"><i class="ti ti-check"></i> ${a}</div>`).join('')}
+            </div>
+          </div>
+
+          <div class="fade-up visible">
+            <div class="sora" style="font-size: 14px; font-weight: 600;">Guest Review</div>
+            <div class="rcard">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="rav">CM</div>
+                <div>
+                  <div class="sora" style="font-weight: 600; font-size: 12px;">Chanda Mulenga</div>
+                  <div class="rstars">★★★★★</div>
+                </div>
+              </div>
+              <p class="rtext">"Very clean and affordable. Great location near the mall."</p>
+            </div>
+          </div>
+
+          <div class="action-bar fade-up visible">
+            <a href="whatsapp-booking.html?id=${listing.id}" class="btn-green"><i class="ti ti-brand-whatsapp"></i> Book via WhatsApp</a>
+            <a href="payment.html?id=${listing.id}" class="btn-gold"><i class="ti ti-device-mobile"></i> Pay with Mobile Money</a>
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = '<div class="sora">Failed to load details</div>';
+        console.error(err);
+      }
+    }
+
+    loadListingDetail();
+  </script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lala — Search Stays</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="icon" href="data:,">
+  <style>
+    /* Local overrides for search.html */
+    body { background: var(--bg); }
+
+    /* ---- TOP NAV ---- */
+    .search-nav {
+      background: var(--g-dark); padding: 14px 18px 18px; color: #fff;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .search-nav-top {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+    }
+    .back-icon { font-size: 20px; color: #fff; text-decoration: none; }
+    
+    .sbar-field {
+      flex: 1; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.22);
+      border-radius: var(--rsm); padding: 10px 13px; display: flex; align-items: center; gap: 9px;
+    }
+    .sbar-field i { color: rgba(255,255,255,0.8); font-size: 18px; }
+    .sbar-field span { color: #fff; font-size: 14px; font-weight: 500; }
+
+    /* ---- FILTER ROW ---- */
+    .frow {
+      display: flex; gap: 8px; overflow-x: auto; padding: 4px 0;
+      scrollbar-width: none; /* Firefox */
+    }
+    .frow::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
+    
+    .fchip {
+      padding: 6px 14px; border-radius: 99px; font-family: 'Sora', sans-serif;
+      font-size: 11px; font-weight: 500; border: 1.5px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8);
+      white-space: nowrap; cursor: pointer; transition: all 0.2s;
+    }
+    .fchip.on { background: #fff; color: var(--g-dark); border-color: #fff; }
+
+    /* ---- RESULTS ---- */
+    .results-container { padding: 20px 18px; display: flex; flex-direction: column; gap: 14px; }
+    
+    .lcard {
+      background: var(--card); border-radius: var(--r); border: 1px solid var(--border);
+      overflow: hidden; display: block; text-decoration: none; color: inherit;
+    }
+    .limg {
+      height: 120px; display: flex; align-items: center; justify-content: center;
+      font-size: 40px;
+    }
+    .limg.green { background: linear-gradient(135deg, #A5D6A7, #66BB6A); }
+    .limg.warm { background: linear-gradient(135deg, #FFCC80, #FFA726); }
+    .limg.blue { background: linear-gradient(135deg, #90CAF9, #42A5F5); }
+    
+    .lbody { padding: 14px; }
+    .lname { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 15px; color: var(--text); }
+    .lloc { font-size: 12px; color: var(--muted); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+    .lrow { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+    .lprice { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: var(--g-dark); }
+    .lprice-sub { font-size: 11px; color: var(--muted); font-weight: 400; }
+  </style>
+</head>
+<body>
+  <!-- TOP NAV -->
+  <div class="search-nav">
+    <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+      <a href="index.html" class="back-icon"><i class="ti ti-arrow-left"></i></a>
+      <img src="logo-removebg-preview.png" alt="Lala Logo" style="height: 24px; filter: brightness(0) invert(1);">
+    </div>
+    <div class="search-nav-top">
+      <div class="sbar-field">
+        <i class="ti ti-search"></i>
+        <span>Kitwe, Copperbelt</span>
+      </div>
+      <i class="ti ti-adjustments-horizontal" style="font-size: 20px;"></i>
+    </div>
+    <div class="frow">
+      <div class="fchip on">All Stays</div>
+      <div class="fchip">Guesthouse</div>
+      <div class="fchip">Lodge</div>
+      <div class="fchip">Hostel</div>
+      <div class="fchip">Rest House</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="results-container container" id="listingsContainer">
+    <div class="flex-between fade-up">
+      <div class="sora" style="font-size: 14px; font-weight: 600;" id="resultsCount">Loading stays...</div>
+      <div style="font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 4px;">
+        <i class="ti ti-arrows-sort"></i> Price: Low to High
+      </div>
+    </div>
+    <!-- Dynamic listings will be injected here -->
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    async function loadListings() {
+      const container = document.getElementById('listingsContainer');
+      const countEl = document.getElementById('resultsCount');
+      
+      try {
+        const listings = await api.getListings();
+        countEl.innerText = `${listings.length} stays found`;
+        
+        // Clear previous results (except the count header)
+        const header = container.querySelector('.flex-between');
+        container.innerHTML = '';
+        container.appendChild(header);
+
+        listings.forEach(listing => {
+          const card = `
+            <a href="listing-detail.html?id=${listing.id}" class="lcard fade-up visible">
+              <div class="limg green" style="background: url('${listing.photos[0]}') center/cover;">
+                ${!listing.photos[0] ? '<i class="ti ti-home"></i>' : ''}
+              </div>
+              <div class="lbody">
+                <div class="flex-between" style="align-items: flex-start;">
+                  <div>
+                    <div class="lname">${listing.name}</div>
+                    <div class="lloc"><i class="ti ti-map-pin"></i> ${listing.district}, ${listing.city}</div>
+                  </div>
+                  <div class="star-badge"><i class="ti ti-star-filled"></i> 4.5</div>
+                </div>
+                <div class="vbadge" style="margin-top: 8px;"><i class="ti ti-rosette-discount-check"></i> Verified Host</div>
+                <div class="lrow">
+                  <div class="lprice">K${listing.price} <span class="lprice-sub">/night</span></div>
+                  <button class="btn-green" style="padding: 8px 16px; font-size: 12px;" onclick="event.preventDefault(); window.location.href='whatsapp-booking.html?id=${listing.id}'"><i class="ti ti-brand-whatsapp"></i> Book via WA</button>
+                </div>
+              </div>
+            </a>
+          `;
+          container.insertAdjacentHTML('beforeend', card);
+        });
+      } catch (err) {
+        countEl.innerText = 'Failed to load stays';
+        console.error(err);
+      }
+    }
+
+    loadListings();
+
+    (function() {
+      // Intersection Observer logic remains...
+    })();
+  </script>
+</body>
+</html>

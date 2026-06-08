@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lala — Mobile Money Payment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="icon" href="data:,">
+  <style>
+    /* Local overrides for payment.html */
+    body { background: var(--bg); }
+    
+    .gold-hdr {
+      background: linear-gradient(135deg, #F9A825, #F57F17); padding: 20px 18px 24px;
+    }
+    .back-btn { font-size: 20px; color: #3E2700; text-decoration: none; }
+    .gold-hdr-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; color: #3E2700; margin-left: 12px; }
+    
+    .pay-summary {
+      background: rgba(255,255,255,0.25); border-radius: 12px; padding: 16px; margin-top: 16px;
+    }
+    .pay-amount { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 32px; color: #3E2700; }
+    .pay-detail { font-size: 12px; color: rgba(62,39,0,0.7); margin-top: 2px; }
+
+    .payment-body { padding: 20px 18px; display: flex; flex-direction: column; gap: 16px; }
+    
+    .pprov {
+      background: var(--card); border: 2.5px solid var(--border); border-radius: var(--rsm);
+      padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pprov.on { border-color: var(--g-dark); }
+    .plogo {
+      width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center;
+      justify-content: center; font-weight: 700; font-size: 11px; font-family: 'Sora', sans-serif;
+      color: #fff; flex-shrink: 0;
+    }
+    .mtn { background: #FFCC00; color: #000; }
+    .airtel { background: #E0001B; }
+    .zamtel { background: #1B5E20; }
+    .pname { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; color: var(--text); }
+    .psub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .pchk { color: var(--g-dark); font-size: 20px; margin-left: auto; }
+
+    .phone-box {
+      background: var(--card); border: 1.5px solid var(--g-dark); border-radius: var(--rsm);
+      padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+    }
+    .info-box {
+      background: var(--g-light); border-radius: 10px; padding: 12px 14px;
+      font-size: 12px; color: var(--g-mid); line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <div class="gold-hdr">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center;">
+        <a href="listing-detail.html" class="back-btn"><i class="ti ti-arrow-left"></i></a>
+        <span class="gold-hdr-title">Payment</span>
+      </div>
+      <img src="logo-removebg-preview.png" alt="Lala Logo" style="height: 24px;">
+    </div>
+    <div class="pay-summary fade-up">
+      <div style="font-size: 11px; color: rgba(62,39,0,0.6); margin-bottom: 4px;">Total to pay</div>
+      <div class="pay-amount">K360</div>
+      <div class="pay-detail">2 nights · Sunrise Guesthouse</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="payment-body container">
+    <div class="sora fade-up" style="font-size: 14px; font-weight: 600;">Select your provider</div>
+    
+    <div class="pprov on fade-up" onclick="selectProvider('MTN', this)">
+      <div class="plogo mtn">MTN</div>
+      <div>
+        <div class="pname">MTN Mobile Money</div>
+        <div class="psub">Fast, secure USSD push</div>
+      </div>
+      <i class="ti ti-circle-check-filled pchk"></i>
+    </div>
+
+    <div class="pprov fade-up" onclick="selectProvider('Airtel', this)">
+      <div class="plogo airtel">AIR</div>
+      <div>
+        <div class="pname">Airtel Money</div>
+        <div class="psub">Fast, secure USSD push</div>
+      </div>
+    </div>
+
+    <div class="pprov fade-up" onclick="selectProvider('Zamtel', this)">
+      <div class="plogo zamtel">ZAM</div>
+      <div>
+        <div class="pname">Zamtel Money</div>
+        <div class="psub">Fast, secure USSD push</div>
+      </div>
+    </div>
+
+    <div class="fade-up" style="margin-top: 8px;">
+      <div class="sora" style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">Your phone number</div>
+      <div class="phone-box">
+        <span style="font-size: 14px; color: var(--muted); font-weight: 600;">+260</span>
+        <span style="font-size: 15px; color: var(--text); font-weight: 500;">97 7654 321</span>
+      </div>
+    </div>
+
+    <div class="info-box fade-up">
+      <strong>How it works:</strong> You will receive a USSD prompt on your phone. Enter your Mobile Money PIN to confirm. Your booking is confirmed instantly.
+    </div>
+
+    <button id="payBtn" class="btn-gold fade-up" style="padding: 16px; margin-top: 8px;" onclick="handlePayment()">
+      <i class="ti ti-send"></i> Pay K360 via MTN
+    </button>
+  </div>
+
+  <script>
+    function selectProvider(name, el) {
+      document.querySelectorAll('.pprov').forEach(p => {
+        p.classList.remove('on');
+        const check = p.querySelector('.pchk');
+        if (check) check.remove();
+      });
+      el.classList.add('on');
+      el.insertAdjacentHTML('beforeend', '<i class="ti ti-circle-check-filled pchk"></i>');
+      document.getElementById('payBtn').innerHTML = `<i class="ti ti-send"></i> Pay K360 via ${name}`;
+    }
+
+    function handlePayment() {
+      alert('Payment request sent! Check your phone for the USSD prompt.');
+      window.location.href = 'index.html';
+    }
+
+    (function() {
+      const faders = document.querySelectorAll('.fade-up');
+      const appearOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
+      const appearOnScroll = new IntersectionObserver(function(entries, observer) {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        });
+      }, appearOptions);
+      faders.forEach(fader => appearOnScroll.observe(fader));
+    })();
+  </script>
+</body>
+</html>

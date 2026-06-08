@@ -1,0 +1,202 @@
+:root {
+  --g-dark: #1B5E20;  
+  --g-mid: #2E7D32;  
+  --g-light: #E8F5E9;
+  --gold: #F9A825;    
+  --gold-lt: #FFF8E1;
+  --text: #1a1a1a;    
+  --muted: #6B7280;   
+  --bg: #F0F4ED;
+  --card: #fff;       
+  --border: rgba(0,0,0,0.09);
+  --red: #C62828;     
+  --r: 14px;          
+  --rsm: 10px;
+}
+
+html { scroll-behavior: smooth; }
+
+body { 
+  font-family: 'DM Sans', sans-serif; 
+  background: #E9EDE6; 
+  margin: 0; 
+  color: var(--text); 
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4, .sora {
+  font-family: 'Sora', sans-serif;
+}
+
+/* ---- BUTTONS ---- */
+.btn-green {
+  background: var(--g-dark); 
+  color: #fff; 
+  border: none; 
+  border-radius: var(--rsm);
+  padding: 12px 24px; 
+  font-family: 'Sora', sans-serif; 
+  font-weight: 600; 
+  font-size: 14px;
+  cursor: pointer; 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center;
+  gap: 8px; 
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.btn-green:hover { 
+  background: #16401a; 
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(27,94,32,0.2);
+}
+
+.btn-gold {
+  background: var(--gold); 
+  color: #3E2700; 
+  border: none; 
+  border-radius: var(--rsm);
+  padding: 12px 24px; 
+  font-family: 'Sora', sans-serif; 
+  font-weight: 700; 
+  font-size: 14px;
+  cursor: pointer; 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center;
+  gap: 8px; 
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.btn-gold:hover { 
+  background: #f59e0b; 
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249,168,37,0.2);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--g-dark);
+  border: 1.5px solid var(--g-dark);
+  border-radius: var(--rsm);
+  padding: 10px 22px;
+  font-family: 'Sora', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.btn-outline:hover {
+  background: var(--g-light);
+}
+
+/* ---- CARDS ---- */
+.card {
+  background: var(--card); 
+  border-radius: var(--rsm); 
+  border: 1px solid var(--border);
+  padding: 16px; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04); 
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.card:hover { 
+  transform: translateY(-4px); 
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08); 
+}
+
+/* ---- BADGES & PILLS ---- */
+.star-badge {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gold);
+  background: var(--gold-lt);
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-family: 'Sora', sans-serif;
+}
+
+.vbadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--g-light);
+  color: var(--g-mid);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-family: 'Sora', sans-serif;
+}
+
+.apill {
+  background: var(--g-light);
+  color: var(--g-mid);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-family: 'Sora', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ---- FORM ELEMENTS ---- */
+.input-field {
+  width: 100%;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--rsm);
+  padding: 12px 16px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.input-field:focus {
+  border-color: var(--g-dark);
+}
+
+/* ---- UTILITIES ---- */
+.container { 
+  max-width: 1200px; 
+  margin: 0 auto; 
+  padding: 0 20px; 
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.muted-text {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ---- SCROLL FADE EFFECT ---- */
+.fade-up {
+  opacity: 0; 
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1; 
+  transform: translateY(0);
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 768px) {
+  .container { padding: 0 16px; }
+  .flex-mobile-column { flex-direction: column; }
+}

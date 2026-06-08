@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lala — Host Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="icon" href="data:,">
+  <style>
+    /* Local overrides for Host Dashboard */
+    body { background: var(--bg); }
+    
+    .dash-nav {
+      background: var(--g-dark); padding: 16px 18px 24px; color: #fff;
+    }
+    .dash-header { display: flex; justify-content: space-between; align-items: flex-end; }
+    
+    .main-dash { padding: 20px 18px; display: flex; flex-direction: column; gap: 20px; }
+    
+    .srow { display: flex; gap: 10px; }
+    .scard { 
+      flex: 1; background: var(--g-dark); border-radius: var(--rsm); padding: 14px 10px; color: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .scard.blu { background: #1565C0; }
+    .scard.gld { background: var(--gold); color: #3E2700; }
+    .sval { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; }
+    .slbl { font-size: 10px; opacity: 0.8; margin-top: 2px; }
+
+    .bitem {
+      background: var(--card); border-radius: var(--rsm); border: 1px solid var(--border);
+      padding: 12px; display: flex; align-items: center; gap: 10px;
+    }
+    .av {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--g-light);
+      color: var(--g-dark); display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 12px; font-family: 'Sora', sans-serif; flex-shrink: 0;
+    }
+    .bname { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 13px; color: var(--text); }
+    .bdates { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .bstat { 
+      margin-left: auto; font-size: 10px; font-weight: 600; padding: 4px 10px; 
+      border-radius: 99px; font-family: 'Sora', sans-serif;
+    }
+    .conf { background: var(--g-light); color: var(--g-mid); }
+    .pend { background: var(--gold-lt); color: #7B4F00; }
+
+    .dash-footer {
+      position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
+      border-top: 1px solid var(--border); padding: 10px 0 14px;
+      display: flex; justify-content: space-around;
+    }
+    .bni {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      color: var(--muted); font-size: 10px; font-weight: 500; font-family: 'Sora', sans-serif;
+      text-decoration: none;
+    }
+    .bni.on { color: var(--g-dark); }
+    .bni i { font-size: 20px; }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <div class="dash-nav">
+    <div style="margin-bottom: 12px;">
+      <img src="logo-removebg-preview.png" alt="Lala Logo" style="height: 28px; filter: brightness(0) invert(1);">
+    </div>
+    <div class="dash-header">
+      <div>
+        <div style="font-size: 11px; color: rgba(255,255,255,0.7);">Welcome back</div>
+        <div class="sora" style="font-weight: 700; font-size: 18px;">Bwalya Phiri</div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 10px; color: rgba(255,255,255,0.7);">This month</div>
+        <div class="sora" style="font-weight: 700; font-size: 20px; color: var(--gold);">K4,320</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="main-dash container">
+    <div class="srow fade-up">
+      <div class="scard"><div class="sval">24</div><div class="slbl">Bookings</div></div>
+      <div class="scard blu"><div class="sval">87%</div><div class="slbl">Occupancy</div></div>
+      <div class="scard gld"><div class="sval">4.5★</div><div class="slbl">Rating</div></div>
+    </div>
+
+    <div class="fade-up">
+      <div class="sora" style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">Upcoming Bookings</div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div class="bitem">
+          <div class="av">CM</div>
+          <div>
+            <div class="bname">Chanda Mulenga</div>
+            <div class="bdates">26–28 May · 2 nights</div>
+          </div>
+          <div class="bstat conf">Confirmed</div>
+        </div>
+        <div class="bitem">
+          <div class="av">JB</div>
+          <div>
+            <div class="bname">Joseph Banda</div>
+            <div class="bdates">30 May–1 Jun · 2 nights</div>
+          </div>
+          <div class="bstat pend">Pending</div>
+        </div>
+        <div class="bitem">
+          <div class="av">NT</div>
+          <div>
+            <div class="bname">Namwali Tembo</div>
+            <div class="bdates">4–6 Jun · 2 nights</div>
+          </div>
+          <div class="bstat conf">Confirmed</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 10px;" class="fade-up">
+      <button class="btn-green" style="flex: 1; font-size: 13px; padding: 12px 0;">
+        <i class="ti ti-plus"></i> Add Listing
+      </button>
+      <button class="btn-outline" style="flex: 1; font-size: 13px; padding: 12px 0;">
+        View Payouts
+      </button>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="dash-footer">
+    <a href="#" class="bni"><i class="ti ti-dashboard"></i><span>Overview</span></a>
+    <a href="#" class="bni"><i class="ti ti-building"></i><span>Listings</span></a>
+    <a href="#" class="bni on"><i class="ti ti-calendar"></i><span>Bookings</span></a>
+    <a href="#" class="bni"><i class="ti ti-chart-bar"></i><span>Analytics</span></a>
+    <a href="index.html" class="bni"><i class="ti ti-home"></i><span>Home</span></a>
+  </div>
+
+  <script>
+    (function() {
+      const faders = document.querySelectorAll('.fade-up');
+      const appearOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
+      const appearOnScroll = new IntersectionObserver(function(entries, observer) {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        });
+      }, appearOptions);
+      faders.forEach(fader => appearOnScroll.observe(fader));
+    })();
+  </script>
+</body>
+</html>

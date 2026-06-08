@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lala — WhatsApp Booking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="icon" href="data:,">
+  <style>
+    /* Local overrides for WhatsApp flow */
+    body { background: #E9EDE6; padding: 0; }
+    
+    .wa-container {
+      max-width: 500px; margin: 0 auto; min-height: 100vh;
+      display: flex; flex-direction: column; background: #ECE5DD;
+      box-shadow: 0 0 40px rgba(0,0,0,0.1);
+    }
+    
+    .wa-hdr {
+      background: #075E54; padding: 12px 16px; display: flex; align-items: center; gap: 12px; color: #fff;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .wa-back { font-size: 20px; color: #fff; text-decoration: none; }
+    .wa-av { 
+      width: 38px; height: 38px; border-radius: 50%; background: #25D366; 
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .wa-nm { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 15px; }
+    .wa-ol { font-size: 11px; color: rgba(255,255,255,0.7); }
+
+    .wa-body { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+    
+    .wa-bbl {
+      padding: 8px 12px; border-radius: 10px; font-size: 13px; line-height: 1.5;
+      max-width: 85%; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    }
+    .recv { background: #fff; align-self: flex-start; border-top-left-radius: 0; color: #111; }
+    .sent { background: #DCF8C6; align-self: flex-end; border-top-right-radius: 0; color: #111; }
+    .wa-t { font-size: 10px; color: rgba(0,0,0,0.4); text-align: right; margin-top: 4px; }
+
+    .wa-bk {
+      background: #fff; border-radius: 10px; border-left: 5px solid #25D366;
+      padding: 12px; align-self: flex-start; max-width: 85%;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .wa-bk-title { font-weight: 700; font-size: 13px; color: #075E54; font-family: 'Sora', sans-serif; margin-bottom: 6px; }
+    .wa-bk-detail { font-size: 12px; color: #555; line-height: 1.6; }
+    
+    .wa-inp {
+      background: #F0F0F0; padding: 10px 14px; display: flex; gap: 10px;
+      align-items: center; position: sticky; bottom: 0;
+    }
+    .wa-inp-field {
+      flex: 1; background: #fff; border-radius: 24px; padding: 10px 16px;
+      font-size: 14px; color: var(--muted); border: none; outline: none;
+    }
+    .wa-send-btn {
+      width: 44px; height: 44px; border-radius: 50%; background: #25D366;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      border: none;
+    }
+    .wa-send-btn i { color: #fff; font-size: 20px; }
+  </style>
+</head>
+<body>
+  <div class="wa-container">
+    <!-- HEADER -->
+    <div class="wa-hdr">
+      <a href="listing-detail.html" class="wa-back"><i class="ti ti-arrow-left"></i></a>
+      <div class="wa-av"><i class="ti ti-building-estate"></i></div>
+      <div>
+        <div class="wa-nm">Sunrise Guesthouse</div>
+        <div class="wa-ol">via Lala</div>
+      </div>
+      <img src="logo-removebg-preview.png" alt="Lala Logo" style="height: 20px; margin-left: auto; filter: brightness(0) invert(1); opacity: 0.8;">
+    </div>
+
+    <!-- BODY -->
+    <div class="wa-body">
+      <div class="wa-bbl recv fade-up">
+        Hello! Welcome to Sunrise Guesthouse. How can I help you?
+        <div class="wa-t">9:30 AM</div>
+      </div>
+
+      <div class="wa-bk fade-up">
+        <div class="wa-bk-title"><i class="ti ti-clipboard-list"></i> Booking Request via Lala</div>
+        <div class="wa-bk-detail">
+          <strong>Property:</strong> Sunrise Guesthouse<br>
+          <strong>Check-in:</strong> Mon, 26 May 2026<br>
+          <strong>Check-out:</strong> Wed, 28 May 2026<br>
+          <strong>Guests:</strong> 1 Guest · 2 nights
+        </div>
+        <div style="margin-top: 8px; font-size: 13px; font-weight: 700; color: #075E54; font-family: 'Sora', sans-serif;">
+          Total: K360
+        </div>
+      </div>
+
+      <div class="wa-bbl recv fade-up">
+        Confirmed: Rooms are available for those dates! Please confirm your booking and I'll send the mobile money details.
+        <div class="wa-t">9:33 AM</div>
+      </div>
+
+      <div class="wa-bbl sent fade-up">
+        I'd like to confirm. I'll pay via MTN Mobile Money.
+        <div class="wa-t">9:34 AM</div>
+      </div>
+
+      <div class="wa-bbl recv fade-up">
+        Perfect! Please send K360 to MTN <strong>0977 000 111</strong>. Send me the proof of payment and your room will be officially confirmed.
+        <div class="wa-t">9:35 AM</div>
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="wa-inp">
+      <div class="wa-inp-field">Type a message...</div>
+      <button class="wa-send-btn" onclick="window.location.href='index.html'">
+        <i class="ti ti-send"></i>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const faders = document.querySelectorAll('.fade-up');
+      const appearOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
+      const appearOnScroll = new IntersectionObserver(function(entries, observer) {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        });
+      }, appearOptions);
+      faders.forEach(fader => appearOnScroll.observe(fader));
+    })();
+  </script>
+</body>
+</html>
