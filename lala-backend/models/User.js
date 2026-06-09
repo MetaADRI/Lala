@@ -17,7 +17,7 @@ const User = sequelize.define('User', {
     allowNull: true
   },
   role: {
-    type: DataTypes.ENUM('guest', 'host', 'admin'),
+    type: DataTypes.STRING,
     defaultValue: 'guest'
   },
   otp: {
