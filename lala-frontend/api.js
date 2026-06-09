@@ -1,4 +1,7 @@
-const API_BASE = 'http://localhost:5000/api';
+// Use environment variable for API URL, fallback to localhost for development
+const API_BASE = window.API_URL || 'http://localhost:5000/api';
+
+console.log('🔗 Connected to API:', API_BASE);
 
 const api = {
   // AUTH
