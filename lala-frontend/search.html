@@ -135,7 +135,7 @@
                 <div class="vbadge" style="margin-top: 8px;"><i class="ti ti-rosette-discount-check"></i> Verified Host</div>
                 <div class="lrow">
                   <div class="lprice">K${listing.price} <span class="lprice-sub">/night</span></div>
-                  <button class="btn-green" style="padding: 8px 16px; font-size: 12px;" onclick="event.preventDefault(); window.location.href='whatsapp-booking.html?id=${listing.id}'"><i class="ti ti-brand-whatsapp"></i> Book via WA</button>
+                  <button class="btn-green" style="padding: 8px 16px; font-size: 12px;" onclick="event.preventDefault(); handleWhatsAppBooking('${listing.id}', '${listing.name}')"><i class="ti ti-brand-whatsapp"></i> Book via WA</button>
                 </div>
               </div>
             </a>
@@ -146,6 +146,15 @@
         countEl.innerText = 'Failed to load stays';
         console.error(err);
       }
+    }
+
+    function handleWhatsAppBooking(id, name) {
+      const message = `Hi, I'm interested in booking ${name}. Is it available? (via Lala)`;
+      const encoded = encodeURIComponent(message);
+      const hostPhone = "260977000111"; 
+      const waUrl = `https://wa.me/${hostPhone}?text=${encoded}`;
+      console.log('Logging booking intent for:', id);
+      window.open(waUrl, '_blank');
     }
 
     loadListings();

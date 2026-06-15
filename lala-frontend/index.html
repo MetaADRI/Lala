@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="common.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
+  <link rel="manifest" href="manifest.json">
   <style>
     /* Local overrides for index.html */
     
@@ -143,7 +144,7 @@
   <!-- HERO -->
   <div class="hero">
     <video autoplay muted loop playsinline class="hero-video">
-      <source src="https://player.vimeo.com/external/494250269.sd.mp4?s=1240c03666d9f8c0e271427c3d2f928c257d079c&profile_id=165" type="video/mp4">
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-view-of-a-beautiful-resort-with-a-pool-and-palm-trees-1188-large.mp4" type="video/mp4">
     </video>
     <div class="hero-overlay"></div>
     <div class="container">
@@ -261,6 +262,14 @@
 
       faders.forEach(fader => appearOnScroll.observe(fader));
     })();
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('SW Registered', reg))
+          .catch(err => console.log('SW registration failed', err));
+      });
+    }
   </script>
 </body>
 </html>

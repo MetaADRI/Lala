@@ -151,7 +151,7 @@
           </div>
 
           <div class="action-bar fade-up visible">
-            <a href="whatsapp-booking.html?id=${listing.id}" class="btn-green"><i class="ti ti-brand-whatsapp"></i> Book via WhatsApp</a>
+            <button onclick="handleWhatsAppBooking('${listing.id}', '${listing.name}', ${listing.price})" class="btn-green"><i class="ti ti-brand-whatsapp"></i> Book via WhatsApp</button>
             <a href="payment.html?id=${listing.id}" class="btn-gold"><i class="ti ti-device-mobile"></i> Pay with Mobile Money</a>
           </div>
         `;
@@ -159,6 +159,24 @@
         container.innerHTML = '<div class="sora">Failed to load details</div>';
         console.error(err);
       }
+    }
+
+    function handleWhatsAppBooking(id, name, price) {
+      const checkIn = "Mon, 26 May 2026"; // Mocked for now
+      const checkOut = "Wed, 28 May 2026"; // Mocked for now
+      const guestCount = 1;
+      
+      const message = `Hi, I'd like to book ${name} from ${checkIn} to ${checkOut} for ${guestCount} guest(s). Is it available? (via Lala)`;
+      const encoded = encodeURIComponent(message);
+      
+      // Using a mock host number for Phase 1
+      const hostPhone = "260977000111"; 
+      const waUrl = `https://wa.me/${hostPhone}?text=${encoded}`;
+      
+      // Log intent for analytics as per PRD FR-G-003
+      console.log('Logging booking intent for:', id);
+      
+      window.open(waUrl, '_blank');
     }
 
     loadListingDetail();
