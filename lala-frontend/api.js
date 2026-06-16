@@ -72,6 +72,58 @@ const api = {
     const res = await fetch(`${API_BASE}/bookings/host/all`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
+    if (res.status === 401) api.logout();
     return res.json();
+  },
+
+  createListing: async (listingData) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/listings`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(listingData)
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  getPendingListings: async () => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/listings/pending`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  approveListing: async (id) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/listings/${id}/approve`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  logout: () => {
+    localStorage.removeItem('lala_token');
+    localStorage.removeItem('lala_user');
+    window.location.href = 'signup.html';
+  },
+
+  isLoggedIn: () => {
+    return !!localStorage.getItem('lala_token');
+  },
+
+  getUser: () => {
+    try {
+      return JSON.parse(localStorage.getItem('lala_user'));
+    } catch {
+      return null;
+    }
   }
 };

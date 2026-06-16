@@ -1,6 +1,7 @@
 const sequelize = require('./config/database');
 const User = require('./models/User');
 const Listing = require('./models/Listing');
+require('dotenv').config();
 
 const seedData = async () => {
   try {
@@ -14,6 +15,16 @@ const seedData = async () => {
       role: 'host',
       isVerified: true
     });
+
+    // Create a default Admin
+    const admin = await User.create({
+      phone: '0977999999',
+      name: 'Lala Admin',
+      role: 'admin',
+      isVerified: true
+    });
+
+    console.log('✓ Admin account created: 0977999999');
 
     // Create initial Listings
     await Listing.bulkCreate([

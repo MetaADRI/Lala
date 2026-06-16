@@ -60,22 +60,40 @@
     }
     .bni.on { color: var(--g-dark); }
     .bni i { font-size: 20px; }
+
+    /* Modal Styling */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+      background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-content {
+      background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 500px;
+      max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    .input-group { margin-bottom: 16px; }
+    .input-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--muted); }
+    .input-group input, .input-group select {
+      width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 14px; outline: none; transition: border-color 0.2s;
+    }
+    .input-group input:focus { border-color: var(--g-mid); }
   </style>
 </head>
 <body>
   <!-- HEADER -->
   <div class="dash-nav">
-    <div style="margin-bottom: 12px;">
+    <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
       <img src="logo-removebg-preview.png" alt="Lala Logo" style="height: 28px; filter: brightness(0) invert(1);">
+      <button onclick="logout()" style="background:transparent; border:none; color:#fff; font-size:12px; opacity:0.7;">Logout</button>
     </div>
     <div class="dash-header">
       <div>
         <div style="font-size: 11px; color: rgba(255,255,255,0.7);">Welcome back</div>
-        <div class="sora" style="font-weight: 700; font-size: 18px;">Bwalya Phiri</div>
+        <div class="sora" id="hostName" style="font-weight: 700; font-size: 18px;">Loading...</div>
       </div>
       <div style="text-align: right;">
-        <div style="font-size: 10px; color: rgba(255,255,255,0.7);">This month</div>
-        <div class="sora" style="font-weight: 700; font-size: 20px; color: var(--gold);">K4,320</div>
+        <div style="font-size: 10px; color: rgba(255,255,255,0.7);">Total Revenue</div>
+        <div class="sora" id="totalRevenue" style="font-weight: 700; font-size: 20px; color: var(--gold);">K0</div>
       </div>
     </div>
   </div>
@@ -83,61 +101,166 @@
   <!-- CONTENT -->
   <div class="main-dash container">
     <div class="srow fade-up">
-      <div class="scard"><div class="sval">24</div><div class="slbl">Bookings</div></div>
-      <div class="scard blu"><div class="sval">87%</div><div class="slbl">Occupancy</div></div>
+      <div class="scard"><div class="sval" id="bookingCount">0</div><div class="slbl">Bookings</div></div>
+      <div class="scard blu"><div class="sval" id="occupancyRate">87%</div><div class="slbl">Occupancy</div></div>
       <div class="scard gld"><div class="sval">4.5★</div><div class="slbl">Rating</div></div>
     </div>
 
     <div class="fade-up">
-      <div class="sora" style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">Upcoming Bookings</div>
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <div class="bitem">
-          <div class="av">CM</div>
-          <div>
-            <div class="bname">Chanda Mulenga</div>
-            <div class="bdates">26–28 May · 2 nights</div>
-          </div>
-          <div class="bstat conf">Confirmed</div>
-        </div>
-        <div class="bitem">
-          <div class="av">JB</div>
-          <div>
-            <div class="bname">Joseph Banda</div>
-            <div class="bdates">30 May–1 Jun · 2 nights</div>
-          </div>
-          <div class="bstat pend">Pending</div>
-        </div>
-        <div class="bitem">
-          <div class="av">NT</div>
-          <div>
-            <div class="bname">Namwali Tembo</div>
-            <div class="bdates">4–6 Jun · 2 nights</div>
-          </div>
-          <div class="bstat conf">Confirmed</div>
-        </div>
+      <div class="sora" style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">Recent Bookings</div>
+      <div id="bookingsList" style="display: flex; flex-direction: column; gap: 10px;">
+        <!-- Dynamic Bookings -->
+        <div class="muted-text" style="text-align:center; padding:20px;">Loading bookings...</div>
       </div>
     </div>
 
     <div style="display: flex; gap: 10px;" class="fade-up">
-      <button class="btn-green" style="flex: 1; font-size: 13px; padding: 12px 0;">
+      <button onclick="toggleModal('listingModal')" class="btn-green" style="flex: 1; font-size: 13px; padding: 12px 0;">
         <i class="ti ti-plus"></i> Add Listing
       </button>
-      <button class="btn-outline" style="flex: 1; font-size: 13px; padding: 12px 0;">
-        View Payouts
-      </button>
+    </div>
+  </div>
+
+  <!-- ADD LISTING MODAL -->
+  <div id="listingModal" class="modal">
+    <div class="modal-content">
+      <div class="flex-between" style="margin-bottom: 20px;">
+        <h2 class="sora" style="font-size:18px;">New Listing</h2>
+        <i class="ti ti-x" onclick="toggleModal('listingModal')" style="cursor:pointer; font-size: 20px;"></i>
+      </div>
+      <form id="listingForm">
+        <div class="input-group">
+          <label>Property Name</label>
+          <input type="text" name="name" placeholder="e.g. Sunrise Guesthouse" required>
+        </div>
+        <div class="input-group">
+          <label>Type</label>
+          <select name="type" required>
+            <option value="Guesthouse">Guesthouse</option>
+            <option value="Lodge">Lodge</option>
+            <option value="Hostel">Hostel</option>
+            <option value="Rest House">Rest House</option>
+          </select>
+        </div>
+        <div class="srow">
+          <div class="input-group" style="flex:1;">
+            <label>City</label>
+            <input type="text" name="city" placeholder="e.g. Lusaka" required>
+          </div>
+          <div class="input-group" style="flex:1;">
+            <label>District</label>
+            <input type="text" name="district" placeholder="e.g. Central" required>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Price per Night (ZMW)</label>
+          <input type="number" name="price" placeholder="150" required>
+        </div>
+        <div class="input-group">
+          <label>Amenities (comma separated)</label>
+          <input type="text" name="amenities" placeholder="Wi-Fi, Parking, Hot Water">
+        </div>
+        <button type="submit" class="btn-green" style="width: 100%; margin-top: 10px;">Submit for Review</button>
+      </form>
     </div>
   </div>
 
   <!-- BOTTOM NAV -->
   <div class="dash-footer">
-    <a href="#" class="bni"><i class="ti ti-dashboard"></i><span>Overview</span></a>
-    <a href="#" class="bni"><i class="ti ti-building"></i><span>Listings</span></a>
-    <a href="#" class="bni on"><i class="ti ti-calendar"></i><span>Bookings</span></a>
-    <a href="#" class="bni"><i class="ti ti-chart-bar"></i><span>Analytics</span></a>
+    <a href="#" class="bni on"><i class="ti ti-dashboard"></i><span>Overview</span></a>
+    <div id="adminLink" style="display:none;">
+      <a href="admin-portal.html" class="bni"><i class="ti ti-shield-check"></i><span>Admin</span></a>
+    </div>
+    <a href="search.html" class="bni"><i class="ti ti-search"></i><span>Browse</span></a>
     <a href="index.html" class="bni"><i class="ti ti-home"></i><span>Home</span></a>
   </div>
 
+  <script src="api.js"></script>
   <script>
+    const user = JSON.parse(localStorage.getItem('lala_user'));
+    if (!user || (user.role !== 'host' && user.role !== 'admin')) {
+      window.location.href = 'signup.html';
+    }
+
+    if (user.role === 'admin') {
+      document.getElementById('adminLink').style.display = 'block';
+    }
+
+    document.getElementById('hostName').innerText = user.name || user.phone;
+
+    async function loadDashboard() {
+      try {
+        const bookings = await api.getHostBookings();
+        const listEl = document.getElementById('bookingsList');
+        const totalRevEl = document.getElementById('totalRevenue');
+        const bookingCountEl = document.getElementById('bookingCount');
+        
+        bookingCountEl.innerText = bookings.length;
+        let totalRev = 0;
+        
+        listEl.innerHTML = '';
+        if (bookings.length === 0) {
+          listEl.innerHTML = '<div class="muted-text" style="text-align:center; padding:20px;">No bookings yet.</div>';
+        }
+
+        bookings.forEach(b => {
+          totalRev += b.totalAmount;
+          const initials = "G"; // Placeholder for guest
+          listEl.insertAdjacentHTML('beforeend', `
+            <div class="bitem">
+              <div class="av">${initials}</div>
+              <div>
+                <div class="bname">Booking #${b.id.split('-')[0]}</div>
+                <div class="bdates">${new Date(b.checkIn).toLocaleDateString()} · K${b.totalAmount}</div>
+              </div>
+              <div class="bstat ${b.status === 'confirmed' ? 'conf' : 'pend'}">${b.status}</div>
+            </div>
+          `);
+        });
+        
+        totalRevEl.innerText = `K${totalRev}`;
+      } catch (err) {
+        console.error(err);
+        document.getElementById('bookingsList').innerHTML = '<div class="muted-text" style="text-align:center; padding:20px; color:red;">Error loading bookings.</div>';
+      }
+    }
+
+    function toggleModal(id) {
+      const modal = document.getElementById(id);
+      modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    document.getElementById('listingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = {
+        name: formData.get('name'),
+        type: formData.get('type'),
+        city: formData.get('city'),
+        district: formData.get('district'),
+        price: parseFloat(formData.get('price')),
+        amenities: formData.get('amenities').split(',').map(a => a.trim()).filter(a => a)
+      };
+
+      try {
+        await api.createListing(data);
+        alert('Listing submitted for review!');
+        toggleModal('listingModal');
+        e.target.reset();
+      } catch (err) {
+        alert('Failed to submit listing');
+      }
+    });
+
+    function logout() {
+      localStorage.removeItem('lala_token');
+      localStorage.removeItem('lala_user');
+      window.location.href = 'index.html';
+    }
+
+    loadDashboard();
+
+    // Scroll Animation
     (function() {
       const faders = document.querySelectorAll('.fade-up');
       const appearOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };

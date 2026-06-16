@@ -1,4 +1,5 @@
 const CACHE_NAME = 'lala-v1';
+const DATA_CACHE_NAME = 'lala-data-v1';
 const ASSETS = [
   '/',
   '/index.html',
@@ -15,6 +16,7 @@ const ASSETS = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
+      console.log('📦 Caching shell assets');
       return cache.addAll(ASSETS);
     })
   );
@@ -24,16 +26,39 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
-      return Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)));
+      return Promise.all(keys.filter(key => key !== CACHE_NAME && key !== DATA_CACHE_NAME).map(key => caches.delete(key)));
     })
   );
 });
 
-// Fetch event - Network first, fallback to cache
+// Fetch event
 self.addEventListener('fetch', event => {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // Cache API responses (Listings)
+  if (url.pathname.includes('/api/listings')) {
+    event.respondWith(
+      caches.open(DATA_CACHE_NAME).then(cache => {
+        return fetch(request)
+          .then(response => {
+            if (response.status === 200) {
+              cache.put(request.url, response.clone());
+            }
+            return response;
+          })
+          .catch(() => {
+            return cache.match(request.url);
+          });
+      })
+    );
+    return;
+  }
+
+  // Shell assets - Cache first, fallback to network
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
+    caches.match(request).then(response => {
+      return response || fetch(request);
     })
   );
 });

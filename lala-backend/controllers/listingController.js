@@ -31,6 +31,15 @@ exports.getListingById = async (req, res) => {
   }
 };
 
+exports.getPendingListings = async (req, res) => {
+  try {
+    const listings = await Listing.findAll({ where: { isApproved: false } });
+    res.json(listings);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.createListing = async (req, res) => {
   try {
     const listing = await Listing.create({

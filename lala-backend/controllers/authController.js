@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const smsService = require('../services/smsService');
 
 exports.requestOTP = async (req, res) => {
   const { phone } = req.body;
@@ -11,12 +12,19 @@ exports.requestOTP = async (req, res) => {
       user = await User.create({ phone });
     }
 
-    // Mock OTP generation
-    const otp = '123456'; 
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
     user.otp = otp;
     await user.save();
 
-    res.json({ message: 'OTP sent successfully (Mock: 123456)', phone });
+    // Send via SMS Service
+    const smsResult = await smsService.sendOTP(phone, otp);
+
+    if (smsResult.success) {
+      res.json({ message: 'OTP sent successfully', phone, mockOtp: process.env.NODE_ENV === 'development' ? otp : undefined });
+    } else {
+      res.status(500).json({ error: 'Failed to send OTP' });
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lala — Admin Verification</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="logo-removebg-preview.png">
+  <style>
+    body { background: #F8F9FA; }
+    .admin-nav { background: #1B5E20; color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .admin-container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+    
+    .pcard {
+      background: #fff; border-radius: 12px; border: 1px solid #E0E0E0; padding: 20px;
+      margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;
+      transition: transform 0.2s;
+    }
+    .pcard:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+    
+    .pinfo h3 { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .ploc { font-size: 13px; color: #666; display: flex; align-items: center; gap: 4px; }
+    .pdetails { font-size: 12px; color: #888; margin-top: 8px; }
+    
+    .pbadge { background: #FFF3E0; color: #E65100; font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; }
+    
+    .action-btns { display: flex; gap: 10px; }
+    .btn-approve { background: #2E7D32; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
+    .btn-reject { background: #F44336; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: #888; }
+    .empty-state i { font-size: 48px; color: #DDD; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <div class="admin-nav">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <img src="logo-removebg-preview.png" alt="Lala" style="height: 24px; filter: brightness(0) invert(1);">
+      <div class="sora" style="font-weight: 700; font-size: 16px; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 12px;">Admin Portal</div>
+    </div>
+    <div style="display: flex; gap: 20px; align-items: center;">
+      <a href="host-dashboard.html" style="color: #fff; text-decoration: none; font-size: 13px; font-weight: 500;">Dashboard</a>
+      <button onclick="logout()" style="background:transparent; border:1px solid rgba(255,255,255,0.3); color:#fff; font-size:12px; padding: 6px 12px; border-radius: 4px; cursor:pointer;">Logout</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="flex-between" style="margin-bottom: 24px;">
+      <h1 class="sora" style="font-size: 22px;">Verification Queue</h1>
+      <div id="queueCount" class="pbadge">0 Pending</div>
+    </div>
+
+    <div id="pendingList">
+      <!-- Listings will be injected here -->
+      <div class="empty-state">
+        <i class="ti ti-loader animate-spin"></i>
+        <p>Loading verification queue...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    const user = JSON.parse(localStorage.getItem('lala_user'));
+    if (!user || user.role !== 'admin') {
+      window.location.href = 'index.html';
+    }
+
+    async function loadQueue() {
+      const listEl = document.getElementById('pendingList');
+      const countEl = document.getElementById('queueCount');
+      
+      try {
+        const listings = await api.getPendingListings();
+        countEl.innerText = `${listings.length} Pending`;
+        
+        listEl.innerHTML = '';
+        if (listings.length === 0) {
+          listEl.innerHTML = `
+            <div class="empty-state">
+              <i class="ti ti-circle-check" style="color: #2E7D32;"></i>
+              <p>Queue is empty. All listings verified!</p>
+            </div>
+          `;
+          return;
+        }
+
+        listings.forEach(l => {
+          listEl.insertAdjacentHTML('beforeend', `
+            <div class="pcard fade-up visible">
+              <div class="pinfo">
+                <h3>${l.name}</h3>
+                <div class="ploc"><i class="ti ti-map-pin"></i> ${l.district}, ${l.city}</div>
+                <div class="pdetails">
+                  Type: <strong>${l.type}</strong> · Price: <strong>K${l.price}</strong> · Host: <strong>${l.hostId.split('-')[0]}</strong>
+                </div>
+              </div>
+              <div class="action-btns">
+                <button onclick="approveListing('${l.id}')" class="btn-approve">Approve</button>
+                <button onclick="rejectListing('${l.id}')" class="btn-reject">Reject</button>
+              </div>
+            </div>
+          `);
+        });
+      } catch (err) {
+        console.error(err);
+        listEl.innerHTML = '<div class="empty-state"><p style="color:red;">Error loading queue. Please check permissions.</p></div>';
+      }
+    }
+
+    async function approveListing(id) {
+      if (!confirm('Approve this listing for publication?')) return;
+      try {
+        await api.approveListing(id);
+        loadQueue();
+      } catch (err) {
+        alert('Approval failed');
+      }
+    }
+
+    function rejectListing(id) {
+      alert('Reject functionality coming soon (requires manual host notification).');
+    }
+
+    function logout() {
+      localStorage.removeItem('lala_token');
+      localStorage.removeItem('lala_user');
+      window.location.href = 'index.html';
+    }
+
+    loadQueue();
+  </script>
+</body>
+</html>

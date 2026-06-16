@@ -1,5 +1,6 @@
 const Booking = require('../models/Booking');
 const Listing = require('../models/Listing');
+const paymentService = require('../services/paymentService');
 
 exports.createBooking = async (req, res) => {
   const { listingId, checkIn, checkOut } = req.body;
@@ -8,9 +9,9 @@ exports.createBooking = async (req, res) => {
     const listing = await Listing.findByPk(listingId);
     if (!listing) return res.status(404).json({ error: 'Listing not found' });
 
-    // Calculate total amount (mock logic: checkOut - checkIn days * price)
+    // Calculate total amount
     const nights = Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24));
-    const totalAmount = nights * listing.price;
+    const totalAmount = (nights || 1) * listing.price;
 
     const booking = await Booking.create({
       listingId,
@@ -44,12 +45,22 @@ exports.initiatePayment = async (req, res) => {
     const booking = await Booking.findByPk(bookingId);
     if (!booking) return res.status(404).json({ error: 'Booking not found' });
 
-    // Mock Mobile Money USSD Push
-    res.json({
-      message: `USSD push initiated on ${phone} for K${booking.totalAmount} via ${provider}. Please enter your PIN to confirm.`,
-      status: 'initiated',
-      bookingId
-    });
+    // Use Payment Service
+    const paymentResult = await paymentService.initiateMomoPush(booking, provider, phone);
+
+    if (paymentResult.success) {
+      booking.status = 'awaiting_payment';
+      await booking.save();
+      
+      res.json({
+        message: paymentResult.message,
+        transactionRef: paymentResult.transactionRef,
+        status: 'initiated',
+        bookingId
+      });
+    } else {
+      res.status(500).json({ error: 'Failed to initiate payment' });
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

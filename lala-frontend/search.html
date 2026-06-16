@@ -78,16 +78,16 @@
     <div class="search-nav-top">
       <div class="sbar-field">
         <i class="ti ti-search"></i>
-        <span>Kitwe, Copperbelt</span>
+        <input type="text" id="citySearch" placeholder="Enter city (e.g. Lusaka)" style="background:transparent; border:none; color:#fff; outline:none; font-size:14px; width:100%;">
       </div>
-      <i class="ti ti-adjustments-horizontal" style="font-size: 20px;"></i>
+      <button onclick="applyFilters()" style="background:transparent; border:none; color:#fff; cursor:pointer;"><i class="ti ti-search" style="font-size: 20px;"></i></button>
     </div>
-    <div class="frow">
-      <div class="fchip on">All Stays</div>
-      <div class="fchip">Guesthouse</div>
-      <div class="fchip">Lodge</div>
-      <div class="fchip">Hostel</div>
-      <div class="fchip">Rest House</div>
+    <div class="frow" id="typeFilters">
+      <div class="fchip on" data-type="">All Stays</div>
+      <div class="fchip" data-type="Guesthouse">Guesthouse</div>
+      <div class="fchip" data-type="Lodge">Lodge</div>
+      <div class="fchip" data-type="Hostel">Hostel</div>
+      <div class="fchip" data-type="Rest House">Rest House</div>
     </div>
   </div>
 
@@ -99,18 +99,19 @@
         <i class="ti ti-arrows-sort"></i> Price: Low to High
       </div>
     </div>
-    <!-- Dynamic listings will be injected here -->
   </div>
 
   <script src="config.js"></script>
   <script src="api.js"></script>
   <script>
+    let currentFilters = { city: '', type: '' };
+
     async function loadListings() {
       const container = document.getElementById('listingsContainer');
       const countEl = document.getElementById('resultsCount');
       
       try {
-        const listings = await api.getListings();
+        const listings = await api.getListings(currentFilters);
         countEl.innerText = `${listings.length} stays found`;
         
         // Clear previous results (except the count header)
@@ -118,10 +119,15 @@
         container.innerHTML = '';
         container.appendChild(header);
 
+        if (listings.length === 0) {
+          container.insertAdjacentHTML('beforeend', '<div class="sora" style="text-align:center; padding:40px; color:var(--muted);">No stays found matching your search.</div>');
+          return;
+        }
+
         listings.forEach(listing => {
           const card = `
             <a href="listing-detail.html?id=${listing.id}" class="lcard fade-up visible">
-              <div class="limg green" style="background: url('${listing.photos[0]}') center/cover;">
+              <div class="limg green" style="background: url('${listing.photos[0] || ''}') center/cover;">
                 ${!listing.photos[0] ? '<i class="ti ti-home"></i>' : ''}
               </div>
               <div class="lbody">
@@ -148,20 +154,36 @@
       }
     }
 
+    function applyFilters() {
+      currentFilters.city = document.getElementById('citySearch').value;
+      loadListings();
+    }
+
+    // Handle Chip Clicks
+    document.getElementById('typeFilters').addEventListener('click', (e) => {
+      if (e.target.classList.contains('fchip')) {
+        document.querySelectorAll('.fchip').forEach(c => c.classList.remove('on'));
+        e.target.classList.add('on');
+        currentFilters.type = e.target.dataset.type;
+        loadListings();
+      }
+    });
+
+    // Initial load
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('city')) {
+      document.getElementById('citySearch').value = urlParams.get('city');
+      currentFilters.city = urlParams.get('city');
+    }
+    loadListings();
+
     function handleWhatsAppBooking(id, name) {
       const message = `Hi, I'm interested in booking ${name}. Is it available? (via Lala)`;
       const encoded = encodeURIComponent(message);
       const hostPhone = "260977000111"; 
       const waUrl = `https://wa.me/${hostPhone}?text=${encoded}`;
-      console.log('Logging booking intent for:', id);
       window.open(waUrl, '_blank');
     }
-
-    loadListings();
-
-    (function() {
-      // Intersection Observer logic remains...
-    })();
   </script>
 </body>
 </html>
