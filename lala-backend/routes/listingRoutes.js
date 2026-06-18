@@ -8,5 +8,6 @@ router.get('/pending', authMiddleware, roleMiddleware(['admin']), listingControl
 router.get('/:id', listingController.getListingById);
 router.post('/', authMiddleware, roleMiddleware(['host', 'admin']), listingController.createListing);
 router.patch('/:id/approve', authMiddleware, roleMiddleware(['admin']), listingController.approveListing);
+router.delete('/:id/reject', authMiddleware, roleMiddleware(['admin']), listingController.rejectListing);
 
 module.exports = router;

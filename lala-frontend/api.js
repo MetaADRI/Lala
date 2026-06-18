@@ -4,7 +4,7 @@ const API_BASE = window.API_URL || 'http://localhost:5000/api';
 console.log('🔗 Connected to API:', API_BASE);
 
 const api = {
-  // AUTH
+  // ─── AUTH ──────────────────────────────────────────────────────────────────
   requestOTP: async (phone) => {
     const res = await fetch(`${API_BASE}/auth/request-otp`, {
       method: 'POST',
@@ -28,10 +28,12 @@ const api = {
     return data;
   },
 
-  // LISTINGS
+  // ─── LISTINGS ──────────────────────────────────────────────────────────────
   getListings: async (filters = {}) => {
-    const params = new URLSearchParams(filters).toString();
-    const res = await fetch(`${API_BASE}/listings?${params}`);
+    // Remove empty filter values so the URL stays clean
+    const clean = Object.fromEntries(Object.entries(filters).filter(([_, v]) => v));
+    const params = new URLSearchParams(clean).toString();
+    const res = await fetch(`${API_BASE}/listings${params ? '?' + params : ''}`);
     return res.json();
   },
 
@@ -40,30 +42,57 @@ const api = {
     return res.json();
   },
 
-  // BOOKINGS
-  createBooking: async (bookingData) => {
+  // ─── BOOKINGS ──────────────────────────────────────────────────────────────
+  /**
+   * Creates a booking AND initiates mobile money payment in one call.
+   * @param {Object} data - { listingId, checkIn, checkOut, provider, phone }
+   * @returns { booking, message, transactionRef }
+   */
+  createBooking: async (data) => {
     const token = localStorage.getItem('lala_token');
     const res = await fetch(`${API_BASE}/bookings`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(bookingData)
+      body: JSON.stringify(data)
     });
+    if (res.status === 401) api.logout();
     return res.json();
   },
 
-  initiatePayment: async (paymentData) => {
+  /**
+   * Fetches a single booking by ID (for the confirmation page).
+   */
+  getBooking: async (id) => {
     const token = localStorage.getItem('lala_token');
-    const res = await fetch(`${API_BASE}/bookings/pay`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(paymentData)
+    const res = await fetch(`${API_BASE}/bookings/${id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
     });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  /**
+   * Confirm a booking after payment succeeds (called by polling or webhook).
+   */
+  confirmBooking: async (id) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/bookings/${id}/confirm`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  getGuestBookings: async () => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/bookings/guest/all`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
     return res.json();
   },
 
@@ -76,11 +105,12 @@ const api = {
     return res.json();
   },
 
+  // ─── HOST / ADMIN ──────────────────────────────────────────────────────────
   createListing: async (listingData) => {
     const token = localStorage.getItem('lala_token');
     const res = await fetch(`${API_BASE}/listings`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
@@ -109,6 +139,7 @@ const api = {
     return res.json();
   },
 
+  // ─── HELPERS ───────────────────────────────────────────────────────────────
   logout: () => {
     localStorage.removeItem('lala_token');
     localStorage.removeItem('lala_user');

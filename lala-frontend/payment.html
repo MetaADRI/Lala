@@ -10,143 +10,357 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
-    /* Local overrides for payment.html */
-    body { background: var(--bg); }
-    
+    body { background: var(--bg); padding-bottom: 20px; }
+
+    /* ── GOLD HEADER ──────────────────────────────────────────────────── */
     .gold-hdr {
-      background: linear-gradient(135deg, #F9A825, #F57F17); padding: 20px 18px 24px;
+      background: linear-gradient(135deg, #F9A825, #E65100);
+      padding: 18px 18px 28px; position: relative;
     }
     .back-btn { font-size: 20px; color: #3E2700; text-decoration: none; }
-    .gold-hdr-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; color: #3E2700; margin-left: 12px; }
-    
+    .gold-hdr-title {
+      font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px;
+      color: #3E2700; margin-left: 12px;
+    }
     .pay-summary {
-      background: rgba(255,255,255,0.25); border-radius: 12px; padding: 16px; margin-top: 16px;
+      background: rgba(255,255,255,0.28); border-radius: 14px;
+      padding: 16px; margin-top: 16px; backdrop-filter: blur(4px);
     }
-    .pay-amount { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 32px; color: #3E2700; }
-    .pay-detail { font-size: 12px; color: rgba(62,39,0,0.7); margin-top: 2px; }
+    .pay-amount { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 36px; color: #3E2700; }
+    .pay-meta { font-size: 12px; color: rgba(62,39,0,0.65); margin-top: 4px; }
+    .pay-dates { font-size: 11px; color: rgba(62,39,0,0.55); margin-top: 2px; }
 
+    /* ── BODY ─────────────────────────────────────────────────────────── */
     .payment-body { padding: 20px 18px; display: flex; flex-direction: column; gap: 16px; }
-    
+
+    .section-title { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; color: var(--text); }
+
+    /* ── PROVIDER CARDS ───────────────────────────────────────────────── */
     .pprov {
-      background: var(--card); border: 2.5px solid var(--border); border-radius: var(--rsm);
-      padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer;
-      transition: all 0.2s;
+      background: var(--card); border: 2px solid var(--border); border-radius: var(--r);
+      padding: 14px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer;
+      transition: all 0.2s; position: relative;
     }
-    .pprov.on { border-color: var(--g-dark); }
+    .pprov.on { border-color: var(--g-dark); box-shadow: 0 0 0 3px rgba(27,94,32,0.08); }
     .plogo {
-      width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center;
-      justify-content: center; font-weight: 700; font-size: 11px; font-family: 'Sora', sans-serif;
-      color: #fff; flex-shrink: 0;
+      width: 44px; height: 44px; border-radius: 12px; display: flex;
+      align-items: center; justify-content: center;
+      font-weight: 800; font-size: 10px; font-family: 'Sora', sans-serif;
+      color: #fff; flex-shrink: 0; letter-spacing: 0.02em;
     }
-    .mtn { background: #FFCC00; color: #000; }
+    .mtn  { background: #FFCC00; color: #222; font-size: 11px; }
     .airtel { background: #E0001B; }
     .zamtel { background: #1B5E20; }
     .pname { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; color: var(--text); }
-    .psub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .pchk { color: var(--g-dark); font-size: 20px; margin-left: auto; }
+    .psub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .pchk  { color: var(--g-dark); font-size: 22px; margin-left: auto; display: none; }
+    .pprov.on .pchk { display: block; }
 
+    /* ── PHONE INPUT ──────────────────────────────────────────────────── */
     .phone-box {
-      background: var(--card); border: 1.5px solid var(--g-dark); border-radius: var(--rsm);
-      padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+      background: var(--card); border: 1.5px solid var(--border); border-radius: var(--r);
+      padding: 0; overflow: hidden; display: flex; align-items: center;
+      transition: border-color 0.2s;
     }
+    .phone-box:focus-within { border-color: var(--g-dark); }
+    .phone-prefix {
+      background: var(--g-light); padding: 14px 14px; border-right: 1px solid var(--border);
+      font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700;
+      color: var(--g-dark); flex-shrink: 0;
+    }
+    .phone-input {
+      flex: 1; padding: 14px 14px; border: none; outline: none;
+      font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 500;
+      color: var(--text); background: transparent; letter-spacing: 0.04em;
+    }
+    .phone-input::placeholder { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+
+    /* ── INFO BOX ─────────────────────────────────────────────────────── */
     .info-box {
-      background: var(--g-light); border-radius: 10px; padding: 12px 14px;
-      font-size: 12px; color: var(--g-mid); line-height: 1.6;
+      background: var(--g-light); border-radius: 12px; padding: 14px;
+      font-size: 12px; color: var(--g-mid); line-height: 1.7;
+      border: 1px solid rgba(46,125,50,0.12);
     }
+    .info-box strong { color: var(--g-dark); }
+
+    /* ── PAY BUTTON & STATES ──────────────────────────────────────────── */
+    #payBtn {
+      padding: 16px; font-size: 15px; position: relative;
+      transition: all 0.3s;
+    }
+    #payBtn:disabled {
+      opacity: 0.6; cursor: not-allowed; transform: none !important;
+    }
+    .spinner {
+      width: 18px; height: 18px; border: 2.5px solid rgba(62,39,0,0.3);
+      border-top-color: #3E2700; border-radius: 50%;
+      animation: spin 0.8s linear infinite; display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── USSD WAITING SCREEN ─────────────────────────────────────────── */
+    .ussd-screen {
+      display: none;
+      background: var(--card); border-radius: var(--r); border: 1px solid var(--border);
+      padding: 24px; text-align: center;
+    }
+    .ussd-screen.visible { display: block; }
+    .ussd-icon { font-size: 48px; color: var(--g-dark); margin-bottom: 12px; }
+    .ussd-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 8px; }
+    .ussd-msg { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 280px; margin: 0 auto; }
+    .ussd-ref { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 13px; color: var(--g-dark); margin-top: 12px; }
+    .poll-dots { display: flex; justify-content: center; gap: 6px; margin-top: 16px; }
+    .poll-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--g-mid); animation: pulse 1.4s ease-in-out infinite; }
+    .poll-dot:nth-child(2) { animation-delay: 0.2s; }
+    .poll-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse { 0%,80%,100% { opacity: 0.3; transform: scale(0.9); } 40% { opacity: 1; transform: scale(1); } }
   </style>
 </head>
 <body>
   <!-- HEADER -->
   <div class="gold-hdr">
-    <div style="display: flex; align-items: center; justify-content: space-between;">
-      <div style="display: flex; align-items: center;">
-        <a href="listing-detail.html" class="back-btn"><i class="ti ti-arrow-left"></i></a>
-        <span class="gold-hdr-title">Payment</span>
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div style="display:flex; align-items:center;">
+        <a id="backBtn" href="search.html" class="back-btn"><i class="ti ti-arrow-left"></i></a>
+        <span class="gold-hdr-title">Secure Payment</span>
       </div>
-      <img src="logo-removebg-preview.png" alt="Lala Logo" style="height: 24px;">
+      <img src="logo-removebg-preview.png" alt="Lala" style="height:24px;">
     </div>
-    <div class="pay-summary fade-up">
-      <div style="font-size: 11px; color: rgba(62,39,0,0.6); margin-bottom: 4px;">Total to pay</div>
-      <div class="pay-amount">K360</div>
-      <div class="pay-detail">2 nights · Sunrise Guesthouse</div>
+    <div class="pay-summary">
+      <div style="font-size:11px; color:rgba(62,39,0,0.6); margin-bottom:4px;">Total to pay</div>
+      <div class="pay-amount" id="displayAmount">K—</div>
+      <div class="pay-meta" id="displayMeta">Loading...</div>
+      <div class="pay-dates" id="displayDates"></div>
     </div>
   </div>
 
   <!-- CONTENT -->
   <div class="payment-body container">
-    <div class="sora fade-up" style="font-size: 14px; font-weight: 600;">Select your provider</div>
-    
-    <div class="pprov on fade-up" onclick="selectProvider('MTN', this)">
-      <div class="plogo mtn">MTN</div>
-      <div>
-        <div class="pname">MTN Mobile Money</div>
-        <div class="psub">Fast, secure USSD push</div>
+
+    <!-- Provider selection -->
+    <div id="mainForm">
+      <div class="section-title" style="margin-bottom:10px;">Select your provider</div>
+
+      <div class="pprov on" id="prov-MTN" onclick="selectProvider('MTN')">
+        <div class="plogo mtn">MTN</div>
+        <div>
+          <div class="pname">MTN Mobile Money</div>
+          <div class="psub">Fast USSD push · ~50% market share</div>
+        </div>
+        <i class="ti ti-circle-check-filled pchk"></i>
       </div>
-      <i class="ti ti-circle-check-filled pchk"></i>
-    </div>
 
-    <div class="pprov fade-up" onclick="selectProvider('Airtel', this)">
-      <div class="plogo airtel">AIR</div>
-      <div>
-        <div class="pname">Airtel Money</div>
-        <div class="psub">Fast, secure USSD push</div>
+      <div class="pprov" id="prov-Airtel" onclick="selectProvider('Airtel')" style="margin-top:10px;">
+        <div class="plogo airtel">AIR</div>
+        <div>
+          <div class="pname">Airtel Money</div>
+          <div class="psub">Fast USSD push · Airtel Zambia</div>
+        </div>
+        <i class="ti ti-circle-check-filled pchk"></i>
       </div>
-    </div>
 
-    <div class="pprov fade-up" onclick="selectProvider('Zamtel', this)">
-      <div class="plogo zamtel">ZAM</div>
-      <div>
-        <div class="pname">Zamtel Money</div>
-        <div class="psub">Fast, secure USSD push</div>
+      <div class="pprov" id="prov-Zamtel" onclick="selectProvider('Zamtel')" style="margin-top:10px;">
+        <div class="plogo zamtel">ZAM</div>
+        <div>
+          <div class="pname">Zamtel Money</div>
+          <div class="psub">Secure USSD push · Zamtel network</div>
+        </div>
+        <i class="ti ti-circle-check-filled pchk"></i>
       </div>
-    </div>
 
-    <div class="fade-up" style="margin-top: 8px;">
-      <div class="sora" style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">Your phone number</div>
-      <div class="phone-box">
-        <span style="font-size: 14px; color: var(--muted); font-weight: 600;">+260</span>
-        <span style="font-size: 15px; color: var(--text); font-weight: 500;">97 7654 321</span>
+      <!-- Phone input -->
+      <div style="margin-top:18px;">
+        <div class="section-title" style="margin-bottom:8px;">Your mobile money number</div>
+        <div class="phone-box">
+          <div class="phone-prefix">+260</div>
+          <input class="phone-input" type="tel" id="phoneInput" inputmode="numeric"
+            placeholder="97 000 0000" maxlength="9"
+            oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        </div>
+        <div style="font-size:11px; color:var(--muted); margin-top:5px; padding-left:2px;">Enter your 9-digit number (without country code)</div>
       </div>
+
+      <!-- How it works -->
+      <div class="info-box">
+        <strong>How it works:</strong> After tapping Pay, you will receive a USSD prompt on your phone.
+        Enter your <strong>Mobile Money PIN</strong> to confirm. Your booking is secured instantly.
+        <br><br>
+        <strong>Security:</strong> Lala never stores your PIN. All transactions are encrypted.
+      </div>
+
+      <!-- Pay button -->
+      <button id="payBtn" class="btn-gold" style="width:100%; margin-top:8px;" onclick="handlePayment()">
+        <i class="ti ti-send"></i> <span id="payBtnText">Pay via MTN</span>
+      </button>
     </div>
 
-    <div class="info-box fade-up">
-      <strong>How it works:</strong> You will receive a USSD prompt on your phone. Enter your Mobile Money PIN to confirm. Your booking is confirmed instantly.
+    <!-- USSD waiting screen (shown after payment initiated) -->
+    <div class="ussd-screen" id="ussdScreen">
+      <div class="ussd-icon"><i class="ti ti-device-mobile-vibration"></i></div>
+      <div class="ussd-title">Check your phone</div>
+      <div class="ussd-msg">
+        A USSD prompt has been sent to <strong id="confirmPhone">your phone</strong>.
+        Enter your Mobile Money PIN to complete the payment.
+      </div>
+      <div class="ussd-ref" id="transRef"></div>
+      <div class="poll-dots">
+        <div class="poll-dot"></div>
+        <div class="poll-dot"></div>
+        <div class="poll-dot"></div>
+      </div>
+      <div style="font-size:11px; color:var(--muted); margin-top:12px;">Waiting for confirmation...</div>
+      <button class="btn-outline" style="margin-top:20px; width:100%;" onclick="simulateConfirm()">
+        <i class="ti ti-check"></i> Simulate Confirmation (Dev Mode)
+      </button>
     </div>
 
-    <button id="payBtn" class="btn-gold fade-up" style="padding: 16px; margin-top: 8px;" onclick="handlePayment()">
-      <i class="ti ti-send"></i> Pay K360 via MTN
-    </button>
   </div>
 
+  <script src="config.js"></script>
+  <script src="api.js"></script>
   <script>
-    function selectProvider(name, el) {
-      document.querySelectorAll('.pprov').forEach(p => {
-        p.classList.remove('on');
-        const check = p.querySelector('.pchk');
-        if (check) check.remove();
-      });
-      el.classList.add('on');
-      el.insertAdjacentHTML('beforeend', '<i class="ti ti-circle-check-filled pchk"></i>');
-      document.getElementById('payBtn').innerHTML = `<i class="ti ti-send"></i> Pay K360 via ${name}`;
+    // ── Read URL params passed from listing-detail.html ──────────────────
+    const params = new URLSearchParams(window.location.search);
+    const listingId   = params.get('id')    || '';
+    const listingName = params.get('name')  || 'Your Stay';
+    const checkIn     = params.get('checkIn')  || '';
+    const checkOut    = params.get('checkOut') || '';
+    const nights      = parseInt(params.get('nights') || '1');
+    const total       = parseFloat(params.get('total') || '0');
+    const hostPhone   = params.get('hostPhone') || '';
+
+    let selectedProvider = 'MTN';
+    let createdBookingId = null;
+
+    // ── Populate header summary ──────────────────────────────────────────
+    document.getElementById('displayAmount').textContent = total ? `K${parseFloat(total).toLocaleString()}` : 'K—';
+    document.getElementById('displayMeta').textContent = `${nights} night${nights !== 1 ? 's' : ''} · ${listingName}`;
+    if (checkIn && checkOut) {
+      const fmt = d => new Date(d).toLocaleDateString('en-ZM', { weekday:'short', day:'numeric', month:'short' });
+      document.getElementById('displayDates').textContent = `${fmt(checkIn)} → ${fmt(checkOut)}`;
     }
 
-    function handlePayment() {
-      alert('Payment request sent! Check your phone for the USSD prompt.');
-      window.location.href = 'index.html';
+    // Back button goes to listing detail
+    if (listingId) {
+      document.getElementById('backBtn').href = `listing-detail.html?id=${listingId}`;
     }
 
-    (function() {
-      const faders = document.querySelectorAll('.fade-up');
-      const appearOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
-      const appearOnScroll = new IntersectionObserver(function(entries, observer) {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
+    // Pre-fill phone from logged-in user if available
+    const user = api.getUser();
+    if (user && user.phone) {
+      // Strip country code prefix (260) if present
+      const phone = user.phone.replace(/^260/, '').replace(/\D/g, '');
+      document.getElementById('phoneInput').value = phone;
+    }
+
+    // ── Provider selection ───────────────────────────────────────────────
+    function selectProvider(name) {
+      selectedProvider = name;
+      document.querySelectorAll('.pprov').forEach(p => p.classList.remove('on'));
+      document.getElementById(`prov-${name}`).classList.add('on');
+      document.getElementById('payBtnText').textContent = `Pay K${total ? parseFloat(total).toLocaleString() : '—'} via ${name}`;
+    }
+    // Init button text
+    selectProvider('MTN');
+
+    // ── Initiate payment ─────────────────────────────────────────────────
+    async function handlePayment() {
+      const rawPhone = document.getElementById('phoneInput').value.trim();
+      if (!rawPhone || rawPhone.length < 9) {
+        alert('Please enter a valid 9-digit mobile money number.');
+        return;
+      }
+      if (!listingId) {
+        alert('Booking information is missing. Please go back and try again.');
+        return;
+      }
+      if (!api.isLoggedIn()) {
+        window.location.href = `signup.html?redirect=${encodeURIComponent(window.location.href)}`;
+        return;
+      }
+
+      const phone = `260${rawPhone}`;
+      const btn = document.getElementById('payBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner"></span> Sending USSD prompt...`;
+
+      try {
+        const result = await api.createBooking({
+          listingId,
+          checkIn,
+          checkOut,
+          provider: selectedProvider,
+          phone
         });
-      }, appearOptions);
-      faders.forEach(fader => appearOnScroll.observe(fader));
-    })();
+
+        if (result.error) {
+          throw new Error(result.error);
+        }
+
+        createdBookingId = result.booking.id;
+
+        // Show USSD waiting screen
+        document.getElementById('mainForm').style.display = 'none';
+        document.getElementById('ussdScreen').classList.add('visible');
+        document.getElementById('confirmPhone').textContent = `+${phone}`;
+        document.getElementById('transRef').textContent = result.booking.transactionRef
+          ? `Ref: ${result.booking.transactionRef}`
+          : '';
+
+        // In production: start polling the payment status
+        // For now we show the simulate button for dev testing
+        startPolling();
+
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="ti ti-send"></i> <span id="payBtnText">Pay via ${selectedProvider}</span>`;
+        alert('Payment failed: ' + (err.message || 'Please try again.'));
+        console.error(err);
+      }
+    }
+
+    // ── Polling (mock for Phase 1 dev) ───────────────────────────────────
+    let pollInterval = null;
+    let pollAttempts = 0;
+
+    function startPolling() {
+      // In production: poll GET /api/bookings/:id every 3s for status change
+      // For Phase 1 (mock payments), we just let the simulate button handle it
+      pollInterval = setInterval(async () => {
+        pollAttempts++;
+        // Auto-stop after 2 minutes (40 attempts × 3s)
+        if (pollAttempts > 40) {
+          clearInterval(pollInterval);
+        }
+        // Real implementation: check booking status from backend
+      }, 3000);
+    }
+
+    // ── Dev mode: simulate payment confirmation ──────────────────────────
+    async function simulateConfirm() {
+      if (!createdBookingId) return;
+      try {
+        clearInterval(pollInterval);
+        const result = await api.confirmBooking(createdBookingId);
+        if (result.error) throw new Error(result.error);
+
+        // Redirect to confirmation page
+        const confirmParams = new URLSearchParams({
+          bookingId: createdBookingId,
+          listingName,
+          checkIn,
+          checkOut,
+          nights,
+          total,
+          provider: selectedProvider,
+          transactionRef: result.booking.transactionRef || createdBookingId.split('-')[0].toUpperCase(),
+          hostPhone
+        });
+        window.location.href = `booking-confirmed.html?${confirmParams.toString()}`;
+      } catch (err) {
+        alert('Error confirming booking: ' + err.message);
+      }
+    }
   </script>
 </body>
 </html>

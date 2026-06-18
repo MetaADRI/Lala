@@ -42,6 +42,14 @@ const Listing = sequelize.define('Listing', {
   hostId: {
     type: DataTypes.UUID,
     allowNull: false
+  },
+  hostPhone: {
+    type: DataTypes.STRING,
+    allowNull: true  // Populated from host user record at listing creation
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true
   }
 });
 

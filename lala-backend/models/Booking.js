@@ -30,6 +30,18 @@ const Booking = sequelize.define('Booking', {
   totalAmount: {
     type: DataTypes.FLOAT,
     allowNull: false
+  },
+  provider: {
+    type: DataTypes.STRING,
+    allowNull: true  // 'MTN', 'Airtel', 'Zamtel'
+  },
+  guestPhone: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  transactionRef: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 });
 

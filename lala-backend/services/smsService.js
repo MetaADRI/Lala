@@ -5,31 +5,38 @@ const axios = require('axios');
  * Note: Credentials should be in .env
  */
 const smsService = {
-  sendOTP: async (phone, otp) => {
-    console.log(`[SMS Service] Sending OTP ${otp} to ${phone}`);
-    
-    // Fallback to console log if API keys are missing
+  /**
+   * Generic SMS sender — used for booking confirmations, reminders etc.
+   */
+  sendSMS: async (phone, message) => {
+    console.log(`[SMS Service] Sending SMS to ${phone}: ${message}`);
+
     if (!process.env.AT_USERNAME || !process.env.AT_API_KEY) {
-      console.warn('⚠️ Africa\'s Talking credentials missing. Using mock SMS.');
-      return { success: true, message: 'Mock OTP sent' };
+      console.warn("⚠️ Africa's Talking credentials missing. Using mock SMS.");
+      return { success: true, message: 'Mock SMS sent (credentials not configured)' };
     }
 
     try {
-      const options = {
-        apiKey: process.env.AT_API_KEY,
-        username: process.env.AT_USERNAME,
-      };
-      
-      // Implementation for Africa's Talking SMS API would go here
-      // const AfricasTalking = require('africastalking')(options);
+      // Uncomment when Africa's Talking npm package is installed:
+      // const AfricasTalking = require('africastalking')({
+      //   apiKey: process.env.AT_API_KEY,
+      //   username: process.env.AT_USERNAME,
+      // });
       // const sms = AfricasTalking.SMS;
-      // await sms.send({ to: [phone], message: `Your Lala verification code is: ${otp}` });
-      
+      // await sms.send({ to: [phone], message });
       return { success: true };
     } catch (error) {
       console.error('SMS Send Error:', error);
       return { success: false, error: error.message };
     }
+  },
+
+  /**
+   * OTP-specific wrapper (calls sendSMS internally)
+   */
+  sendOTP: async (phone, otp) => {
+    const msg = `Your Lala verification code is: ${otp}. Valid for 10 minutes. Do not share this code.`;
+    return smsService.sendSMS(phone, msg);
   }
 };
 

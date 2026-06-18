@@ -3,180 +3,442 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala — Sunrise Guesthouse</title>
+  <title>Lala — Listing Details</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="common.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
-    /* Local overrides for listing-detail.html */
-    body { background: var(--bg); }
-    
+    body { background: var(--bg); padding-bottom: 100px; }
+
+    /* ── IMAGE HEADER ──────────────────────────────────────────────── */
     .detail-img {
-      height: 200px; background: linear-gradient(135deg, #A5D6A7, #388E3C);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 60px; position: relative;
+      height: 220px; position: relative; overflow: hidden;
+      background: linear-gradient(135deg, #A5D6A7, #388E3C);
+      display: flex; align-items: center; justify-content: center; font-size: 70px;
+    }
+    .detail-img img.hero-photo {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
     }
     .detail-back {
-      position: absolute; top: 16px; left: 16px; width: 34px; height: 34px;
-      border-radius: 50%; background: rgba(0,0,0,0.3); display: flex;
-      align-items: center; justify-content: center; color: #fff; text-decoration: none;
+      position: absolute; top: 16px; left: 16px; width: 36px; height: 36px;
+      border-radius: 50%; background: rgba(0,0,0,0.38); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; text-decoration: none; z-index: 2; font-size: 18px;
     }
     .detail-save {
-      position: absolute; top: 16px; right: 16px; width: 34px; height: 34px;
-      border-radius: 50%; background: rgba(0,0,0,0.3); display: flex;
-      align-items: center; justify-content: center; color: #fff;
+      position: absolute; top: 16px; right: 16px; width: 36px; height: 36px;
+      border-radius: 50%; background: rgba(0,0,0,0.38); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; z-index: 2; font-size: 18px; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .detail-save.saved { background: #C62828; }
+    .logo-overlay {
+      position: absolute; top: 16px; left: 62px; z-index: 2;
     }
 
-    .detail-body { padding: 20px 18px; display: flex; flex-direction: column; gap: 20px; }
-    
+    /* ── BODY SECTIONS ─────────────────────────────────────────────── */
+    .detail-body { padding: 0 18px 20px; display: flex; flex-direction: column; gap: 16px; }
+
+    .name-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 20px 18px 0; gap: 12px;
+    }
+    .listing-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 20px; color: var(--text); }
+    .price-block { text-align: right; flex-shrink: 0; }
+    .price-main { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 26px; color: var(--g-dark); }
+    .price-sub { font-size: 11px; color: var(--muted); }
+
+    /* ── DATES CARD ─────────────────────────────────────────────────── */
+    .dates-card {
+      background: var(--card); border-radius: var(--r); border: 1px solid var(--border);
+      padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .dates-title { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; margin-bottom: 12px; }
+    .dates-row { display: flex; gap: 10px; }
+    .date-field {
+      flex: 1; background: var(--bg); border-radius: 10px; padding: 10px 12px;
+      border: 1.5px solid var(--border); transition: border-color 0.2s;
+    }
+    .date-field:focus-within { border-color: var(--g-dark); }
+    .date-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+    .date-field input[type="date"] {
+      border: none; background: transparent; font-family: 'Sora', sans-serif;
+      font-weight: 600; font-size: 13px; color: var(--text); outline: none; width: 100%; cursor: pointer;
+    }
+
+    /* ── TOTAL CALC ──────────────────────────────────────────────────── */
+    .price-summary {
+      background: var(--g-light); border-radius: 10px; padding: 12px 14px;
+      display: none; /* shown via JS when dates are selected */
+      justify-content: space-between; align-items: center;
+      border: 1px solid rgba(46,125,50,0.15);
+    }
+    .price-summary.visible { display: flex; }
+    .ps-label { font-size: 12px; color: var(--g-mid); }
+    .ps-total { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; color: var(--g-dark); }
+
+    /* ── INFO CARD ───────────────────────────────────────────────────── */
     .info-card {
-      background: var(--card); border-radius: var(--rsm); border: 1px solid var(--border);
+      background: var(--card); border-radius: var(--r); border: 1px solid var(--border);
       padding: 16px;
     }
-    
-    .date-row { display: flex; gap: 10px; margin-top: 10px; }
-    .date-item {
-      flex: 1; background: var(--bg); border-radius: 8px; padding: 10px; text-align: center;
-    }
-    .date-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .date-val { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 13px; color: var(--text); margin-top: 2px; }
+    .info-title { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; margin-bottom: 10px; }
+    .arow { display: flex; gap: 8px; flex-wrap: wrap; }
 
-    .arow { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-    
+    /* ── HOST ROW ────────────────────────────────────────────────────── */
+    .host-row {
+      background: var(--card); border-radius: var(--r); border: 1px solid var(--border);
+      padding: 14px; display: flex; align-items: center; gap: 12px;
+    }
+    .host-av {
+      width: 44px; height: 44px; border-radius: 50%; background: var(--g-dark);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-family: 'Sora', sans-serif; font-size: 16px; flex-shrink: 0;
+    }
+    .host-name { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; }
+    .host-phone { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ── REVIEWS ─────────────────────────────────────────────────────── */
     .rcard {
       background: var(--card); border-radius: var(--rsm); border: 1px solid var(--border);
       padding: 14px; margin-top: 8px;
     }
     .rav {
-      width: 30px; height: 30px; border-radius: 50%; background: var(--g-light);
+      width: 32px; height: 32px; border-radius: 50%; background: var(--g-light);
       color: var(--g-dark); display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 11px; font-family: 'Sora', sans-serif;
+      font-weight: 700; font-size: 12px; font-family: 'Sora', sans-serif;
     }
-    .rstars { color: var(--gold); font-size: 12px; margin-top: 2px; }
+    .rstars { color: var(--gold); font-size: 12px; margin-top: 1px; }
     .rtext { font-size: 13px; color: var(--text); margin-top: 8px; line-height: 1.5; }
 
+    /* ── STICKY ACTION BAR ───────────────────────────────────────────── */
     .action-bar {
-      display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border); padding: 12px 18px 20px;
+      display: flex; gap: 10px; z-index: 50;
+    }
+    .action-bar .btn-green { flex: 1; }
+    .action-bar .btn-gold { flex: 1; }
+
+    /* Date unavailability */
+    input[type="date"]::-webkit-calendar-picker-indicator { 
+      opacity: 0.5; cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="detail-img">
-    <i class="ti ti-building-estate"></i>
+  <!-- IMAGE HEADER (populated by JS) -->
+  <div class="detail-img" id="heroImg">
+    <i class="ti ti-building-estate" id="heroIcon"></i>
     <a href="search.html" class="detail-back"><i class="ti ti-arrow-left"></i></a>
-    <div style="position: absolute; top: 16px; left: 60px;">
-      <img src="logo-removebg-preview.png" alt="Lala Logo" style="height: 24px; filter: brightness(0) invert(1);">
+    <div class="logo-overlay">
+      <img src="logo-removebg-preview.png" alt="Lala" style="height: 22px; filter: brightness(0) invert(1);">
     </div>
-    <div class="detail-save"><i class="ti ti-heart"></i></div>
+    <div class="detail-save" id="saveBtn" onclick="toggleSave()"><i class="ti ti-heart"></i></div>
   </div>
 
-  <div class="detail-body container" id="listingDetail">
-    <div class="fade-up" style="text-align: center; padding: 40px;">
-      <div class="sora">Loading details...</div>
+  <!-- NAME + PRICE (populated by JS) -->
+  <div class="name-row fade-up" id="nameRow" style="display:none;">
+    <div>
+      <div class="listing-title" id="listingName">Loading...</div>
+      <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;" id="badgeRow"></div>
     </div>
+    <div class="price-block">
+      <div class="price-main" id="listingPrice">K—</div>
+      <div class="price-sub">/night</div>
+    </div>
+  </div>
+
+  <!-- BODY CONTENT -->
+  <div class="detail-body">
+
+    <!-- DATE PICKER CARD -->
+    <div class="dates-card fade-up" id="datesCard" style="display:none;">
+      <div class="dates-title"><i class="ti ti-calendar" style="color:var(--g-dark);"></i> Select your dates</div>
+      <div class="dates-row">
+        <div class="date-field">
+          <div class="date-label">Check-in</div>
+          <input type="date" id="checkIn" onchange="recalculate()">
+        </div>
+        <div class="date-field">
+          <div class="date-label">Check-out</div>
+          <input type="date" id="checkOut" onchange="recalculate()">
+        </div>
+      </div>
+      <div class="price-summary" id="priceSummary">
+        <div class="ps-label" id="nightsLabel">— nights</div>
+        <div class="ps-total" id="totalPrice">K—</div>
+      </div>
+    </div>
+
+    <!-- LOCATION / DESCRIPTION -->
+    <div class="info-card fade-up" id="locationCard" style="display:none;">
+      <div class="info-title"><i class="ti ti-map-pin" style="color:var(--g-dark);"></i> Location</div>
+      <div style="font-size:14px; color:var(--muted);" id="locationText"></div>
+      <div style="font-size:13px; color:var(--text); margin-top:8px; line-height:1.6;" id="descriptionText"></div>
+    </div>
+
+    <!-- AMENITIES -->
+    <div class="info-card fade-up" id="amenitiesCard" style="display:none;">
+      <div class="info-title"><i class="ti ti-check" style="color:var(--g-dark);"></i> Amenities</div>
+      <div class="arow" id="amenitiesRow"></div>
+    </div>
+
+    <!-- HOST INFO -->
+    <div class="host-row fade-up" id="hostRow" style="display:none;">
+      <div class="host-av" id="hostInitials">?</div>
+      <div>
+        <div class="host-name" id="hostName">Host</div>
+        <div class="host-phone" id="hostPhone"></div>
+      </div>
+      <div style="margin-left:auto;">
+        <div class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified</div>
+      </div>
+    </div>
+
+    <!-- REVIEWS (static sample for Phase 1) -->
+    <div class="fade-up" id="reviewsSection" style="display:none;">
+      <div class="info-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:14px;">
+        <i class="ti ti-star-filled" style="color:var(--gold);"></i> Guest Reviews
+        <span style="font-size:11px; color:var(--muted); font-weight:400;" id="ratingBadge"></span>
+      </div>
+      <div class="rcard">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="rav">CM</div>
+          <div>
+            <div style="font-family:'Sora',sans-serif; font-weight:600; font-size:12px;">Chanda Mulenga</div>
+            <div class="rstars">★★★★★</div>
+          </div>
+        </div>
+        <p class="rtext">"Very clean and affordable. Great location, close to the main road. The host was friendly and helpful."</p>
+      </div>
+      <div class="rcard">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="rav">BM</div>
+          <div>
+            <div style="font-family:'Sora',sans-serif; font-weight:600; font-size:12px;">Bwalya Mutale</div>
+            <div class="rstars">★★★★☆</div>
+          </div>
+        </div>
+        <p class="rtext">"Good value for money. Hot water was available in the morning. Would recommend for a short stay."</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STICKY ACTION BAR -->
+  <div class="action-bar" id="actionBar" style="display:none;">
+    <button class="btn-green" id="whatsappBtn" onclick="handleWhatsAppBooking()">
+      <i class="ti ti-brand-whatsapp"></i> Book via WhatsApp
+    </button>
+    <button class="btn-gold" id="payBtn" onclick="handlePayNow()">
+      <i class="ti ti-device-mobile"></i> Pay Now
+    </button>
   </div>
 
   <script src="config.js"></script>
   <script src="api.js"></script>
   <script>
+    let listing = null;
+    let pricePerNight = 0;
+    let isSaved = false;
+
+    // ── Set today + tomorrow as default dates ──────────────────────────
+    function initDates() {
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const fmt = d => d.toISOString().split('T')[0];
+      document.getElementById('checkIn').min = fmt(today);
+      document.getElementById('checkIn').value = fmt(today);
+      document.getElementById('checkOut').min = fmt(tomorrow);
+      document.getElementById('checkOut').value = fmt(tomorrow);
+      recalculate();
+    }
+
+    // ── Recalculate total when dates change ────────────────────────────
+    function recalculate() {
+      const ci = document.getElementById('checkIn').value;
+      const co = document.getElementById('checkOut').value;
+      const summary = document.getElementById('priceSummary');
+      const checkOut = document.getElementById('checkOut');
+
+      if (!ci || !co) { summary.classList.remove('visible'); return; }
+
+      const ciDate = new Date(ci);
+      const coDate = new Date(co);
+
+      // Force checkout to be after checkin
+      if (coDate <= ciDate) {
+        const next = new Date(ciDate);
+        next.setDate(next.getDate() + 1);
+        checkOut.value = next.toISOString().split('T')[0];
+        checkOut.min = checkOut.value;
+      }
+
+      const nights = Math.max(1, Math.ceil((new Date(checkOut.value) - ciDate) / (1000 * 60 * 60 * 24)));
+      const total = nights * pricePerNight;
+
+      document.getElementById('nightsLabel').textContent = `${nights} night${nights > 1 ? 's' : ''} × K${pricePerNight}`;
+      document.getElementById('totalPrice').textContent = `K${total.toLocaleString()}`;
+      summary.classList.add('visible');
+
+      // Update pay button text
+      const payBtn = document.getElementById('payBtn');
+      if (payBtn) payBtn.innerHTML = `<i class="ti ti-device-mobile"></i> Pay K${total.toLocaleString()}`;
+    }
+
+    // ── Toggle save ────────────────────────────────────────────────────
+    function toggleSave() {
+      isSaved = !isSaved;
+      const btn = document.getElementById('saveBtn');
+      btn.innerHTML = isSaved ? '<i class="ti ti-heart-filled" style="color:#ff6b6b;"></i>' : '<i class="ti ti-heart"></i>';
+      btn.classList.toggle('saved', isSaved);
+    }
+
+    // ── WhatsApp deep-link booking ─────────────────────────────────────
+    function handleWhatsAppBooking() {
+      if (!listing) return;
+      const name = listing.name;
+      const hostPhone = listing.hostPhone || '260977000111'; // fallback only if missing
+      const checkIn = document.getElementById('checkIn').value || '(date TBD)';
+      const checkOut = document.getElementById('checkOut').value || '(date TBD)';
+
+      const message = `Hi, I'd like to book ${name} from ${checkIn} to ${checkOut} for 1 guest(s). Is it available? (via Lala)`;
+      const encoded = encodeURIComponent(message);
+
+      // Log intent to backend (fire and forget)
+      fetch(`${window.API_URL || 'http://localhost:5000/api'}/bookings/intent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ listingId: listing.id, checkIn, checkOut, type: 'whatsapp' })
+      }).catch(() => {}); // non-blocking
+
+      window.open(`https://wa.me/${hostPhone}?text=${encoded}`, '_blank');
+    }
+
+    // ── Mobile Money pay flow ──────────────────────────────────────────
+    function handlePayNow() {
+      const checkIn = document.getElementById('checkIn').value;
+      const checkOut = document.getElementById('checkOut').value;
+
+      if (!checkIn || !checkOut) {
+        alert('Please select your check-in and check-out dates first.');
+        return;
+      }
+
+      if (!api.isLoggedIn()) {
+        // Save intent and redirect to sign up
+        sessionStorage.setItem('booking_intent', JSON.stringify({
+          listingId: listing.id, checkIn, checkOut
+        }));
+        window.location.href = `signup.html?redirect=listing-detail.html?id=${listing.id}`;
+        return;
+      }
+
+      // Build payment URL with all parameters
+      const nights = Math.max(1, Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)));
+      const total = nights * pricePerNight;
+
+      const params = new URLSearchParams({
+        id: listing.id,
+        name: listing.name,
+        checkIn,
+        checkOut,
+        nights,
+        total,
+        hostPhone: listing.hostPhone || ''
+      });
+
+      window.location.href = `payment.html?${params.toString()}`;
+    }
+
+    // ── Load listing from API ──────────────────────────────────────────
     async function loadListingDetail() {
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id');
-      const container = document.getElementById('listingDetail');
 
       if (!id) {
-        container.innerHTML = '<div class="sora">No listing ID provided</div>';
+        document.body.innerHTML = '<div style="padding:40px;text-align:center;">No listing ID provided.</div>';
         return;
       }
 
       try {
-        const listing = await api.getListing(id);
-        
-        container.innerHTML = `
-          <div class="fade-up visible">
-            <div class="flex-between" style="align-items: flex-start;">
-              <div>
-                <h1 class="sora" style="font-size: 20px; font-weight: 700;">${listing.name}</h1>
-                <div class="lloc" style="margin-top: 4px; color: var(--muted); font-size: 13px;">
-                  <i class="ti ti-map-pin" style="color: var(--g-dark);"></i> ${listing.district}, ${listing.city}
-                </div>
-              </div>
-              <div style="text-align: right;">
-                <div class="sora" style="font-weight: 700; font-size: 24px; color: var(--g-dark);">K${listing.price}</div>
-                <div style="font-size: 11px; color: var(--muted);">/night</div>
-              </div>
-            </div>
-            <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
-              <div class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified Host</div>
-              <div class="star-badge"><i class="ti ti-star-filled"></i> 4.5 (32 reviews)</div>
-            </div>
-          </div>
+        listing = await api.getListing(id);
+        if (listing.error) throw new Error(listing.error);
 
-          <div class="info-card fade-up visible">
-            <div class="sora" style="font-size: 14px; font-weight: 600;">Check-in / Check-out</div>
-            <div class="date-row">
-              <div class="date-item">
-                <div class="date-lbl">Check-in</div>
-                <div class="date-val">Mon, 26 May</div>
-              </div>
-              <div style="width: 1px; background: var(--border);"></div>
-              <div class="date-item">
-                <div class="date-lbl">Check-out</div>
-                <div class="date-val">Wed, 28 May</div>
-              </div>
-            </div>
-          </div>
+        pricePerNight = listing.price;
+        document.title = `Lala — ${listing.name}`;
 
-          <div class="fade-up visible">
-            <div class="sora" style="font-size: 14px; font-weight: 600;">Amenities</div>
-            <div class="arow">
-              ${listing.amenities.map(a => `<div class="apill"><i class="ti ti-check"></i> ${a}</div>`).join('')}
-            </div>
-          </div>
+        // Hero image
+        const heroImg = document.getElementById('heroImg');
+        if (listing.photos && listing.photos.length > 0) {
+          heroImg.style.backgroundImage = `url('${listing.photos[0]}')`;
+          heroImg.style.backgroundSize = 'cover';
+          heroImg.style.backgroundPosition = 'center';
+          document.getElementById('heroIcon').style.display = 'none';
+        }
 
-          <div class="fade-up visible">
-            <div class="sora" style="font-size: 14px; font-weight: 600;">Guest Review</div>
-            <div class="rcard">
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <div class="rav">CM</div>
-                <div>
-                  <div class="sora" style="font-weight: 600; font-size: 12px;">Chanda Mulenga</div>
-                  <div class="rstars">★★★★★</div>
-                </div>
-              </div>
-              <p class="rtext">"Very clean and affordable. Great location near the mall."</p>
-            </div>
-          </div>
-
-          <div class="action-bar fade-up visible">
-            <button onclick="handleWhatsAppBooking('${listing.id}', '${listing.name}', ${listing.price})" class="btn-green"><i class="ti ti-brand-whatsapp"></i> Book via WhatsApp</button>
-            <a href="payment.html?id=${listing.id}" class="btn-gold"><i class="ti ti-device-mobile"></i> Pay with Mobile Money</a>
-          </div>
+        // Name + Price row
+        document.getElementById('listingName').textContent = listing.name;
+        document.getElementById('listingPrice').textContent = `K${listing.price}`;
+        const badges = document.getElementById('badgeRow');
+        badges.innerHTML = `
+          <div class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified</div>
+          <div class="star-badge"><i class="ti ti-star-filled"></i> 4.5 (12 reviews)</div>
+          <div class="apill"><i class="ti ti-home"></i> ${listing.type}</div>
         `;
+        document.getElementById('nameRow').style.display = 'flex';
+
+        // Location card
+        document.getElementById('locationText').textContent = `${listing.district}, ${listing.city}, Zambia`;
+        document.getElementById('descriptionText').textContent = listing.description || 'A comfortable and affordable stay in the heart of the city, close to public transport and local amenities.';
+        document.getElementById('locationCard').style.display = 'block';
+
+        // Amenities
+        if (listing.amenities && listing.amenities.length > 0) {
+          const icons = { 'Wi-Fi': 'ti-wifi', 'Parking': 'ti-parking', 'Hot Water': 'ti-droplet', 'Security': 'ti-shield', 'CCTV': 'ti-camera', 'Generator': 'ti-bolt', 'Breakfast': 'ti-egg', 'TV': 'ti-tv' };
+          document.getElementById('amenitiesRow').innerHTML = listing.amenities
+            .map(a => `<div class="apill"><i class="ti ${icons[a] || 'ti-check'}"></i> ${a}</div>`).join('');
+          document.getElementById('amenitiesCard').style.display = 'block';
+        }
+
+        // Host row
+        const hostPhone = listing.hostPhone || '';
+        document.getElementById('hostInitials').textContent = listing.name ? listing.name[0].toUpperCase() : 'H';
+        document.getElementById('hostName').textContent = 'Verified Host';
+        document.getElementById('hostPhone').textContent = hostPhone ? `+${hostPhone}` : 'Contact via WhatsApp';
+        document.getElementById('hostRow').style.display = 'flex';
+
+        // Reviews
+        document.getElementById('ratingBadge').textContent = ' — 4.5 avg (12 reviews)';
+        document.getElementById('reviewsSection').style.display = 'block';
+
+        // Dates card
+        document.getElementById('datesCard').style.display = 'block';
+        initDates();
+
+        // Action bar
+        document.getElementById('actionBar').style.display = 'flex';
+
+        // Animate everything
+        document.querySelectorAll('.fade-up').forEach(el => {
+          setTimeout(() => el.classList.add('visible'), 50);
+        });
+
       } catch (err) {
-        container.innerHTML = '<div class="sora">Failed to load details</div>';
+        document.getElementById('heroIcon').style.fontSize = '40px';
+        document.querySelector('.detail-body').innerHTML = `
+          <div style="text-align:center; padding:40px; color:var(--muted);">
+            <i class="ti ti-alert-circle" style="font-size:40px;"></i>
+            <div style="margin-top:12px; font-family:'Sora',sans-serif;">Failed to load listing details.</div>
+            <a href="search.html" class="btn-outline" style="margin-top:16px; display:inline-flex;">Back to Search</a>
+          </div>`;
         console.error(err);
       }
-    }
-
-    function handleWhatsAppBooking(id, name, price) {
-      const checkIn = "Mon, 26 May 2026"; // Mocked for now
-      const checkOut = "Wed, 28 May 2026"; // Mocked for now
-      const guestCount = 1;
-      
-      const message = `Hi, I'd like to book ${name} from ${checkIn} to ${checkOut} for ${guestCount} guest(s). Is it available? (via Lala)`;
-      const encoded = encodeURIComponent(message);
-      
-      // Using a mock host number for Phase 1
-      const hostPhone = "260977000111"; 
-      const waUrl = `https://wa.me/${hostPhone}?text=${encoded}`;
-      
-      // Log intent for analytics as per PRD FR-G-003
-      console.log('Logging booking intent for:', id);
-      
-      window.open(waUrl, '_blank');
     }
 
     loadListingDetail();

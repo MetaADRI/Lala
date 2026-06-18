@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lala — Booking Confirmed!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="logo-removebg-preview.png">
+  <style>
+    body { background: var(--bg); min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ── CONFETTI BURST ANIMATION ─────────────────────────────────────── */
+    .confetti-wrap {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute; top: -20px;
+      width: 10px; height: 10px; border-radius: 2px;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ── SUCCESS HEADER ───────────────────────────────────────────────── */
+    .success-hdr {
+      background: linear-gradient(160deg, var(--g-dark) 0%, #2E7D32 60%, #43A047 100%);
+      padding: 50px 24px 80px; text-align: center; position: relative; overflow: hidden;
+    }
+    .success-hdr::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 120%, rgba(255,255,255,0.08) 0%, transparent 70%);
+    }
+    .check-ring {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: rgba(255,255,255,0.15); border: 3px solid rgba(255,255,255,0.3);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; font-size: 40px; color: #fff;
+      animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s both;
+    }
+    @keyframes pop {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .success-title {
+      font-family: 'Sora', sans-serif; font-weight: 800; font-size: 26px;
+      color: #fff; margin-bottom: 8px; letter-spacing: -0.5px;
+      animation: slideUp 0.5s ease 0.35s both;
+    }
+    .success-sub {
+      font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.5;
+      animation: slideUp 0.5s ease 0.45s both;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── FLOATING CARD ────────────────────────────────────────────────── */
+    .floating-card {
+      background: var(--card); border-radius: 20px;
+      box-shadow: 0 -4px 30px rgba(0,0,0,0.12), 0 8px 30px rgba(0,0,0,0.06);
+      margin: -40px 18px 0; padding: 24px; position: relative; z-index: 10;
+      animation: slideUp 0.5s ease 0.55s both;
+    }
+
+    /* ── BOOKING REFERENCE ────────────────────────────────────────────── */
+    .ref-box {
+      background: var(--g-light); border-radius: 12px; padding: 14px 16px;
+      text-align: center; border: 1.5px dashed rgba(27,94,32,0.25);
+      margin-bottom: 20px;
+    }
+    .ref-label { font-size: 10px; color: var(--g-mid); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+    .ref-code { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 22px; color: var(--g-dark); letter-spacing: 0.05em; }
+
+    /* ── DETAIL ROWS ──────────────────────────────────────────────────── */
+    .detail-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .detail-row:last-of-type { border-bottom: none; }
+    .dr-label { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+    .dr-value { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 13px; color: var(--text); text-align: right; max-width: 60%; }
+
+    /* ── PROVIDER BADGE ───────────────────────────────────────────────── */
+    .prov-badge {
+      display: inline-flex; align-items: center; gap: 6px; border-radius: 99px;
+      padding: 4px 12px; font-size: 12px; font-weight: 700; font-family: 'Sora', sans-serif;
+    }
+    .prov-mtn    { background: #FFF9C4; color: #7B6000; }
+    .prov-airtel { background: #FFEBEE; color: #B71C1C; }
+    .prov-zamtel { background: var(--g-light); color: var(--g-dark); }
+
+    /* ── ACTIONS ──────────────────────────────────────────────────────── */
+    .actions { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+
+    /* ── WHAT'S NEXT ──────────────────────────────────────────────────── */
+    .next-section {
+      margin: 18px 18px 0; background: var(--card); border-radius: 16px;
+      border: 1px solid var(--border); padding: 18px;
+      animation: slideUp 0.5s ease 0.7s both;
+    }
+    .next-title { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; margin-bottom: 14px; }
+    .next-item {
+      display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px;
+    }
+    .next-item:last-child { margin-bottom: 0; }
+    .next-icon {
+      width: 34px; height: 34px; border-radius: 10px; background: var(--g-light);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--g-dark); font-size: 16px; flex-shrink: 0;
+    }
+    .next-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .next-text strong { color: var(--text); display: block; margin-bottom: 1px; font-size: 13px; }
+
+    /* ── FOOTER ───────────────────────────────────────────────────────── */
+    .conf-footer {
+      text-align: center; padding: 28px 18px; margin-top: auto;
+      animation: slideUp 0.5s ease 0.8s both;
+    }
+  </style>
+</head>
+<body>
+  <!-- Confetti container (populated by JS) -->
+  <div class="confetti-wrap" id="confetti"></div>
+
+  <!-- SUCCESS HEADER -->
+  <div class="success-hdr">
+    <div class="check-ring"><i class="ti ti-check"></i></div>
+    <div class="success-title">Booking Confirmed!</div>
+    <div class="success-sub">
+      Your USSD payment was successful.<br>Check your phone for the SMS confirmation.
+    </div>
+  </div>
+
+  <!-- FLOATING BOOKING CARD -->
+  <div class="floating-card">
+    <!-- Booking Reference -->
+    <div class="ref-box">
+      <div class="ref-label">Booking Reference</div>
+      <div class="ref-code" id="refCode">LALA–XXXXXX</div>
+    </div>
+
+    <!-- Property Details -->
+    <div class="detail-row">
+      <div class="dr-label"><i class="ti ti-building-estate"></i> Property</div>
+      <div class="dr-value" id="detailProperty">Loading...</div>
+    </div>
+    <div class="detail-row">
+      <div class="dr-label"><i class="ti ti-calendar-event"></i> Check-in</div>
+      <div class="dr-value" id="detailCheckIn">—</div>
+    </div>
+    <div class="detail-row">
+      <div class="dr-label"><i class="ti ti-calendar-x"></i> Check-out</div>
+      <div class="dr-value" id="detailCheckOut">—</div>
+    </div>
+    <div class="detail-row">
+      <div class="dr-label"><i class="ti ti-moon"></i> Nights</div>
+      <div class="dr-value" id="detailNights">—</div>
+    </div>
+    <div class="detail-row">
+      <div class="dr-label"><i class="ti ti-device-mobile"></i> Payment</div>
+      <div class="dr-value">
+        <span class="prov-badge" id="provBadge">MTN</span>
+      </div>
+    </div>
+    <div class="detail-row">
+      <div class="dr-label"><i class="ti ti-coin"></i> Amount Paid</div>
+      <div class="dr-value" id="detailAmount" style="color:var(--g-dark); font-size:16px;">K—</div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="btn-green" id="whatsappConfirmBtn" onclick="shareViaWhatsApp()">
+        <i class="ti ti-brand-whatsapp"></i> Message the Host
+      </button>
+      <a href="index.html" class="btn-outline" style="text-align:center; justify-content:center;">
+        <i class="ti ti-home"></i> Back to Home
+      </a>
+    </div>
+  </div>
+
+  <!-- WHAT'S NEXT -->
+  <div class="next-section">
+    <div class="next-title">What happens next?</div>
+    <div class="next-item">
+      <div class="next-icon"><i class="ti ti-message-circle-check"></i></div>
+      <div class="next-text">
+        <strong>SMS Confirmation sent</strong>
+        Check your phone for the booking confirmation SMS from Lala.
+      </div>
+    </div>
+    <div class="next-item">
+      <div class="next-icon"><i class="ti ti-brand-whatsapp"></i></div>
+      <div class="next-text">
+        <strong>Message your host</strong>
+        Tap "Message the Host" above to let them know your arrival time via WhatsApp.
+      </div>
+    </div>
+    <div class="next-item">
+      <div class="next-icon"><i class="ti ti-star"></i></div>
+      <div class="next-text">
+        <strong>Leave a review after checkout</strong>
+        You'll receive a reminder 24 hours after your check-out date.
+      </div>
+    </div>
+  </div>
+
+  <div class="conf-footer">
+    <img src="logo-removebg-preview.png" alt="Lala" style="height:28px; opacity:0.6;">
+    <div style="font-size:11px; color:var(--muted); margin-top:8px;">Lala · Affordable Stays in Zambia</div>
+  </div>
+
+  <script>
+    // ── Read URL params ─────────────────────────────────────────────────
+    const p = new URLSearchParams(window.location.search);
+    const listingName    = p.get('listingName')    || 'Your Stay';
+    const checkIn        = p.get('checkIn')        || '';
+    const checkOut       = p.get('checkOut')       || '';
+    const nights         = parseInt(p.get('nights') || '1');
+    const total          = parseFloat(p.get('total') || '0');
+    const provider       = p.get('provider')       || 'MTN';
+    const transactionRef = p.get('transactionRef') || '';
+    const bookingId      = p.get('bookingId')      || '';
+    const hostPhone      = p.get('hostPhone')      || '260977000111';
+
+    // ── Build reference code ──────────────────────────────────────────────
+    const refCode = transactionRef
+      ? transactionRef
+      : ('LALA-' + (bookingId ? bookingId.split('-')[0].toUpperCase() : Math.random().toString(36).substr(2,6).toUpperCase()));
+    document.getElementById('refCode').textContent = refCode;
+
+    // ── Populate booking card ─────────────────────────────────────────────
+    document.getElementById('detailProperty').textContent  = listingName;
+    document.getElementById('detailNights').textContent    = `${nights} night${nights !== 1 ? 's' : ''}`;
+    document.getElementById('detailAmount').textContent    = total ? `K${parseFloat(total).toLocaleString()}` : 'K—';
+
+    const fmt = d => {
+      if (!d) return '—';
+      return new Date(d + 'T00:00:00').toLocaleDateString('en-ZM', { weekday:'short', day:'numeric', month:'long', year:'numeric' });
+    };
+    document.getElementById('detailCheckIn').textContent  = fmt(checkIn);
+    document.getElementById('detailCheckOut').textContent = fmt(checkOut);
+
+    // Provider badge
+    const badge = document.getElementById('provBadge');
+    const provClass = { MTN: 'prov-mtn', Airtel: 'prov-airtel', Zamtel: 'prov-zamtel' };
+    badge.className = `prov-badge ${provClass[provider] || 'prov-mtn'}`;
+    badge.textContent = `${provider} Mobile Money`;
+
+    // Page title
+    document.title = `Lala — ${listingName} Confirmed!`;
+
+    // ── WhatsApp host message ─────────────────────────────────────────────
+    function shareViaWhatsApp() {
+      const msg = `Hi, I've just confirmed my booking at ${listingName} (Lala Booking Ref: ${refCode}) from ${checkIn} to ${checkOut}. Looking forward to my stay! My expected arrival time is...`;
+      const encoded = encodeURIComponent(msg);
+      window.open(`https://wa.me/${hostPhone}?text=${encoded}`, '_blank');
+    }
+
+    // ── Confetti burst ────────────────────────────────────────────────────
+    function launchConfetti() {
+      const colors = ['#1B5E20','#F9A825','#2E7D32','#E65100','#43A047','#FFD600','#388E3C'];
+      const container = document.getElementById('confetti');
+      for (let i = 0; i < 60; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.cssText = `
+          left: ${Math.random() * 100}vw;
+          background: ${colors[Math.floor(Math.random() * colors.length)]};
+          width: ${6 + Math.random() * 8}px;
+          height: ${6 + Math.random() * 8}px;
+          border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+          animation-duration: ${1.5 + Math.random() * 2}s;
+          animation-delay: ${Math.random() * 0.8}s;
+        `;
+        container.appendChild(el);
+      }
+      // Remove after animation
+      setTimeout(() => container.innerHTML = '', 4000);
+    }
+
+    // Launch confetti on page load
+    setTimeout(launchConfetti, 300);
+  </script>
+</body>
+</html>
