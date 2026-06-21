@@ -2,7 +2,6 @@ const CACHE_NAME = 'lala-v1';
 const DATA_CACHE_NAME = 'lala-data-v1';
 const ASSETS = [
   '/',
-  '/index.html',
   '/search.html',
   '/listing-detail.html',
   '/signup.html',

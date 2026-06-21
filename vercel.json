@@ -1,6 +1,5 @@
 {
   "buildCommand": "",
   "outputDirectory": "lala-frontend",
-  "cleanUrls": true,
   "trailingSlash": false
 }
