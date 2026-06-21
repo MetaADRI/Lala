@@ -139,6 +139,44 @@ const api = {
     return res.json();
   },
 
+  // ─── REVIEWS ───────────────────────────────────────────────────────────────
+  getReviews: async (listingId) => {
+    const res = await fetch(`${API_BASE}/reviews/${listingId}`);
+    return res.json();
+  },
+
+  createReview: async (reviewData) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/reviews`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(reviewData)
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  checkCanReview: async (listingId) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/reviews/can-review/${listingId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  getHostRating: async () => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/reviews/host/rating`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
   // ─── HELPERS ───────────────────────────────────────────────────────────────
   logout: () => {
     localStorage.removeItem('lala_token');

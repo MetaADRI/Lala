@@ -114,6 +114,14 @@
     .rstars { color: var(--gold); font-size: 12px; margin-top: 1px; }
     .rtext { font-size: 13px; color: var(--text); margin-top: 8px; line-height: 1.5; }
 
+    /* Star rating interactives */
+    .star-rating span {
+      transition: transform 0.15s, color 0.15s;
+    }
+    .star-rating span:hover {
+      transform: scale(1.2);
+    }
+
     /* ── STICKY ACTION BAR ───────────────────────────────────────────── */
     .action-bar {
       position: fixed; bottom: 0; left: 0; right: 0;
@@ -200,31 +208,39 @@
       </div>
     </div>
 
-    <!-- REVIEWS (static sample for Phase 1) -->
+    <!-- REVIEWS -->
     <div class="fade-up" id="reviewsSection" style="display:none;">
       <div class="info-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:14px;">
         <i class="ti ti-star-filled" style="color:var(--gold);"></i> Guest Reviews
         <span style="font-size:11px; color:var(--muted); font-weight:400;" id="ratingBadge"></span>
       </div>
-      <div class="rcard">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div class="rav">CM</div>
-          <div>
-            <div style="font-family:'Sora',sans-serif; font-weight:600; font-size:12px;">Chanda Mulenga</div>
-            <div class="rstars">★★★★★</div>
-          </div>
-        </div>
-        <p class="rtext">"Very clean and affordable. Great location, close to the main road. The host was friendly and helpful."</p>
+      <!-- Dynamic review cards will be appended here -->
+    </div>
+
+    <!-- REVIEW SUBMISSION FORM (shown only if logged-in guest has a confirmed stay) -->
+    <div class="fade-up" id="reviewFormCard" style="display:none; margin-top: 24px; margin-bottom: 24px;">
+      <div class="info-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:14px;">
+        <i class="ti ti-edit" style="color:var(--g-dark);"></i> Write a Review
       </div>
-      <div class="rcard">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div class="rav">BM</div>
-          <div>
-            <div style="font-family:'Sora',sans-serif; font-weight:600; font-size:12px;">Bwalya Mutale</div>
-            <div class="rstars">★★★★☆</div>
+      <div class="rcard" style="padding: 18px; border-color: rgba(46, 125, 50, 0.3);">
+        <form id="submitReviewForm" onsubmit="handleReviewSubmit(event)">
+          <div style="margin-bottom: 14px;">
+            <label style="display:block; font-size:12px; font-weight:600; margin-bottom: 6px; color:var(--muted);">Your Rating</label>
+            <div class="star-rating" style="display:flex; gap:8px; font-size:28px; color:#ccc; cursor:pointer;">
+              <span data-val="1" onclick="setRating(1)" onmouseover="highlightStars(1)" onmouseout="resetStars()">★</span>
+              <span data-val="2" onclick="setRating(2)" onmouseover="highlightStars(2)" onmouseout="resetStars()">★</span>
+              <span data-val="3" onclick="setRating(3)" onmouseover="highlightStars(3)" onmouseout="resetStars()">★</span>
+              <span data-val="4" onclick="setRating(4)" onmouseover="highlightStars(4)" onmouseout="resetStars()">★</span>
+              <span data-val="5" onclick="setRating(5)" onmouseover="highlightStars(5)" onmouseout="resetStars()">★</span>
+            </div>
+            <input type="hidden" id="reviewRating" name="rating" value="">
           </div>
-        </div>
-        <p class="rtext">"Good value for money. Hot water was available in the morning. Would recommend for a short stay."</p>
+          <div style="margin-bottom: 14px;">
+            <label for="reviewComment" style="display:block; font-size:12px; font-weight:600; margin-bottom: 6px; color:var(--muted);">Your Comment</label>
+            <textarea id="reviewComment" class="input-field" placeholder="Share your experience staying here..." style="min-height: 80px; font-family: inherit; resize: vertical;" required></textarea>
+          </div>
+          <button type="submit" class="btn-green" id="submitReviewBtn" style="width:100%;">Submit Review</button>
+        </form>
       </div>
     </div>
   </div>
@@ -331,11 +347,11 @@
       }
 
       if (!api.isLoggedIn()) {
-        // Save intent and redirect to sign up
+        // Save intent and redirect to guest login
         sessionStorage.setItem('booking_intent', JSON.stringify({
           listingId: listing.id, checkIn, checkOut
         }));
-        window.location.href = `signup.html?redirect=listing-detail.html?id=${listing.id}`;
+        window.location.href = `guest-login.html?redirect=${encodeURIComponent(`listing-detail.html?id=${listing.id}`)}`;
         return;
       }
 
@@ -385,10 +401,14 @@
         // Name + Price row
         document.getElementById('listingName').textContent = listing.name;
         document.getElementById('listingPrice').textContent = `K${listing.price}`;
-        const badges = document.getElementById('badgeRow');
-        badges.innerHTML = `
+        
+        // Title & type
+        const dynamicRatingText = listing.ratingAverage > 0 
+          ? `${listing.ratingAverage.toFixed(1)} (${listing.reviewCount} review${listing.reviewCount !== 1 ? 's' : ''})` 
+          : 'New';
+        document.getElementById('badgeRow').innerHTML = `
           <div class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified</div>
-          <div class="star-badge"><i class="ti ti-star-filled"></i> 4.5 (12 reviews)</div>
+          <div class="star-badge"><i class="ti ti-star-filled"></i> ${dynamicRatingText}</div>
           <div class="apill"><i class="ti ti-home"></i> ${listing.type}</div>
         `;
         document.getElementById('nameRow').style.display = 'flex';
@@ -414,8 +434,28 @@
         document.getElementById('hostRow').style.display = 'flex';
 
         // Reviews
-        document.getElementById('ratingBadge').textContent = ' — 4.5 avg (12 reviews)';
+        const reviewText = listing.reviewCount > 0 
+          ? ` — ${listing.ratingAverage.toFixed(1)} avg (${listing.reviewCount} review${listing.reviewCount !== 1 ? 's' : ''})` 
+          : ' — No reviews yet';
+        document.getElementById('ratingBadge').textContent = reviewText;
         document.getElementById('reviewsSection').style.display = 'block';
+
+        // Load dynamic reviews
+        await loadReviews();
+
+        // Check if guest can review
+        if (api.isLoggedIn()) {
+          try {
+            const check = await api.checkCanReview(listing.id);
+            if (check.canReview && !check.alreadyReviewed) {
+              document.getElementById('reviewFormCard').style.display = 'block';
+            } else {
+              document.getElementById('reviewFormCard').style.display = 'none';
+            }
+          } catch (err) {
+            console.error('Error checking review privileges:', err);
+          }
+        }
 
         // Dates card
         document.getElementById('datesCard').style.display = 'block';
@@ -438,6 +478,123 @@
             <a href="search.html" class="btn-outline" style="margin-top:16px; display:inline-flex;">Back to Search</a>
           </div>`;
         console.error(err);
+      }
+    }
+
+    // ── Review UI Helpers ──────────────────────────────────────────────
+    let selectedRating = 0;
+    
+    window.setRating = function(rating) {
+      selectedRating = rating;
+      document.getElementById('reviewRating').value = rating;
+      updateStars(rating);
+    }
+    
+    window.highlightStars = function(rating) {
+      updateStars(rating);
+    }
+    
+    window.resetStars = function() {
+      updateStars(selectedRating);
+    }
+    
+    function updateStars(rating) {
+      const stars = document.querySelectorAll('.star-rating span');
+      stars.forEach((star, idx) => {
+        if (idx < rating) {
+          star.style.color = 'var(--gold)';
+        } else {
+          star.style.color = '#ccc';
+        }
+      });
+    }
+
+    async function loadReviews() {
+      try {
+        const reviews = await api.getReviews(listing.id);
+        const reviewsContainer = document.getElementById('reviewsSection');
+        
+        // Remove existing review cards (elements with class .rcard)
+        const existingCards = reviewsContainer.querySelectorAll('.rcard');
+        existingCards.forEach(card => card.remove());
+        
+        const noRev = reviewsContainer.querySelector('.no-reviews-card');
+        if (noRev) noRev.remove();
+
+        if (reviews.length === 0) {
+          reviewsContainer.insertAdjacentHTML('beforeend', `
+            <div class="rcard no-reviews-card" style="text-align: center; padding: 20px; color: var(--muted); border-style: dashed;">
+              No reviews yet. Be the first to leave a review!
+            </div>
+          `);
+        } else {
+          reviews.forEach(r => {
+            const guestName = r.guest ? r.guest.name || r.guest.phone || 'Anonymous' : 'Anonymous';
+            const initials = guestName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            
+            // Build stars string
+            const fullStars = '★'.repeat(r.rating);
+            const emptyStars = '☆'.repeat(5 - r.rating);
+            
+            reviewsContainer.insertAdjacentHTML('beforeend', `
+              <div class="rcard">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div class="rav">${initials}</div>
+                  <div>
+                    <div style="font-family:'Sora',sans-serif; font-weight:600; font-size:12px;">${guestName}</div>
+                    <div class="rstars">${fullStars}${emptyStars}</div>
+                  </div>
+                  <div style="margin-left: auto; font-size: 10px; color: var(--muted);">
+                    ${new Date(r.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+                <p class="rtext">"${r.comment || ''}"</p>
+              </div>
+            `);
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load reviews:', err);
+      }
+    }
+
+    window.handleReviewSubmit = async function(e) {
+      e.preventDefault();
+      const ratingVal = document.getElementById('reviewRating').value;
+      const commentVal = document.getElementById('reviewComment').value.trim();
+      
+      if (!ratingVal) {
+        alert('Please select a star rating.');
+        return;
+      }
+      
+      const btn = document.getElementById('submitReviewBtn');
+      btn.disabled = true;
+      btn.innerText = 'Submitting...';
+      
+      try {
+        const result = await api.createReview({
+          listingId: listing.id,
+          rating: parseInt(ratingVal, 10),
+          comment: commentVal
+        });
+        
+        if (result.error) {
+          throw new Error(result.error);
+        }
+        
+        alert('Thank you! Your review has been submitted.');
+        
+        // Hide review form and reload
+        document.getElementById('reviewFormCard').style.display = 'none';
+        
+        // Reload listing details to get updated average rating
+        await loadListingDetail();
+        
+      } catch (err) {
+        alert(err.message || 'Failed to submit review. Please try again.');
+        btn.disabled = false;
+        btn.innerText = 'Submit Review';
       }
     }
 

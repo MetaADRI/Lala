@@ -1,5 +1,7 @@
 const Listing = require('../models/Listing');
 const User = require('../models/User');
+const Review = require('../models/Review');
+const sequelize = require('../config/database');
 const { Op } = require('sequelize');
 
 exports.getAllListings = async (req, res) => {
@@ -16,7 +18,35 @@ exports.getAllListings = async (req, res) => {
 
   try {
     const listings = await Listing.findAll({ where, order: [['createdAt', 'DESC']] });
-    res.json(listings);
+    
+    // Fetch average ratings and counts in a group query
+    const reviews = await Review.findAll({
+      attributes: [
+        'listingId',
+        [sequelize.fn('AVG', sequelize.col('rating')), 'ratingAverage'],
+        [sequelize.fn('COUNT', sequelize.col('id')), 'reviewCount']
+      ],
+      group: ['listingId']
+    });
+
+    const reviewsMap = reviews.reduce((map, r) => {
+      map[r.listingId] = {
+        ratingAverage: parseFloat(parseFloat(r.getDataValue('ratingAverage') || 0).toFixed(1)),
+        reviewCount: parseInt(r.getDataValue('reviewCount') || 0, 10)
+      };
+      return map;
+    }, {});
+
+    const results = listings.map(listing => {
+      const rev = reviewsMap[listing.id] || { ratingAverage: 0, reviewCount: 0 };
+      return {
+        ...listing.toJSON(),
+        ratingAverage: rev.ratingAverage,
+        reviewCount: rev.reviewCount
+      };
+    });
+
+    res.json(results);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -26,7 +56,18 @@ exports.getListingById = async (req, res) => {
   try {
     const listing = await Listing.findByPk(req.params.id);
     if (!listing) return res.status(404).json({ error: 'Listing not found' });
-    res.json(listing);
+    
+    const reviews = await Review.findAll({ where: { listingId: req.params.id } });
+    const reviewCount = reviews.length;
+    const ratingAverage = reviewCount > 0 
+      ? parseFloat((reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount).toFixed(1))
+      : 0;
+
+    res.json({
+      ...listing.toJSON(),
+      ratingAverage,
+      reviewCount
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

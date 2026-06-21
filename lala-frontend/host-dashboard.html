@@ -103,7 +103,7 @@
     <div class="srow fade-up">
       <div class="scard"><div class="sval" id="bookingCount">0</div><div class="slbl">Bookings</div></div>
       <div class="scard blu"><div class="sval" id="occupancyRate">87%</div><div class="slbl">Occupancy</div></div>
-      <div class="scard gld"><div class="sval">4.5★</div><div class="slbl">Rating</div></div>
+      <div class="scard gld"><div class="sval" id="hostRating">—</div><div class="slbl">Rating</div></div>
     </div>
 
     <div class="fade-up">
@@ -194,7 +194,13 @@
         const listEl = document.getElementById('bookingsList');
         const totalRevEl = document.getElementById('totalRevenue');
         const bookingCountEl = document.getElementById('bookingCount');
-        
+        const hostRatingEl = document.getElementById('hostRating');
+
+        const ratingData = await api.getHostRating();
+        hostRatingEl.innerText = ratingData.ratingAverage > 0
+          ? `${ratingData.ratingAverage}★`
+          : '—';
+
         bookingCountEl.innerText = bookings.length;
         let totalRev = 0;
         

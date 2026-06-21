@@ -136,7 +136,7 @@
                     <div class="lname">${listing.name}</div>
                     <div class="lloc"><i class="ti ti-map-pin"></i> ${listing.district}, ${listing.city}</div>
                   </div>
-                  <div class="star-badge"><i class="ti ti-star-filled"></i> 4.5</div>
+                  <div class="star-badge"><i class="ti ti-star-filled"></i> ${listing.ratingAverage > 0 ? listing.ratingAverage.toFixed(1) : 'New'} ${listing.reviewCount > 0 ? `(${listing.reviewCount})` : ''}</div>
                 </div>
                 <div class="vbadge" style="margin-top: 8px;"><i class="ti ti-rosette-discount-check"></i> Verified Host</div>
                 <div class="lrow">
