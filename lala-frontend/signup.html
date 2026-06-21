@@ -81,7 +81,7 @@
         <input type="tel" id="phoneInput" class="input-field" placeholder="Phone (e.g. 0977...)" style="margin-bottom: 5px;">
         <button class="btn-green" id="requestBtn" onclick="handleRequestOTP()"><i class="ti ti-phone"></i> Sign up with phone number</button>
         <div style="text-align: center; font-size: 12px; color: var(--muted);">
-          Already have an account? <a href="#" onclick="showStep(2)" style="color: var(--g-dark); font-weight: 600; text-decoration: none;">Sign in</a>
+          Already have an account? <a href="guest-login.html" style="color: var(--g-dark); font-weight: 600; text-decoration: none;">Sign in</a>
         </div>
       </div>
     </div>
@@ -130,9 +130,10 @@
     }
 
     async function handleRequestOTP() {
-      const phone = document.getElementById('phoneInput').value;
-      if (!phone) return alert('Please enter your phone number');
+      const raw = document.getElementById('phoneInput').value.trim();
+      if (!raw) return alert('Please enter your phone number');
       
+      const phone = raw.startsWith('260') ? raw : `260${raw.replace(/^0+/, '')}`;
       const btn = document.getElementById('requestBtn');
       btn.innerText = 'Sending...';
       btn.disabled = true;
@@ -175,9 +176,7 @@
       }
     }
 
-    (function() {
-      // Intersection Observer logic remains...
-    })();
+
   </script>
 </body>
 </html>

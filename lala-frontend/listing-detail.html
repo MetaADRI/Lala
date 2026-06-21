@@ -326,13 +326,6 @@
       const message = `Hi, I'd like to book ${name} from ${checkIn} to ${checkOut} for 1 guest(s). Is it available? (via Lala)`;
       const encoded = encodeURIComponent(message);
 
-      // Log intent to backend (fire and forget)
-      fetch(`${window.API_URL || 'http://localhost:5000/api'}/bookings/intent`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ listingId: listing.id, checkIn, checkOut, type: 'whatsapp' })
-      }).catch(() => {}); // non-blocking
-
       window.open(`https://wa.me/${hostPhone}?text=${encoded}`, '_blank');
     }
 

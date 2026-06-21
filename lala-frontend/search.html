@@ -78,7 +78,7 @@
     <div class="search-nav-top">
       <div class="sbar-field">
         <i class="ti ti-search"></i>
-        <input type="text" id="citySearch" placeholder="Enter city (e.g. Lusaka)" style="background:transparent; border:none; color:#fff; outline:none; font-size:14px; width:100%;">
+        <input type="text" id="citySearch" placeholder="Enter city (e.g. Lusaka)" onkeydown="if(event.key==='Enter') applyFilters()" style="background:transparent; border:none; color:#fff; outline:none; font-size:14px; width:100%;">
       </div>
       <button onclick="applyFilters()" style="background:transparent; border:none; color:#fff; cursor:pointer;"><i class="ti ti-search" style="font-size: 20px;"></i></button>
     </div>
@@ -127,8 +127,8 @@
         listings.forEach(listing => {
           const card = `
             <a href="listing-detail.html?id=${listing.id}" class="lcard fade-up visible">
-              <div class="limg green" style="background: url('${listing.photos[0] || ''}') center/cover;">
-                ${!listing.photos[0] ? '<i class="ti ti-home"></i>' : ''}
+              <div class="limg green" style="background: url('${(listing.photos && listing.photos[0]) || ''}') center/cover;">
+                ${(!listing.photos || !listing.photos[0]) ? '<i class="ti ti-home"></i>' : ''}
               </div>
               <div class="lbody">
                 <div class="flex-between" style="align-items: flex-start;">

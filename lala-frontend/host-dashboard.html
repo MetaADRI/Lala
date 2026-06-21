@@ -175,6 +175,7 @@
     <a href="index.html" class="bni"><i class="ti ti-home"></i><span>Home</span></a>
   </div>
 
+  <script src="config.js"></script>
   <script src="api.js"></script>
   <script>
     const user = JSON.parse(localStorage.getItem('lala_user'));
@@ -211,7 +212,9 @@
 
         bookings.forEach(b => {
           totalRev += b.totalAmount;
-          const initials = "G"; // Placeholder for guest
+          const guest = b.guest || {};
+          const guestName = guest.name || guest.phone || 'Guest';
+          const initials = guestName.replace(/[^a-zA-Z0-9]/g, ' ').split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'G';
           listEl.insertAdjacentHTML('beforeend', `
             <div class="bitem">
               <div class="av">${initials}</div>
