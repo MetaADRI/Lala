@@ -1,5 +1,5 @@
-const CACHE_NAME = 'lala-v1';
-const DATA_CACHE_NAME = 'lala-data-v1';
+const CACHE_NAME = 'lala-v2';
+const DATA_CACHE_NAME = 'lala-data-v2';
 const ASSETS = [
   '/',
   '/search.html',
