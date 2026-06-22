@@ -239,7 +239,7 @@
       try {
         const data = await api.requestOTP(phone);
         currentPhone = phone;
-        document.getElementById('otpSentTo').innerText = `We sent a code to +${phone} (Mock code is active in development)`;
+        document.getElementById('otpSentTo').innerText = `We sent a code to +${phone}${data.mockOtp ? ` (Dev mock code: ${data.mockOtp})` : ''}`;
         showStep(2);
       } catch (err) {
         alert('Failed to send OTP. Is the backend API running?');
