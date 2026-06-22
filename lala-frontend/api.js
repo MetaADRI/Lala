@@ -133,6 +133,17 @@ const api = {
     return res.json();
   },
 
+  // ─── HOST SETUP ────────────────────────────────────────────────────────────
+  setupHost: async (name) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/auth/setup-host`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ name })
+    });
+    return res.json();
+  },
+
   // ─── HOST / ADMIN ──────────────────────────────────────────────────────────
   getMyListings: async () => {
     const token = localStorage.getItem('lala_token');

@@ -53,3 +53,27 @@ exports.verifyOTP = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.setupHost = async (req, res) => {
+  const { name } = req.body;
+  if (!name) return res.status(400).json({ error: 'Name is required' });
+
+  try {
+    const user = await User.findByPk(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    user.name = name;
+    user.role = 'host';
+    await user.save();
+
+    const token = jwt.sign(
+      { id: user.id, phone: user.phone, role: user.role },
+      process.env.JWT_SECRET || 'lala_secret_key_2026',
+      { expiresIn: '7d' }
+    );
+
+    res.json({ message: 'Host profile created', token, user: { id: user.id, phone: user.phone, role: user.role, name: user.name } });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

@@ -62,13 +62,13 @@
 </head>
 <body>
   <!-- STEP 1: WELCOME -->
-  <div class="onboarding-card fade-up" id="step1">
+  <div class="onboarding-card fade-up visible" id="step1">
     <div class="hero-il"><i class="ti ti-building-estate"></i></div>
     <div class="ob-header">
       <img src="logo-removebg-preview.png" alt="Lala Logo" style="height: 32px;">
       <div class="step-ind"><div class="sdot on"></div><div class="sdot"></div></div>
     </div>
-    <div class="form-body">
+    <div class="ob-body">
       <div class="ob-title">Affordable stays anywhere in Zambia</div>
       <div class="ob-sub">Find verified guesthouses, lodges, and township stays. Book via WhatsApp. Pay with mobile money.</div>
       <div class="feat-row">
@@ -109,12 +109,35 @@
       <div style="width: 100%;">
         <button class="btn-green" id="verifyBtn" style="width: 100%;" onclick="handleVerifyOTP()">Verify & Continue</button>
         <div style="text-align: center; font-size: 12px; color: var(--muted); margin-top: 12px;">
-          Didn't receive it? <a href="#" style="color: var(--g-dark); font-weight: 600; text-decoration: none;">Resend via WhatsApp</a>
+          Didn't receive it? <a href="#" onclick="handleRequestOTP()" style="color: var(--g-dark); font-weight: 600; text-decoration: none;">Resend</a>
         </div>
       </div>
 
       <div class="info-box">
         No email required. Your phone number is your account. Secure and private.
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: NAME + HOST SETUP -->
+  <div class="onboarding-card fade-up" id="step3" style="display: none;">
+    <div class="ob-header">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <i class="ti ti-arrow-left" style="color: #fff; font-size: 20px; cursor: pointer;" onclick="showStep(2)"></i>
+        <div class="sora" style="font-weight: 700; font-size: 15px; color: #fff;">Set up your host profile</div>
+      </div>
+    </div>
+    <div class="ob-body" style="gap: 24px; padding-top: 40px;">
+      <div>
+        <i class="ti ti-building-estate" style="font-size: 48px; color: var(--g-dark); opacity: 0.15;"></i>
+        <div class="sora" style="font-weight: 600; font-size: 16px; margin-top: 16px;">What's your name?</div>
+        <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Guests will see this when they book your property.</div>
+      </div>
+      <div style="width: 100%; display: flex; flex-direction: column; gap: 14px;">
+        <input type="text" id="nameInput" class="input-field" placeholder="e.g. John Banda" style="text-align: center; font-size: 18px; font-weight: 600;">
+        <button class="btn-gold" id="setupBtn" style="width: 100%;" onclick="handleSetupHost()">
+          <i class="ti ti-rosette-discount-check"></i> Start Hosting
+        </button>
       </div>
     </div>
   </div>
@@ -127,6 +150,9 @@
     function showStep(n) {
       document.getElementById('step1').style.display = n === 1 ? 'flex' : 'none';
       document.getElementById('step2').style.display = n === 2 ? 'flex' : 'none';
+      document.getElementById('step3').style.display = n === 3 ? 'flex' : 'none';
+      const card = document.getElementById('step' + n);
+      if (card) setTimeout(() => card.classList.add('visible'), 50);
     }
 
     async function handleRequestOTP() {
@@ -163,7 +189,7 @@
       try {
         const data = await api.verifyOTP(currentPhone, otp);
         if (data.token) {
-          window.location.href = 'host-dashboard.html';
+          showStep(3);
         } else {
           alert(data.error || 'Invalid code');
         }
@@ -176,7 +202,31 @@
       }
     }
 
+    async function handleSetupHost() {
+      const name = document.getElementById('nameInput').value.trim();
+      if (!name) return alert('Please enter your name.');
 
+      const setupBtn = document.getElementById('setupBtn');
+      setupBtn.disabled = true;
+      setupBtn.innerText = 'Setting up...';
+
+      try {
+        const data = await api.setupHost(name);
+        if (data.token) {
+          localStorage.setItem('lala_token', data.token);
+          localStorage.setItem('lala_user', JSON.stringify(data.user));
+          window.location.href = 'host-dashboard.html';
+        } else {
+          alert(data.error || 'Setup failed');
+        }
+      } catch (err) {
+        alert('Setup failed. Is the backend running?');
+        console.error(err);
+      } finally {
+        setupBtn.disabled = false;
+        setupBtn.innerHTML = '<i class="ti ti-rosette-discount-check"></i> Start Hosting';
+      }
+    }
   </script>
 </body>
 </html>
