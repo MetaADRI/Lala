@@ -50,6 +50,10 @@ const Listing = sequelize.define('Listing', {
   description: {
     type: DataTypes.TEXT,
     allowNull: true
+  },
+  cancellationPolicy: {
+    type: DataTypes.STRING,
+    defaultValue: 'flexible'
   }
 });
 

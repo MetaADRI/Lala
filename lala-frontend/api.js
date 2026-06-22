@@ -30,11 +30,18 @@ const api = {
 
   // ─── LISTINGS ──────────────────────────────────────────────────────────────
   getListings: async (filters = {}) => {
-    // Remove empty filter values so the URL stays clean
-    const clean = Object.fromEntries(Object.entries(filters).filter(([_, v]) => v));
+    const clean = Object.fromEntries(Object.entries(filters).filter(([_, v]) => v !== '' && v !== null && v !== undefined));
     const params = new URLSearchParams(clean).toString();
     const res = await fetch(`${API_BASE}/listings${params ? '?' + params : ''}`);
     return res.json();
+  },
+
+  getListingsByCity: async () => {
+    const res = await fetch(`${API_BASE}/listings`);
+    const listings = await res.json();
+    const counts = {};
+    listings.forEach(l => { counts[l.city] = (counts[l.city] || 0) + 1; });
+    return counts;
   },
 
   getListing: async (id) => {
@@ -105,7 +112,37 @@ const api = {
     return res.json();
   },
 
+  // ─── SAVED LISTINGS ────────────────────────────────────────────────────────
+  toggleSaved: async (listingId) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/saved-listings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ listingId })
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  getSavedListings: async () => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/saved-listings`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
   // ─── HOST / ADMIN ──────────────────────────────────────────────────────────
+  getMyListings: async () => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/listings/mine`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
   createListing: async (listingData) => {
     const token = localStorage.getItem('lala_token');
     const res = await fetch(`${API_BASE}/listings`, {
@@ -172,6 +209,17 @@ const api = {
     const token = localStorage.getItem('lala_token');
     const res = await fetch(`${API_BASE}/reviews/host/rating`, {
       headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  hostRespond: async (reviewId, response) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/reviews/host/respond`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ reviewId, response })
     });
     if (res.status === 401) api.logout();
     return res.json();

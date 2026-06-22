@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lala — My Bookings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="logo-removebg-preview.png">
+  <style>
+    body { background: var(--bg); padding-bottom: 80px; }
+
+    .page-header {
+      background: var(--g-dark); color: #fff; padding: 20px 18px 16px;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .page-header-top {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+    }
+    .page-header h1 {
+      font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; margin: 0;
+    }
+    .page-header p { font-size: 12px; opacity: 0.8; margin: 0; }
+
+    .tabs {
+      display: flex; gap: 0; margin-top: 12px;
+      background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;
+    }
+    .tab {
+      flex: 1; padding: 8px; text-align: center; font-family: 'Sora', sans-serif;
+      font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.6);
+      cursor: pointer; transition: all 0.2s; border: none; background: transparent;
+    }
+    .tab.active { background: #fff; color: var(--g-dark); border-radius: 10px; }
+    .tab .count {
+      display: inline-block; background: rgba(255,255,255,0.2); border-radius: 99px;
+      padding: 0 6px; font-size: 9px; margin-left: 4px;
+    }
+    .tab.active .count { background: var(--g-light); color: var(--g-dark); }
+
+    .bookings-container { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+
+    .bcard {
+      background: var(--card); border-radius: var(--r); border: 1px solid var(--border);
+      overflow: hidden; text-decoration: none; color: inherit;
+      transition: transform 0.2s;
+    }
+    .bcard:hover { transform: translateY(-1px); }
+
+    .bcard-top {
+      padding: 14px; display: flex; gap: 12px;
+    }
+    .bcard-thumb {
+      width: 60px; height: 60px; border-radius: 10px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--g-light), var(--g-dark));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 24px;
+    }
+    .bcard-info { flex: 1; min-width: 0; }
+    .bcard-name { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; }
+    .bcard-city { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .bcard-dates { font-size: 11px; color: var(--muted); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+
+    .bcard-bottom {
+      border-top: 1px solid var(--border);
+      padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .bcard-amount { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; color: var(--g-dark); }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 99px;
+      font-family: 'Sora', sans-serif;
+    }
+    .status-confirmed { background: #E8F5E9; color: #1B5E20; }
+    .status-pending { background: #FFF8E1; color: #F57F17; }
+    .status-awaiting_payment { background: #FFF3E0; color: #E65100; }
+    .status-payment_failed { background: #FFEBEE; color: #C62828; }
+    .status-cancelled { background: #F5F5F5; color: #757575; }
+    .status-info { background: #E3F2FD; color: #1565C0; }
+
+    .provider-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 9px; font-weight: 600; padding: 2px 6px; border-radius: 4px;
+    }
+    .provider-MTN { background: #FFFDE7; color: #F57F17; }
+    .provider-Airtel { background: #FFEBEE; color: #C62828; }
+    .provider-Zamtel { background: #E8F5E9; color: #2E7D32; }
+
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: var(--muted);
+    }
+    .empty-state i { font-size: 48px; color: #ddd; margin-bottom: 16px; }
+    .empty-state h3 { font-family: 'Sora', sans-serif; font-size: 16px; color: var(--text); }
+    .empty-state p { font-size: 13px; }
+
+    .ref-code { font-size: 10px; color: var(--muted); font-family: monospace; }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <div class="page-header-top">
+      <a href="index.html" style="color:#fff; font-size:20px; text-decoration:none;"><i class="ti ti-arrow-left"></i></a>
+      <div>
+        <h1>My Bookings</h1>
+        <p>View and manage your stays</p>
+      </div>
+    </div>
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-filter="upcoming">Upcoming <span class="count" id="upcomingCount">0</span></button>
+      <button class="tab" data-filter="completed">Completed <span class="count" id="completedCount">0</span></button>
+      <button class="tab" data-filter="cancelled">Cancelled <span class="count" id="cancelledCount">0</span></button>
+    </div>
+  </div>
+
+  <div class="bookings-container" id="bookingsContainer">
+    <div class="empty-state" id="loadingState">
+      <i class="ti ti-loader"></i>
+      <p>Loading your bookings...</p>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script>
+    let allBookings = [];
+    let currentFilter = 'upcoming';
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function getThumbLetter(name) {
+      return name ? name[0].toUpperCase() : 'S';
+    }
+
+    function getStatusBadgeHTML(status) {
+      const labels = {
+        'confirmed': 'Confirmed',
+        'pending': 'Pending',
+        'awaiting_payment': 'Awaiting Payment',
+        'payment_failed': 'Payment Failed',
+        'cancelled': 'Cancelled'
+      };
+      return `<span class="status-badge status-${status}"><i class="ti ti-${status === 'confirmed' ? 'check' : status === 'pending' ? 'clock' : status === 'cancelled' ? 'x' : 'alert-circle'}"></i> ${labels[status] || status}</span>`;
+    }
+
+    function getProviderBadge(provider) {
+      if (!provider) return '';
+      return `<span class="provider-badge provider-${provider}">${provider}</span>`;
+    }
+
+    function renderBookings() {
+      const container = document.getElementById('bookingsContainer');
+      const now = new Date();
+
+      let filtered = allBookings.filter(b => {
+        const checkOut = new Date(b.checkOut);
+        if (currentFilter === 'upcoming') return checkOut >= now && b.status !== 'cancelled';
+        if (currentFilter === 'completed') return checkOut < now || b.status === 'confirmed' && !(checkOut >= now);
+        if (currentFilter === 'cancelled') return b.status === 'cancelled' || b.status === 'payment_failed';
+        return true;
+      });
+
+      if (allBookings.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="ti ti-calendar-off"></i>
+            <h3>No bookings yet</h3>
+            <p>When you book a stay, it will appear here.</p>
+            <a href="search.html" class="btn-green" style="margin-top:16px; display:inline-flex;">Browse Stays</a>
+          </div>`;
+        return;
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="ti ti-search-off"></i>
+            <h3>No ${currentFilter} bookings</h3>
+            <p>You don't have any ${currentFilter} bookings at the moment.</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(b => `
+        <div class="bcard fade-up visible">
+          <div class="bcard-top">
+            <div class="bcard-thumb">${getThumbLetter(b.listingName)}</div>
+            <div class="bcard-info">
+              <div class="bcard-name">${b.listingName}</div>
+              <div class="bcard-city"><i class="ti ti-map-pin"></i> ${b.listingCity || ''}</div>
+              <div class="bcard-dates">
+                <i class="ti ti-calendar"></i> ${formatDate(b.checkIn)} — ${formatDate(b.checkOut)}
+              </div>
+              ${b.transactionRef ? `<div class="ref-code">Ref: ${b.transactionRef}</div>` : ''}
+            </div>
+          </div>
+          <div class="bcard-bottom">
+            <div>
+              <div class="bcard-amount">K${b.totalAmount.toLocaleString()}</div>
+              ${getProviderBadge(b.provider)}
+            </div>
+            ${getStatusBadgeHTML(b.status)}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function loadBookings() {
+      if (!api.isLoggedIn()) {
+        sessionStorage.setItem('redirect_after_login', window.location.href);
+        window.location.href = 'guest-login.html';
+        return;
+      }
+
+      try {
+        allBookings = await api.getGuestBookings();
+        if (!Array.isArray(allBookings)) allBookings = [];
+
+        const now = new Date();
+        const upcoming = allBookings.filter(b => new Date(b.checkOut) >= now && b.status !== 'cancelled').length;
+        const completed = allBookings.filter(b => new Date(b.checkOut) < now).length;
+        const cancelled = allBookings.filter(b => b.status === 'cancelled' || b.status === 'payment_failed').length;
+
+        document.getElementById('upcomingCount').textContent = upcoming;
+        document.getElementById('completedCount').textContent = completed;
+        document.getElementById('cancelledCount').textContent = cancelled;
+
+        renderBookings();
+      } catch (err) {
+        document.getElementById('bookingsContainer').innerHTML = `
+          <div class="empty-state">
+            <i class="ti ti-alert-circle"></i>
+            <h3>Failed to load bookings</h3>
+            <p>${err.message || 'Something went wrong. Please try again.'}</p>
+            <button class="btn-outline" style="margin-top:16px;" onclick="loadBookings()">Retry</button>
+          </div>`;
+        console.error(err);
+      }
+    }
+
+    document.getElementById('tabs').addEventListener('click', (e) => {
+      const tab = e.target.closest('.tab');
+      if (!tab) return;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentFilter = tab.dataset.filter;
+      renderBookings();
+    });
+
+    loadBookings();
+  </script>
+</body>
+</html>

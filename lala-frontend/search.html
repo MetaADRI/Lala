@@ -33,9 +33,9 @@
     /* ---- FILTER ROW ---- */
     .frow {
       display: flex; gap: 8px; overflow-x: auto; padding: 4px 0;
-      scrollbar-width: none; /* Firefox */
+      scrollbar-width: none;
     }
-    .frow::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
+    .frow::-webkit-scrollbar { display: none; }
     
     .fchip {
       padding: 6px 14px; border-radius: 99px; font-family: 'Sora', sans-serif;
@@ -45,27 +45,110 @@
     }
     .fchip.on { background: #fff; color: var(--g-dark); border-color: #fff; }
 
+    /* ---- SORT DROPDOWN ---- */
+    .sort-dropdown {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--rsm);
+      padding: 6px 12px;
+      font-family: 'Sora', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+      min-height: 36px;
+    }
+
     /* ---- RESULTS ---- */
     .results-container { padding: 20px 18px; display: flex; flex-direction: column; gap: 14px; }
     
     .lcard {
       background: var(--card); border-radius: var(--r); border: 1px solid var(--border);
       overflow: hidden; display: block; text-decoration: none; color: inherit;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
+    .lcard:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+    
     .limg {
-      height: 120px; display: flex; align-items: center; justify-content: center;
-      font-size: 40px;
+      height: 140px; display: flex; align-items: center; justify-content: center;
+      font-size: 40px; position: relative; overflow: hidden;
     }
+    .limg img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
     .limg.green { background: linear-gradient(135deg, #A5D6A7, #66BB6A); }
     .limg.warm { background: linear-gradient(135deg, #FFCC80, #FFA726); }
     .limg.blue { background: linear-gradient(135deg, #90CAF9, #42A5F5); }
+
+    .save-btn-card {
+      position: absolute; top: 8px; right: 8px; width: 34px; height: 34px;
+      border-radius: 50%; background: rgba(0,0,0,0.35); backdrop-filter: blur(4px);
+      border: none; color: #fff; font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 2; transition: background 0.2s;
+    }
+    .save-btn-card:hover { background: rgba(0,0,0,0.5); }
+    .save-btn-card.saved { background: var(--red); }
+    .property-badge-card {
+      position: absolute; bottom: 8px; left: 8px;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+      color: #fff; font-size: 10px; font-weight: 600;
+      padding: 2px 10px; border-radius: 99px;
+      font-family: 'Sora', sans-serif;
+    }
     
     .lbody { padding: 14px; }
     .lname { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 15px; color: var(--text); }
     .lloc { font-size: 12px; color: var(--muted); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
-    .lrow { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+    
+    .card-mid { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+    .score-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 2px 8px; border-radius: 6px; font-size: 12px;
+      font-weight: 700; font-family: 'Sora', sans-serif;
+    }
+    .score-badge i { font-size: 10px; }
+    .score-excellent { background: #1B5E20; color: #fff; }
+    .score-very-good { background: #2E7D32; color: #fff; }
+    .score-good { background: #1565C0; color: #fff; }
+    .score-fair { background: #757575; color: #fff; }
+    .score-new { background: var(--gold-lt); color: var(--gold); }
+    
+    .review-count-label { font-size: 11px; color: var(--muted); }
+    .amenity-pills { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+    .amenity-pill-card {
+      background: var(--g-light); color: var(--g-mid); font-size: 9px;
+      font-weight: 500; padding: 1px 8px; border-radius: 99px;
+      font-family: 'Sora', sans-serif;
+    }
+    
+    .lrow { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
     .lprice { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: var(--g-dark); }
     .lprice-sub { font-size: 11px; color: var(--muted); font-weight: 400; }
+
+    /* ---- PRICE FILTER ---- */
+    .price-filter-toggle {
+      font-size: 11px; color: rgba(255,255,255,0.7); cursor: pointer;
+      display: flex; align-items: center; gap: 4px; padding: 4px 0;
+      font-family: 'Sora', sans-serif; font-weight: 500;
+    }
+    .price-filter-toggle:hover { color: #fff; }
+    .price-filter-panel {
+      display: none; margin-top: 6px; padding: 10px; background: rgba(255,255,255,0.1);
+      border-radius: 10px; gap: 8px;
+    }
+    .price-filter-panel.open { display: flex; flex-wrap: wrap; }
+    .price-input-group { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 120px; }
+    .price-input-group label { font-size: 10px; color: rgba(255,255,255,0.6); white-space: nowrap; }
+    .price-input-group input {
+      flex: 1; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none; width: 70px;
+    }
+    .price-input-group input::placeholder { color: rgba(255,255,255,0.4); }
+    .apply-price-btn {
+      background: #fff; color: var(--g-dark); border: none; border-radius: 8px;
+      padding: 6px 14px; font-size: 11px; font-weight: 600; cursor: pointer;
+      font-family: 'Sora', sans-serif;
+    }
   </style>
 </head>
 <body>
@@ -89,14 +172,34 @@
       <div class="fchip" data-type="Hostel">Hostel</div>
       <div class="fchip" data-type="Rest House">Rest House</div>
     </div>
+    <div class="price-filter-toggle" onclick="togglePriceFilter()">
+      <i class="ti ti-filter"></i> Price range <i class="ti ti-chevron-down" id="priceChevron"></i>
+    </div>
+    <div class="price-filter-panel" id="priceFilterPanel">
+      <div class="price-input-group">
+        <label>Min</label>
+        <input type="number" id="minPrice" placeholder="K0" min="0">
+      </div>
+      <div class="price-input-group">
+        <label>Max</label>
+        <input type="number" id="maxPrice" placeholder="K5000" min="0">
+      </div>
+      <button class="apply-price-btn" onclick="applyPriceFilter()">Apply</button>
+    </div>
   </div>
 
   <!-- CONTENT -->
   <div class="results-container container" id="listingsContainer">
     <div class="flex-between fade-up">
       <div class="sora" style="font-size: 14px; font-weight: 600;" id="resultsCount">Loading stays...</div>
-      <div style="font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 4px;">
-        <i class="ti ti-arrows-sort"></i> Price: Low to High
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <i class="ti ti-arrows-sort" style="color: var(--muted); font-size: 14px;"></i>
+        <select class="sort-dropdown" id="sortSelect" onchange="applySort()">
+          <option value="newest">Newest First</option>
+          <option value="price_asc">Price: Low to High</option>
+          <option value="price_desc">Price: High to Low</option>
+          <option value="rating">Best Rated</option>
+        </select>
       </div>
     </div>
   </div>
@@ -104,7 +207,41 @@
   <script src="config.js"></script>
   <script src="api.js"></script>
   <script>
-    let currentFilters = { city: '', type: '' };
+    let currentFilters = { city: '', type: '', sort: 'newest', minPrice: '', maxPrice: '' };
+    let savedIds = new Set(JSON.parse(localStorage.getItem('lala_saved') || '[]'));
+
+    function togglePriceFilter() {
+      const panel = document.getElementById('priceFilterPanel');
+      const chevron = document.getElementById('priceChevron');
+      panel.classList.toggle('open');
+      chevron.classList.toggle('ti-chevron-down');
+      chevron.classList.toggle('ti-chevron-up');
+    }
+
+    function applyPriceFilter() {
+      currentFilters.minPrice = document.getElementById('minPrice').value;
+      currentFilters.maxPrice = document.getElementById('maxPrice').value;
+      loadListings();
+    }
+
+    function getScoreBadge(rating) {
+      if (!rating || rating === 0) return '<span class="score-badge score-new"><i class="ti ti-star"></i> New</span>';
+      if (rating >= 4.5) return `<span class="score-badge score-excellent"><i class="ti ti-star-filled"></i> ${rating.toFixed(1)}</span>`;
+      if (rating >= 4.0) return `<span class="score-badge score-very-good"><i class="ti ti-star-filled"></i> ${rating.toFixed(1)}</span>`;
+      if (rating >= 3.0) return `<span class="score-badge score-good"><i class="ti ti-star-filled"></i> ${rating.toFixed(1)}</span>`;
+      return `<span class="score-badge score-fair"><i class="ti ti-star-filled"></i> ${rating.toFixed(1)}</span>`;
+    }
+
+    function toggleSaveCard(e, listingId) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (savedIds.has(listingId)) savedIds.delete(listingId);
+      else savedIds.add(listingId);
+      localStorage.setItem('lala_saved', JSON.stringify([...savedIds]));
+      const btn = e.currentTarget;
+      btn.classList.toggle('saved', savedIds.has(listingId));
+      btn.innerHTML = savedIds.has(listingId) ? '<i class="ti ti-heart-filled"></i>' : '<i class="ti ti-heart"></i>';
+    }
 
     async function loadListings() {
       const container = document.getElementById('listingsContainer');
@@ -112,36 +249,55 @@
       
       try {
         const listings = await api.getListings(currentFilters);
-        countEl.innerText = `${listings.length} stays found`;
         
-        // Clear previous results (except the count header)
+        // Sort client-side
+        const sorted = [...listings];
+        switch (currentFilters.sort) {
+          case 'price_asc': sorted.sort((a, b) => a.price - b.price); break;
+          case 'price_desc': sorted.sort((a, b) => b.price - a.price); break;
+          case 'rating': sorted.sort((a, b) => (b.ratingAverage || 0) - (a.ratingAverage || 0)); break;
+          default: break; // newest first (default from backend)
+        }
+        
+        countEl.innerText = `${sorted.length} stay${sorted.length !== 1 ? 's' : ''} found`;
+        
         const header = container.querySelector('.flex-between');
         container.innerHTML = '';
         container.appendChild(header);
 
-        if (listings.length === 0) {
+        if (sorted.length === 0) {
           container.insertAdjacentHTML('beforeend', '<div class="sora" style="text-align:center; padding:40px; color:var(--muted);">No stays found matching your search.</div>');
           return;
         }
 
-        listings.forEach(listing => {
+        sorted.forEach(listing => {
+          const isSaved = savedIds.has(listing.id);
+          const photoUrl = (listing.photos && listing.photos[0]) || '';
+          const showIcon = !photoUrl;
+          
           const card = `
             <a href="listing-detail.html?id=${listing.id}" class="lcard fade-up visible">
-              <div class="limg green" style="background: url('${(listing.photos && listing.photos[0]) || ''}') center/cover;">
-                ${(!listing.photos || !listing.photos[0]) ? '<i class="ti ti-home"></i>' : ''}
+              <div class="limg ${photoUrl ? '' : 'green'}">
+                ${photoUrl ? `<img src="${photoUrl}" loading="lazy" alt="${listing.name}">` : '<i class="ti ti-home"></i>'}
+                <button class="save-btn-card ${isSaved ? 'saved' : ''}" onclick="toggleSaveCard(event, '${listing.id}')">
+                  <i class="ti ${isSaved ? 'ti-heart-filled' : 'ti-heart'}"></i>
+                </button>
+                <span class="property-badge-card">${listing.type}</span>
               </div>
               <div class="lbody">
-                <div class="flex-between" style="align-items: flex-start;">
-                  <div>
-                    <div class="lname">${listing.name}</div>
-                    <div class="lloc"><i class="ti ti-map-pin"></i> ${listing.district}, ${listing.city}</div>
-                  </div>
-                  <div class="star-badge"><i class="ti ti-star-filled"></i> ${listing.ratingAverage > 0 ? listing.ratingAverage.toFixed(1) : 'New'} ${listing.reviewCount > 0 ? `(${listing.reviewCount})` : ''}</div>
+                <div class="lname">${listing.name}</div>
+                <div class="lloc"><i class="ti ti-map-pin"></i> ${listing.district}, ${listing.city}</div>
+                <div class="card-mid">
+                  ${getScoreBadge(listing.ratingAverage)}
+                  <span class="review-count-label">${listing.reviewCount > 0 ? `${listing.reviewCount} review${listing.reviewCount !== 1 ? 's' : ''}` : 'No reviews'}</span>
                 </div>
-                <div class="vbadge" style="margin-top: 8px;"><i class="ti ti-rosette-discount-check"></i> Verified Host</div>
+                ${listing.amenities && listing.amenities.length > 0 ? `
+                <div class="amenity-pills">
+                  ${listing.amenities.slice(0, 3).map(a => `<span class="amenity-pill-card">${a}</span>`).join('')}
+                </div>` : ''}
                 <div class="lrow">
                   <div class="lprice">K${listing.price} <span class="lprice-sub">/night</span></div>
-                  <button class="btn-green" style="padding: 8px 16px; font-size: 12px;" onclick="event.preventDefault(); handleWhatsAppBooking('${listing.id}', '${listing.name}')"><i class="ti ti-brand-whatsapp"></i> Book via WA</button>
+                  <div class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified</div>
                 </div>
               </div>
             </a>
@@ -159,7 +315,11 @@
       loadListings();
     }
 
-    // Handle Chip Clicks
+    function applySort() {
+      currentFilters.sort = document.getElementById('sortSelect').value;
+      loadListings();
+    }
+
     document.getElementById('typeFilters').addEventListener('click', (e) => {
       if (e.target.classList.contains('fchip')) {
         document.querySelectorAll('.fchip').forEach(c => c.classList.remove('on'));
@@ -169,11 +329,14 @@
       }
     });
 
-    // Initial load
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('city')) {
       document.getElementById('citySearch').value = urlParams.get('city');
       currentFilters.city = urlParams.get('city');
+    }
+    if (urlParams.has('sort')) {
+      currentFilters.sort = urlParams.get('sort');
+      document.getElementById('sortSelect').value = currentFilters.sort;
     }
     loadListings();
 

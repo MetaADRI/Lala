@@ -5,7 +5,7 @@ const sequelize = require('../config/database');
 const { Op } = require('sequelize');
 
 exports.getAllListings = async (req, res) => {
-  const { city, type, minPrice, maxPrice } = req.query;
+  const { city, type, minPrice, maxPrice, sort, limit, offset } = req.query;
   const where = { isApproved: true };
 
   if (city) where.city = { [Op.iLike]: `%${city}%` };
@@ -16,8 +16,17 @@ exports.getAllListings = async (req, res) => {
     if (maxPrice) where.price[Op.lte] = parseFloat(maxPrice);
   }
 
+  const sortOptions = {
+    'price_asc': [['price', 'ASC']],
+    'price_desc': [['price', 'DESC']],
+    'newest': [['createdAt', 'DESC']]
+  };
+  const order = sortOptions[sort] || [['createdAt', 'DESC']];
+  const queryLimit = limit ? parseInt(limit, 10) : 50;
+  const queryOffset = offset ? parseInt(offset, 10) : 0;
+
   try {
-    const listings = await Listing.findAll({ where, order: [['createdAt', 'DESC']] });
+    const listings = await Listing.findAll({ where, order, limit: queryLimit, offset: queryOffset });
     
     // Fetch average ratings and counts in a group query
     const reviews = await Review.findAll({
@@ -68,6 +77,18 @@ exports.getListingById = async (req, res) => {
       ratingAverage,
       reviewCount
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getMyListings = async (req, res) => {
+  try {
+    const listings = await Listing.findAll({
+      where: { hostId: req.user.id },
+      order: [['createdAt', 'DESC']]
+    });
+    res.json(listings);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

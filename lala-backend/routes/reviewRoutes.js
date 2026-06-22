@@ -7,6 +7,7 @@ const { authMiddleware } = require('../middleware/auth');
 router.post('/', authMiddleware, reviewController.createReview);
 router.get('/can-review/:listingId', authMiddleware, reviewController.checkCanReview);
 router.get('/host/rating', authMiddleware, reviewController.getHostRating);
+router.post('/host/respond', authMiddleware, reviewController.hostRespond);
 
 // Public route to fetch reviews (must be last — catches by listingId)
 router.get('/:listingId', reviewController.getListingReviews);

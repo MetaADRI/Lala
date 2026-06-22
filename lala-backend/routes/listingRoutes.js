@@ -5,6 +5,7 @@ const { authMiddleware, roleMiddleware } = require('../middleware/auth');
 
 router.get('/', listingController.getAllListings);
 router.get('/pending', authMiddleware, roleMiddleware(['admin']), listingController.getPendingListings);
+router.get('/mine', authMiddleware, roleMiddleware(['host', 'admin']), listingController.getMyListings);
 router.get('/:id', listingController.getListingById);
 router.post('/', authMiddleware, roleMiddleware(['host', 'admin']), listingController.createListing);
 router.patch('/:id/approve', authMiddleware, roleMiddleware(['admin']), listingController.approveListing);

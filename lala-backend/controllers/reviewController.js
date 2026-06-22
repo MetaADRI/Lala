@@ -6,7 +6,7 @@ const { Op } = require('sequelize');
 const sequelize = require('../config/database');
 
 exports.createReview = async (req, res) => {
-  const { listingId, rating, comment } = req.body;
+  const { listingId, rating, cleanliness, comfort, location, value, comment } = req.body;
   const guestId = req.user.id;
 
   if (!listingId || !rating) {
@@ -19,25 +19,16 @@ exports.createReview = async (req, res) => {
   }
 
   try {
-    // Check if user has a confirmed stay for this listing
     const confirmedBooking = await Booking.findOne({
-      where: {
-        listingId,
-        guestId,
-        status: 'confirmed'
-      }
+      where: { listingId, guestId, status: 'confirmed' }
     });
 
     if (!confirmedBooking) {
       return res.status(403).json({ error: 'You can only review properties where you have a confirmed stay.' });
     }
 
-    // Check if user already reviewed this listing
     const existingReview = await Review.findOne({
-      where: {
-        listingId,
-        guestId
-      }
+      where: { listingId, guestId }
     });
 
     if (existingReview) {
@@ -48,10 +39,13 @@ exports.createReview = async (req, res) => {
       listingId,
       guestId,
       rating: numericRating,
+      cleanliness: cleanliness ? parseInt(cleanliness, 10) : null,
+      comfort: comfort ? parseInt(comfort, 10) : null,
+      location: location ? parseInt(location, 10) : null,
+      value: value ? parseInt(value, 10) : null,
       comment
     });
 
-    // Load guest info to return with the review
     const guest = await User.findByPk(guestId);
 
     res.status(201).json({
@@ -60,7 +54,13 @@ exports.createReview = async (req, res) => {
         id: review.id,
         listingId: review.listingId,
         rating: review.rating,
+        cleanliness: review.cleanliness,
+        comfort: review.comfort,
+        location: review.location,
+        value: review.value,
         comment: review.comment,
+        hostResponse: review.hostResponse,
+        hostRespondedAt: review.hostRespondedAt,
         createdAt: review.createdAt,
         guest: guest ? { name: guest.name, phone: guest.phone } : { name: 'Anonymous', phone: '' }
       }
@@ -94,7 +94,13 @@ exports.getListingReviews = async (req, res) => {
         id: r.id,
         listingId: r.listingId,
         rating: r.rating,
+        cleanliness: r.cleanliness,
+        comfort: r.comfort,
+        location: r.location,
+        value: r.value,
         comment: r.comment,
+        hostResponse: r.hostResponse,
+        hostRespondedAt: r.hostRespondedAt,
         createdAt: r.createdAt,
         guest: guest ? { name: guest.name, phone: guest.phone } : { name: 'Anonymous', phone: '' }
       };
@@ -130,6 +136,33 @@ exports.checkCanReview = async (req, res) => {
       canReview: !!confirmedBooking && !existingReview,
       alreadyReviewed: !!existingReview
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.hostRespond = async (req, res) => {
+  const { reviewId, response } = req.body;
+  const hostId = req.user.id;
+
+  if (!reviewId || !response) {
+    return res.status(400).json({ error: 'reviewId and response are required' });
+  }
+
+  try {
+    const review = await Review.findByPk(reviewId);
+    if (!review) return res.status(404).json({ error: 'Review not found' });
+
+    const listing = await Listing.findByPk(review.listingId);
+    if (!listing || listing.hostId !== hostId) {
+      return res.status(403).json({ error: 'You can only respond to reviews for your own listings.' });
+    }
+
+    review.hostResponse = response;
+    review.hostRespondedAt = new Date();
+    await review.save();
+
+    res.json({ message: 'Response submitted', hostResponse: response, hostRespondedAt: review.hostRespondedAt });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

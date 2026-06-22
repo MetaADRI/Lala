@@ -110,6 +110,19 @@ h1, h2, h3, h4, .sora {
   box-shadow: 0 8px 24px rgba(0,0,0,0.08); 
 }
 
+/* ---- SCORE BADGES ---- */
+.score-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 8px; border-radius: 6px; font-size: 12px;
+  font-weight: 700; font-family: 'Sora', sans-serif;
+}
+.score-badge i { font-size: 10px; }
+.score-excellent { background: #1B5E20; color: #fff; }
+.score-very-good { background: #2E7D32; color: #fff; }
+.score-good { background: #1565C0; color: #fff; }
+.score-fair { background: #757575; color: #fff; }
+.score-new { background: var(--gold-lt); color: var(--gold); }
+
 /* ---- BADGES & PILLS ---- */
 .star-badge {
   display: flex;

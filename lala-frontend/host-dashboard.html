@@ -106,11 +106,22 @@
       <div class="scard gld"><div class="sval" id="hostRating">—</div><div class="slbl">Rating</div></div>
     </div>
 
-    <div class="fade-up">
+    <div style="display:flex; gap:8px; margin-bottom:12px;" class="fade-up">
+      <button class="btn-green" id="tabBookings" onclick="switchTab('bookings')" style="flex:1; font-size:12px; padding:8px;">Bookings</button>
+      <button class="btn-outline" id="tabReviews" onclick="switchTab('reviews')" style="flex:1; font-size:12px; padding:8px;">Reviews</button>
+    </div>
+
+    <div class="fade-up" id="bookingsSection">
       <div class="sora" style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">Recent Bookings</div>
       <div id="bookingsList" style="display: flex; flex-direction: column; gap: 10px;">
-        <!-- Dynamic Bookings -->
         <div class="muted-text" style="text-align:center; padding:20px;">Loading bookings...</div>
+      </div>
+    </div>
+
+    <div class="fade-up" id="reviewsSection" style="display:none;">
+      <div class="sora" style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">Guest Reviews</div>
+      <div id="reviewsList" style="display: flex; flex-direction: column; gap: 10px;">
+        <div class="muted-text" style="text-align:center; padding:20px;">Loading reviews...</div>
       </div>
     </div>
 
@@ -188,6 +199,97 @@
     }
 
     document.getElementById('hostName').innerText = user.name || user.phone;
+
+    function switchTab(tab) {
+      const bSec = document.getElementById('bookingsSection');
+      const rSec = document.getElementById('reviewsSection');
+      const bTab = document.getElementById('tabBookings');
+      const rTab = document.getElementById('tabReviews');
+      if (tab === 'bookings') {
+        bSec.style.display = 'block'; rSec.style.display = 'none';
+        bTab.className = 'btn-green'; rTab.className = 'btn-outline';
+      } else {
+        bSec.style.display = 'none'; rSec.style.display = 'block';
+        bTab.className = 'btn-outline'; rTab.className = 'btn-green';
+        loadReviews();
+      }
+    }
+
+    async function loadReviews() {
+      const listEl = document.getElementById('reviewsList');
+      listEl.innerHTML = '<div class="muted-text" style="text-align:center; padding:20px;">Loading reviews...</div>';
+      try {
+        const listings = await api.getMyListings();
+        if (!Array.isArray(listings) || listings.length === 0) {
+          listEl.innerHTML = '<div class="muted-text" style="text-align:center; padding:20px;">No listings yet.</div>';
+          return;
+        }
+        let allReviews = [];
+        for (const l of listings) {
+          const reviews = await api.getReviews(l.id);
+          reviews.forEach(r => { r.listingName = l.name; r.listingId = l.id; });
+          allReviews = allReviews.concat(reviews);
+        }
+        allReviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        if (allReviews.length === 0) {
+          listEl.innerHTML = '<div class="muted-text" style="text-align:center; padding:20px;">No reviews yet.</div>';
+          return;
+        }
+        listEl.innerHTML = allReviews.map(r => {
+          const guestName = r.guest ? r.guest.name || r.guest.phone || 'Anonymous' : 'Anonymous';
+          const initials = guestName.replace(/[^a-zA-Z0-9]/g, ' ').split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'G';
+          const fullStars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+          const hasResponse = r.hostResponse && r.hostResponse.trim();
+          return `
+            <div class="bitem" style="flex-direction:column; align-items:stretch;">
+              <div style="display:flex; align-items:center; gap:10px; width:100%;">
+                <div class="av">${initials}</div>
+                <div style="flex:1;">
+                  <div class="bname">${r.listingName}</div>
+                  <div style="font-size:10px; color:var(--muted);">${guestName} · ${new Date(r.createdAt).toLocaleDateString()}</div>
+                  <div style="font-size:12px; color:var(--gold);">${fullStars}</div>
+                </div>
+              </div>
+              ${r.comment ? `<p style="font-size:12px; color:var(--text); margin:6px 0 0 0; line-height:1.5;">"${r.comment}"</p>` : ''}
+              ${hasResponse ? `
+                <div style="margin-top:8px; padding:8px; background:var(--g-light); border-radius:8px;">
+                  <div style="font-size:10px; font-weight:600; color:var(--g-dark);">Your response:</div>
+                  <div style="font-size:11px; margin-top:2px;">${r.hostResponse}</div>
+                </div>
+              ` : `
+                <button class="btn-outline" style="font-size:10px; padding:6px 12px; margin-top:8px; align-self:flex-start;" onclick="showRespondForm('${r.id}', '${r.listingId}')">
+                  <i class="ti ti-message"></i> Respond
+                </button>
+              `}
+              <div class="respond-form" id="respond-${r.id}" style="display:none; margin-top:8px;">
+                <textarea id="resp-text-${r.id}" style="width:100%; padding:8px; border:1.5px solid var(--border); border-radius:8px; font-size:12px; min-height:60px; resize:vertical; font-family:inherit;" placeholder="Write your response..."></textarea>
+                <button class="btn-green" style="font-size:10px; padding:6px 14px; margin-top:4px;" onclick="submitResponse('${r.id}')">Submit Response</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error(err);
+        listEl.innerHTML = '<div class="muted-text" style="text-align:center; padding:20px; color:red;">Error loading reviews.</div>';
+      }
+    }
+
+    window.showRespondForm = function(reviewId) {
+      const form = document.getElementById(`respond-${reviewId}`);
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    };
+
+    window.submitResponse = async function(reviewId) {
+      const text = document.getElementById(`resp-text-${reviewId}`).value.trim();
+      if (!text) { alert('Please write a response.'); return; }
+      try {
+        await api.hostRespond(reviewId, text);
+        alert('Response submitted!');
+        loadReviews();
+      } catch (err) {
+        alert('Failed to submit response.');
+      }
+    };
 
     async function loadDashboard() {
       try {

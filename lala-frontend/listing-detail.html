@@ -72,13 +72,16 @@
     /* ── TOTAL CALC ──────────────────────────────────────────────────── */
     .price-summary {
       background: var(--g-light); border-radius: 10px; padding: 12px 14px;
-      display: none; /* shown via JS when dates are selected */
-      justify-content: space-between; align-items: center;
+      display: none;
       border: 1px solid rgba(46,125,50,0.15);
     }
-    .price-summary.visible { display: flex; }
+    .price-summary.visible { display: block; }
+    .ps-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
     .ps-label { font-size: 12px; color: var(--g-mid); }
-    .ps-total { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; color: var(--g-dark); }
+    .ps-value { font-size: 12px; color: var(--text); font-weight: 500; }
+    .ps-total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(46,125,50,0.2); }
+    .ps-total-label { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; color: var(--text); }
+    .ps-total { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: var(--g-dark); }
 
     /* ── INFO CARD ───────────────────────────────────────────────────── */
     .info-card {
@@ -132,6 +135,60 @@
     .action-bar .btn-green { flex: 1; }
     .action-bar .btn-gold { flex: 1; }
 
+    /* ── PHOTO GALLERY ────────────────────────────────────────────────── */
+    .photo-gallery {
+      position: relative; overflow: hidden;
+    }
+    .photo-gallery .hero-img {
+      width: 100%; height: 220px; object-fit: cover; display: block;
+    }
+    .gallery-thumbs {
+      display: none;
+    }
+    @media (min-width: 768px) {
+      .photo-gallery {
+        display: grid; grid-template-columns: 2fr 1fr; gap: 3px; height: 280px;
+      }
+      .photo-gallery .hero-img { height: 100%; }
+      .gallery-thumbs {
+        display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+        gap: 3px;
+      }
+      .gallery-thumbs img {
+        width: 100%; height: 100%; object-fit: cover; cursor: pointer;
+        transition: opacity 0.2s;
+      }
+      .gallery-thumbs img:hover { opacity: 0.85; }
+    }
+    .gallery-dots {
+      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 6px; z-index: 2;
+    }
+    .gallery-dots span {
+      width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5);
+      cursor: pointer;
+    }
+    .gallery-dots span.active { background: #fff; }
+
+    /* ── LIGHTBOX ─────────────────────────────────────────────────────── */
+    .lightbox {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 999;
+      display: none; align-items: center; justify-content: center;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img { max-width: 90%; max-height: 90%; object-fit: contain; }
+    .lightbox-close {
+      position: absolute; top: 20px; right: 20px; color: #fff;
+      font-size: 30px; cursor: pointer; background: none; border: none; z-index: 1000;
+    }
+    .lightbox-prev, .lightbox-next {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      color: #fff; font-size: 40px; cursor: pointer; background: rgba(0,0,0,0.3);
+      border: none; padding: 10px 16px; border-radius: 50%;
+    }
+    .lightbox-prev { left: 20px; }
+    .lightbox-next { right: 20px; }
+
     /* Date unavailability */
     input[type="date"]::-webkit-calendar-picker-indicator { 
       opacity: 0.5; cursor: pointer;
@@ -139,14 +196,24 @@
   </style>
 </head>
 <body>
-  <!-- IMAGE HEADER (populated by JS) -->
-  <div class="detail-img" id="heroImg">
-    <i class="ti ti-building-estate" id="heroIcon"></i>
+  <!-- PHOTO GALLERY -->
+  <div class="photo-gallery" id="photoGallery">
+    <img class="hero-img" id="heroImg" src="" alt="Listing photo" style="display:none;">
+    <div class="gallery-thumbs" id="galleryThumbs"></div>
     <a href="search.html" class="detail-back"><i class="ti ti-arrow-left"></i></a>
     <div class="logo-overlay">
       <img src="logo-removebg-preview.png" alt="Lala" style="height: 22px; filter: brightness(0) invert(1);">
     </div>
     <div class="detail-save" id="saveBtn" onclick="toggleSave()"><i class="ti ti-heart"></i></div>
+    <div class="gallery-dots" id="galleryDots"></div>
+  </div>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+    <button class="lightbox-prev" onclick="changePhoto(-1)">&#8249;</button>
+    <img id="lightboxImg" src="" alt="">
+    <button class="lightbox-next" onclick="changePhoto(1)">&#8250;</button>
   </div>
 
   <!-- NAME + PRICE (populated by JS) -->
@@ -156,8 +223,8 @@
       <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;" id="badgeRow"></div>
     </div>
     <div class="price-block">
-      <div class="price-main" id="listingPrice">K—</div>
-      <div class="price-sub">/night</div>
+        <div class="price-main" id="listingPrice">K—</div>
+        <div class="price-sub" id="priceSubLabel">/night</div>
     </div>
   </div>
 
@@ -178,8 +245,9 @@
         </div>
       </div>
       <div class="price-summary" id="priceSummary">
-        <div class="ps-label" id="nightsLabel">— nights</div>
-        <div class="ps-total" id="totalPrice">K—</div>
+        <div class="ps-row"><span class="ps-label" id="nightsLabel">— nights</span><span class="ps-value" id="subtotalPrice">K—</span></div>
+        <div class="ps-row"><span class="ps-label">Service fee (5%)</span><span class="ps-value" id="serviceFeePrice">K—</span></div>
+        <div class="ps-total-row"><span class="ps-total-label">Total</span><span class="ps-total" id="totalPrice">K—</span></div>
       </div>
     </div>
 
@@ -225,7 +293,7 @@
       <div class="rcard" style="padding: 18px; border-color: rgba(46, 125, 50, 0.3);">
         <form id="submitReviewForm" onsubmit="handleReviewSubmit(event)">
           <div style="margin-bottom: 14px;">
-            <label style="display:block; font-size:12px; font-weight:600; margin-bottom: 6px; color:var(--muted);">Your Rating</label>
+            <label style="display:block; font-size:12px; font-weight:600; margin-bottom: 6px; color:var(--muted);">Overall Rating</label>
             <div class="star-rating" style="display:flex; gap:8px; font-size:28px; color:#ccc; cursor:pointer;">
               <span data-val="1" onclick="setRating(1)" onmouseover="highlightStars(1)" onmouseout="resetStars()">★</span>
               <span data-val="2" onclick="setRating(2)" onmouseover="highlightStars(2)" onmouseout="resetStars()">★</span>
@@ -234,6 +302,36 @@
               <span data-val="5" onclick="setRating(5)" onmouseover="highlightStars(5)" onmouseout="resetStars()">★</span>
             </div>
             <input type="hidden" id="reviewRating" name="rating" value="">
+          </div>
+          <div style="margin-bottom: 14px; display:grid; grid-template-columns:1fr 1fr; gap:10px;" id="categoryRatings">
+            <div>
+              <label style="font-size:10px; font-weight:600; color:var(--muted); display:block; margin-bottom:3px;">Cleanliness</label>
+              <div class="cat-stars" data-cat="cleanliness" style="display:flex; gap:4px; font-size:18px; color:#ccc; cursor:pointer;">
+                <span data-val="1">★</span><span data-val="2">★</span><span data-val="3">★</span><span data-val="4">★</span><span data-val="5">★</span>
+              </div>
+              <input type="hidden" id="reviewCleanliness" value="">
+            </div>
+            <div>
+              <label style="font-size:10px; font-weight:600; color:var(--muted); display:block; margin-bottom:3px;">Comfort</label>
+              <div class="cat-stars" data-cat="comfort" style="display:flex; gap:4px; font-size:18px; color:#ccc; cursor:pointer;">
+                <span data-val="1">★</span><span data-val="2">★</span><span data-val="3">★</span><span data-val="4">★</span><span data-val="5">★</span>
+              </div>
+              <input type="hidden" id="reviewComfort" value="">
+            </div>
+            <div>
+              <label style="font-size:10px; font-weight:600; color:var(--muted); display:block; margin-bottom:3px;">Location</label>
+              <div class="cat-stars" data-cat="location" style="display:flex; gap:4px; font-size:18px; color:#ccc; cursor:pointer;">
+                <span data-val="1">★</span><span data-val="2">★</span><span data-val="3">★</span><span data-val="4">★</span><span data-val="5">★</span>
+              </div>
+              <input type="hidden" id="reviewLocation" value="">
+            </div>
+            <div>
+              <label style="font-size:10px; font-weight:600; color:var(--muted); display:block; margin-bottom:3px;">Value</label>
+              <div class="cat-stars" data-cat="value" style="display:flex; gap:4px; font-size:18px; color:#ccc; cursor:pointer;">
+                <span data-val="1">★</span><span data-val="2">★</span><span data-val="3">★</span><span data-val="4">★</span><span data-val="5">★</span>
+              </div>
+              <input type="hidden" id="reviewValue" value="">
+            </div>
           </div>
           <div style="margin-bottom: 14px;">
             <label for="reviewComment" style="display:block; font-size:12px; font-weight:600; margin-bottom: 6px; color:var(--muted);">Your Comment</label>
@@ -261,6 +359,8 @@
     let listing = null;
     let pricePerNight = 0;
     let isSaved = false;
+    let currentPhotoIndex = 0;
+    let photos = [];
 
     // ── Set today + tomorrow as default dates ──────────────────────────
     function initDates() {
@@ -280,32 +380,93 @@
       const ci = document.getElementById('checkIn').value;
       const co = document.getElementById('checkOut').value;
       const summary = document.getElementById('priceSummary');
-      const checkOut = document.getElementById('checkOut');
+      const checkOutEl = document.getElementById('checkOut');
 
       if (!ci || !co) { summary.classList.remove('visible'); return; }
 
       const ciDate = new Date(ci);
       const coDate = new Date(co);
 
-      // Force checkout to be after checkin
       if (coDate <= ciDate) {
         const next = new Date(ciDate);
         next.setDate(next.getDate() + 1);
-        checkOut.value = next.toISOString().split('T')[0];
-        checkOut.min = checkOut.value;
+        checkOutEl.value = next.toISOString().split('T')[0];
+        checkOutEl.min = checkOutEl.value;
       }
 
-      const nights = Math.max(1, Math.ceil((new Date(checkOut.value) - ciDate) / (1000 * 60 * 60 * 24)));
-      const total = nights * pricePerNight;
+      const nights = Math.max(1, Math.ceil((new Date(checkOutEl.value) - ciDate) / (1000 * 60 * 60 * 24)));
+      const subtotal = nights * pricePerNight;
+      const serviceFee = Math.round(subtotal * 0.05);
+      const total = subtotal + serviceFee;
 
       document.getElementById('nightsLabel').textContent = `${nights} night${nights > 1 ? 's' : ''} × K${pricePerNight}`;
+      document.getElementById('subtotalPrice').textContent = `K${subtotal.toLocaleString()}`;
+      document.getElementById('serviceFeePrice').textContent = `K${serviceFee.toLocaleString()}`;
       document.getElementById('totalPrice').textContent = `K${total.toLocaleString()}`;
       summary.classList.add('visible');
 
-      // Update pay button text
       const payBtn = document.getElementById('payBtn');
       if (payBtn) payBtn.innerHTML = `<i class="ti ti-device-mobile"></i> Pay K${total.toLocaleString()}`;
     }
+
+    // ── Photo Gallery ───────────────────────────────────────────────────
+    function setupGallery(photosArr) {
+      photos = photosArr;
+      const heroImg = document.getElementById('heroImg');
+      const thumbs = document.getElementById('galleryThumbs');
+      const dots = document.getElementById('galleryDots');
+
+      if (!photos || photos.length === 0) {
+        heroImg.style.display = 'none';
+        return;
+      }
+
+      heroImg.src = photos[0];
+      heroImg.style.display = 'block';
+      dots.innerHTML = photos.map((_, i) => `<span class="${i === 0 ? 'active' : ''}" onclick="showPhoto(${i})"></span>`).join('');
+
+      if (photos.length > 1) {
+        thumbs.innerHTML = photos.slice(1, 5).map((p, i) =>
+          `<img src="${p}" loading="lazy" onclick="openLightbox(${i + 1})" alt="Photo ${i + 2}">`
+        ).join('');
+      }
+
+      heroImg.onclick = () => openLightbox(0);
+    }
+
+    function showPhoto(index) {
+      currentPhotoIndex = index;
+      document.getElementById('heroImg').src = photos[index];
+      document.querySelectorAll('.gallery-dots span').forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
+      });
+    }
+
+    // ── Lightbox ────────────────────────────────────────────────────────
+    function openLightbox(index) {
+      currentPhotoIndex = index;
+      document.getElementById('lightboxImg').src = photos[index];
+      document.getElementById('lightbox').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox(e) {
+      if (e && e.target !== e.currentTarget) return;
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function changePhoto(direction) {
+      currentPhotoIndex = (currentPhotoIndex + direction + photos.length) % photos.length;
+      document.getElementById('lightboxImg').src = photos[currentPhotoIndex];
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (!document.getElementById('lightbox').classList.contains('open')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') changePhoto(-1);
+      if (e.key === 'ArrowRight') changePhoto(1);
+    });
 
     // ── Toggle save ────────────────────────────────────────────────────
     function toggleSave() {
@@ -313,13 +474,17 @@
       const btn = document.getElementById('saveBtn');
       btn.innerHTML = isSaved ? '<i class="ti ti-heart-filled" style="color:#ff6b6b;"></i>' : '<i class="ti ti-heart"></i>';
       btn.classList.toggle('saved', isSaved);
+      const saved = new Set(JSON.parse(localStorage.getItem('lala_saved') || '[]'));
+      if (isSaved) saved.add(listing.id);
+      else saved.delete(listing.id);
+      localStorage.setItem('lala_saved', JSON.stringify([...saved]));
     }
 
     // ── WhatsApp deep-link booking ─────────────────────────────────────
     function handleWhatsAppBooking() {
       if (!listing) return;
       const name = listing.name;
-      const hostPhone = listing.hostPhone || '260977000111'; // fallback only if missing
+      const hostPhone = listing.hostPhone || '260977000111';
       const checkIn = document.getElementById('checkIn').value || '(date TBD)';
       const checkOut = document.getElementById('checkOut').value || '(date TBD)';
 
@@ -340,7 +505,6 @@
       }
 
       if (!api.isLoggedIn()) {
-        // Save intent and redirect to guest login
         sessionStorage.setItem('booking_intent', JSON.stringify({
           listingId: listing.id, checkIn, checkOut
         }));
@@ -348,7 +512,6 @@
         return;
       }
 
-      // Build payment URL with all parameters
       const nights = Math.max(1, Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)));
       const total = nights * pricePerNight;
 
@@ -382,20 +545,26 @@
         pricePerNight = listing.price;
         document.title = `Lala — ${listing.name}`;
 
-        // Hero image
-        const heroImg = document.getElementById('heroImg');
-        if (listing.photos && listing.photos.length > 0) {
-          heroImg.style.backgroundImage = `url('${listing.photos[0]}')`;
-          heroImg.style.backgroundSize = 'cover';
-          heroImg.style.backgroundPosition = 'center';
-          document.getElementById('heroIcon').style.display = 'none';
+        // Check saved state
+        const saved = new Set(JSON.parse(localStorage.getItem('lala_saved') || '[]'));
+        isSaved = saved.has(listing.id);
+        if (isSaved) {
+          document.getElementById('saveBtn').innerHTML = '<i class="ti ti-heart-filled" style="color:#ff6b6b;"></i>';
+          document.getElementById('saveBtn').classList.add('saved');
         }
+
+        // Photo gallery
+        setupGallery(listing.photos || []);
 
         // Name + Price row
         document.getElementById('listingName').textContent = listing.name;
         document.getElementById('listingPrice').textContent = `K${listing.price}`;
         
-        // Title & type
+        // Badge row
+        const scoreColor = !listing.ratingAverage || listing.ratingAverage === 0 ? 'score-new' :
+          listing.ratingAverage >= 4.5 ? 'score-excellent' :
+          listing.ratingAverage >= 4.0 ? 'score-very-good' :
+          listing.ratingAverage >= 3.0 ? 'score-good' : 'score-fair';
         const dynamicRatingText = listing.ratingAverage > 0 
           ? `${listing.ratingAverage.toFixed(1)} (${listing.reviewCount} review${listing.reviewCount !== 1 ? 's' : ''})` 
           : 'New';
@@ -423,7 +592,8 @@
         const hostPhone = listing.hostPhone || '';
         document.getElementById('hostInitials').textContent = listing.name ? listing.name[0].toUpperCase() : 'H';
         document.getElementById('hostName').textContent = 'Verified Host';
-        document.getElementById('hostPhone').textContent = hostPhone ? `+${hostPhone}` : 'Contact via WhatsApp';
+        const hostSince = listing.createdAt ? new Date(listing.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '';
+        document.getElementById('hostPhone').innerHTML = hostPhone ? `+${hostPhone}${hostSince ? `<br><span style="font-size:10px;color:#999;">Host since ${hostSince}</span>` : ''}` : 'Contact via WhatsApp';
         document.getElementById('hostRow').style.display = 'flex';
 
         // Reviews
@@ -433,7 +603,6 @@
         document.getElementById('ratingBadge').textContent = reviewText;
         document.getElementById('reviewsSection').style.display = 'block';
 
-        // Load dynamic reviews
         await loadReviews();
 
         // Check if guest can review
@@ -463,7 +632,7 @@
         });
 
       } catch (err) {
-        document.getElementById('heroIcon').style.fontSize = '40px';
+        document.getElementById('heroImg').style.display = 'none';
         document.querySelector('.detail-body').innerHTML = `
           <div style="text-align:center; padding:40px; color:var(--muted);">
             <i class="ti ti-alert-circle" style="font-size:40px;"></i>
@@ -476,6 +645,7 @@
 
     // ── Review UI Helpers ──────────────────────────────────────────────
     let selectedRating = 0;
+    const catValues = { cleanliness: 0, comfort: 0, location: 0, value: 0 };
     
     window.setRating = function(rating) {
       selectedRating = rating;
@@ -494,12 +664,60 @@
     function updateStars(rating) {
       const stars = document.querySelectorAll('.star-rating span');
       stars.forEach((star, idx) => {
-        if (idx < rating) {
-          star.style.color = 'var(--gold)';
-        } else {
-          star.style.color = '#ccc';
-        }
+        star.style.color = idx < rating ? 'var(--gold)' : '#ccc';
       });
+    }
+
+    document.querySelectorAll('.cat-stars').forEach(container => {
+      const cat = container.dataset.cat;
+      container.querySelectorAll('span').forEach(star => {
+        star.addEventListener('click', () => {
+          const val = parseInt(star.dataset.val, 10);
+          catValues[cat] = val;
+          document.getElementById(`review${cat.charAt(0).toUpperCase() + cat.slice(1)}`).value = val;
+          container.querySelectorAll('span').forEach((s, i) => {
+            s.style.color = i < val ? 'var(--g-dark)' : '#ccc';
+          });
+        });
+        star.addEventListener('mouseover', () => {
+          const val = parseInt(star.dataset.val, 10);
+          container.querySelectorAll('span').forEach((s, i) => {
+            s.style.color = i < val ? '#66BB6A' : '#ccc';
+          });
+        });
+        star.addEventListener('mouseout', () => {
+          const val = catValues[cat] || 0;
+          container.querySelectorAll('span').forEach((s, i) => {
+            s.style.color = i < val ? 'var(--g-dark)' : '#ccc';
+          });
+        });
+      });
+    });
+
+    function getReviewBreakdownHTML(r) {
+      const cats = [
+        { key: 'cleanliness', label: 'Cleanliness' },
+        { key: 'comfort', label: 'Comfort' },
+        { key: 'location', label: 'Location' },
+        { key: 'value', label: 'Value' }
+      ];
+      const hasCategories = cats.some(c => r[c.key]);
+      if (!hasCategories) return '';
+      return `<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0;">
+        ${cats.map(c => {
+          const val = r[c.key] || 0;
+          const pct = val / 5 * 100;
+          return `<div style="font-size:11px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+              <span style="color:var(--muted);">${c.label}</span>
+              <span style="font-weight:600;">${val}/5</span>
+            </div>
+            <div style="background:#e0e0e0; height:4px; border-radius:2px; overflow:hidden;">
+              <div style="background:var(--g-dark); height:100%; width:${pct}%; border-radius:2px;"></div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
     }
 
     async function loadReviews() {
@@ -507,7 +725,6 @@
         const reviews = await api.getReviews(listing.id);
         const reviewsContainer = document.getElementById('reviewsSection');
         
-        // Remove existing review cards (elements with class .rcard)
         const existingCards = reviewsContainer.querySelectorAll('.rcard');
         existingCards.forEach(card => card.remove());
         
@@ -524,10 +741,9 @@
           reviews.forEach(r => {
             const guestName = r.guest ? r.guest.name || r.guest.phone || 'Anonymous' : 'Anonymous';
             const initials = guestName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-            
-            // Build stars string
             const fullStars = '★'.repeat(r.rating);
             const emptyStars = '☆'.repeat(5 - r.rating);
+            const hasHostResponse = r.hostResponse && r.hostResponse.trim();
             
             reviewsContainer.insertAdjacentHTML('beforeend', `
               <div class="rcard">
@@ -542,6 +758,16 @@
                   </div>
                 </div>
                 <p class="rtext">"${r.comment || ''}"</p>
+                ${getReviewBreakdownHTML(r)}
+                ${hasHostResponse ? `
+                  <div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--border); background:var(--g-light); border-radius:8px; padding:10px;">
+                    <div style="font-size:10px; font-weight:600; color:var(--g-dark); margin-bottom:4px;">
+                      <i class="ti ti-rosette-discount-check"></i> Host Response
+                    </div>
+                    <div style="font-size:12px; color:var(--text);">${r.hostResponse}</div>
+                    <div style="font-size:9px; color:var(--muted); margin-top:4px;">${new Date(r.hostRespondedAt).toLocaleDateString()}</div>
+                  </div>
+                ` : ''}
               </div>
             `);
           });
@@ -555,6 +781,10 @@
       e.preventDefault();
       const ratingVal = document.getElementById('reviewRating').value;
       const commentVal = document.getElementById('reviewComment').value.trim();
+      const cleanlinessVal = document.getElementById('reviewCleanliness').value;
+      const comfortVal = document.getElementById('reviewComfort').value;
+      const locationVal = document.getElementById('reviewLocation').value;
+      const valueVal = document.getElementById('reviewValue').value;
       
       if (!ratingVal) {
         alert('Please select a star rating.');
@@ -569,19 +799,17 @@
         const result = await api.createReview({
           listingId: listing.id,
           rating: parseInt(ratingVal, 10),
+          cleanliness: cleanlinessVal ? parseInt(cleanlinessVal, 10) : null,
+          comfort: comfortVal ? parseInt(comfortVal, 10) : null,
+          location: locationVal ? parseInt(locationVal, 10) : null,
+          value: valueVal ? parseInt(valueVal, 10) : null,
           comment: commentVal
         });
         
-        if (result.error) {
-          throw new Error(result.error);
-        }
+        if (result.error) throw new Error(result.error);
         
         alert('Thank you! Your review has been submitted.');
-        
-        // Hide review form and reload
         document.getElementById('reviewFormCard').style.display = 'none';
-        
-        // Reload listing details to get updated average rating
         await loadListingDetail();
         
       } catch (err) {
