@@ -12,15 +12,17 @@ function signToken(user) {
 }
 
 exports.register = async (req, res) => {
-  const { email, password, name, phone } = req.body;
+  const { email, password, name, phone, role } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
+
+  const safeRole = role === 'host' ? 'host' : 'guest';
 
   try {
     const existing = await User.findOne({ where: { email } });
     if (existing) return res.status(400).json({ error: 'An account with this email already exists' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ email, password: hashedPassword, name, phone, role: 'guest' });
+    const user = await User.create({ email, password: hashedPassword, name, phone, role: safeRole });
 
     const { token, user: userData } = signToken(user);
     res.status(201).json({ message: 'Account created successfully', token, user: userData });

@@ -5,11 +5,11 @@ console.log('🔗 Connected to API:', API_BASE);
 
 const api = {
   // ─── AUTH ──────────────────────────────────────────────────────────────────
-  register: async (email, password, name, phone) => {
+  register: async (email, password, name, phone, role) => {
     const res = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, name, phone })
+      body: JSON.stringify({ email, password, name, phone, role })
     });
     const data = await res.json();
     if (data.token) {

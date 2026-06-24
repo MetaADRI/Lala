@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lala — Become a Host</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="logo-removebg-preview.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0F2B10 0%, #1B5E20 30%, #2E7D32 60%, #43A047 100%);
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 80% 20%, rgba(249,168,37,0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 20% 80%, rgba(255,255,255,0.04) 0%, transparent 40%);
+      animation: bgShift 20s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes bgShift {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      100% { transform: translate(4%, -4%) rotate(-2deg); }
+    }
+
+    .floating-shapes {
+      position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0;
+    }
+    .shape {
+      position: absolute; border-radius: 50%; opacity: 0.05;
+      animation: floatShape 25s ease-in-out infinite;
+    }
+    .shape:nth-child(1) { width: 280px; height: 280px; background: var(--gold); top: 10%; right: 5%; animation-duration: 28s; }
+    .shape:nth-child(2) { width: 160px; height: 160px; background: #fff; bottom: 15%; left: 5%; animation-delay: -8s; animation-duration: 22s; }
+    .shape:nth-child(3) { width: 100px; height: 100px; background: var(--gold); top: 45%; left: 55%; animation-delay: -15s; animation-duration: 18s; }
+
+    @keyframes floatShape {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-25px, -25px) scale(1.08); }
+      66% { transform: translate(20px, 25px) scale(0.92); }
+    }
+
+    .host-card {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 420px;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(20px);
+      border-radius: 28px;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.25);
+      overflow: hidden;
+      animation: cardEnter 0.8s ease-out;
+    }
+
+    @keyframes cardEnter {
+      from { opacity: 0; transform: translateY(40px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .card-strip {
+      height: 4px;
+      background: linear-gradient(90deg, var(--gold), #FFB300, var(--gold));
+      background-size: 200% 100%;
+      animation: stripShine 3s linear infinite;
+    }
+
+    @keyframes stripShine {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .card-header {
+      background: linear-gradient(160deg, #1B5E20, #2E7D32);
+      padding: 22px 28px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header::after {
+      content: ''; position: absolute; top: -40px; right: -30px;
+      width: 160px; height: 160px;
+      background: rgba(249,168,37,0.08);
+      border-radius: 50%;
+    }
+
+    .earn-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--gold); color: #3E2700;
+      font-size: 11px; font-weight: 700; padding: 4px 12px;
+      border-radius: 99px; margin-bottom: 14px;
+      font-family: 'Sora', sans-serif;
+      position: relative; z-index: 1;
+    }
+
+    .header-title {
+      font-family: 'Sora', sans-serif; font-weight: 800; font-size: 22px;
+      color: #fff; position: relative; z-index: 1; line-height: 1.2;
+    }
+
+    .header-sub {
+      font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 6px; position: relative; z-index: 1;
+    }
+
+    .card-body { padding: 24px 28px; display: flex; flex-direction: column; gap: 16px; }
+
+    .perks {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+
+    .perk {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; color: var(--g-dark); background: var(--g-light);
+      padding: 5px 10px; border-radius: 8px; font-weight: 500;
+    }
+
+    .perk i { font-size: 14px; }
+
+    .input-group { display: flex; flex-direction: column; gap: 5px; }
+
+    .input-group label {
+      font-size: 12px; font-weight: 600; color: var(--muted);
+      font-family: 'Sora', sans-serif; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+
+    .input-wrap {
+      display: flex; align-items: center; background: #F5F7F4;
+      border: 2px solid transparent; border-radius: 12px; padding: 0 14px;
+      transition: all 0.25s;
+    }
+
+    .input-wrap:focus-within {
+      border-color: var(--g-dark); background: #fff;
+      box-shadow: 0 0 0 4px rgba(27,94,32,0.08);
+    }
+
+    .input-wrap i { color: var(--muted); font-size: 18px; margin-right: 10px; transition: color 0.25s; }
+    .input-wrap:focus-within i { color: var(--g-dark); }
+
+    .input-wrap input {
+      flex: 1; border: none; background: transparent; padding: 14px 0; font-size: 14px;
+      font-family: 'DM Sans', sans-serif; color: var(--text); outline: none;
+    }
+
+    .input-wrap input::placeholder { color: #aaa; }
+
+    .toggle-pw { cursor: pointer; color: var(--muted); font-size: 18px; transition: color 0.2s; }
+    .toggle-pw:hover { color: var(--text); }
+
+    .btn-host {
+      width: 100%; padding: 16px;
+      background: linear-gradient(135deg, #F9A825, #FFB300);
+      color: #3E2700; border: none; border-radius: 12px;
+      font-family: 'Sora', sans-serif; font-weight: 800; font-size: 15px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.3s; position: relative; overflow: hidden;
+    }
+
+    .btn-host::before {
+      content: ''; position: absolute; top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-host:hover::before { left: 100%; }
+
+    .btn-host:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(249,168,37,0.35);
+    }
+
+    .btn-host:active { transform: translateY(0); }
+    .btn-host:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+
+    .login-link {
+      text-align: center; font-size: 13px; color: var(--muted);
+    }
+
+    .login-link a { color: var(--g-dark); font-weight: 700; text-decoration: none; }
+    .login-link a:hover { color: #0f3b12; text-decoration: underline; }
+
+    .error-msg {
+      background: #FEF2F2; border: 1px solid #FECACA; color: #DC2626;
+      font-size: 13px; padding: 10px 14px; border-radius: 10px;
+      display: none; align-items: center; gap: 8px;
+    }
+
+    .error-msg.visible { display: flex; }
+
+    /* ── Success Overlay ───────────────────────────────────────────── */
+    .success-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      display: none; align-items: center; justify-content: center;
+      background: rgba(15,43,16,0.92); backdrop-filter: blur(12px);
+    }
+    .success-overlay.show { display: flex; animation: overlayIn 0.5s ease-out; }
+    @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .success-card { text-align: center; color: #fff; animation: cardPop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards; transform: scale(0.8); opacity: 0; }
+    @keyframes cardPop { to { transform: scale(1); opacity: 1; } }
+
+    .success-check {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #FFB300);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px; font-size: 36px;
+      animation: pulseRing 2s ease-in-out infinite;
+    }
+    @keyframes pulseRing { 0%,100% { box-shadow: 0 0 0 0 rgba(249,168,37,0.4); } 50% { box-shadow: 0 0 0 20px rgba(249,168,37,0); } }
+
+    .success-title { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 26px; margin-bottom: 8px; }
+    .success-sub { font-size: 15px; color: rgba(255,255,255,0.7); margin-bottom: 6px; }
+    .success-email { font-size: 13px; color: var(--gold); font-weight: 500; margin-bottom: 28px; }
+
+    .success-loader { width: 120px; height: 3px; background: rgba(255,255,255,0.15); border-radius: 99px; margin: 0 auto; overflow: hidden; }
+    .success-loader-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold), #66BB6A); border-radius: 99px; animation: loadBar 2.8s ease-in-out forwards; }
+    @keyframes loadBar { to { width: 100%; } }
+
+    .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 10000; overflow: hidden; }
+    .confetti-piece { position: absolute; width: 8px; height: 8px; top: -10px; border-radius: 2px; animation: confettiFall linear forwards; }
+    @keyframes confettiFall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+
+    @media (max-width: 480px) {
+      .host-card { border-radius: 20px; }
+      .card-header { padding: 18px 20px 24px; }
+      .card-body { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+  </div>
+
+  <div class="success-overlay" id="successOverlay">
+    <div class="confetti-container" id="confettiContainer"></div>
+    <div class="success-card">
+      <div class="success-check"><i class="ti ti-building-estate"></i></div>
+      <div class="success-title">You're a Host!</div>
+      <div class="success-sub">Your host account is ready — start listing your property</div>
+      <div class="success-email" id="successEmail">host@example.com</div>
+      <div class="success-loader"><div class="success-loader-bar"></div></div>
+      <div style="margin-top: 16px; font-size: 12px; color: rgba(255,255,255,0.4);">Opening your dashboard...</div>
+    </div>
+  </div>
+
+  <div class="host-card">
+    <div class="card-strip"></div>
+    <div class="card-header">
+      <div class="earn-badge"><i class="ti ti-coin"></i> Earn with Lala</div>
+      <div class="header-title">Become a Host</div>
+      <div class="header-sub">List your property and start earning from travellers across Zambia</div>
+    </div>
+
+    <div class="card-body">
+      <div class="perks">
+        <span class="perk"><i class="ti ti-coin"></i> Set your price</span>
+        <span class="perk"><i class="ti ti-wallet"></i> Mobile Money</span>
+        <span class="perk"><i class="ti ti-users"></i> 500+ guests</span>
+      </div>
+
+      <div class="error-msg" id="errorMsg">
+        <i class="ti ti-alert-circle"></i>
+        <span id="errorText">Something went wrong</span>
+      </div>
+
+      <div class="input-group">
+        <label>Full name</label>
+        <div class="input-wrap">
+          <i class="ti ti-user"></i>
+          <input type="text" id="nameInput" placeholder="e.g. Bwalya Phiri" autocomplete="name">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Email address</label>
+        <div class="input-wrap">
+          <i class="ti ti-mail"></i>
+          <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Phone (optional)</label>
+        <div class="input-wrap">
+          <i class="ti ti-phone"></i>
+          <input type="tel" id="phoneInput" placeholder="+260 97 000 0000" autocomplete="tel">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <i class="ti ti-lock"></i>
+          <input type="password" id="passwordInput" placeholder="Create a strong password" autocomplete="new-password">
+          <i class="ti ti-eye toggle-pw" id="togglePw" onclick="togglePassword()"></i>
+        </div>
+      </div>
+
+      <button class="btn-host" id="hostBtn" onclick="handleHostSignup()">
+        <i class="ti ti-building-estate"></i>
+        <span id="hostBtnText">Start Earning</span>
+      </button>
+
+      <div class="login-link">
+        Already a host? <a href="guest-login.html">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js?v=2"></script>
+  <script src="api.js?v=2"></script>
+  <script>
+    function togglePassword() {
+      const input = document.getElementById('passwordInput');
+      const icon = document.getElementById('togglePw');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'ti ti-eye-off toggle-pw';
+      } else {
+        input.type = 'password';
+        icon.className = 'ti ti-eye toggle-pw';
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      document.getElementById('errorText').textContent = msg;
+      el.classList.add('visible');
+    }
+
+    function hideError() {
+      document.getElementById('errorMsg').classList.remove('visible');
+    }
+
+    function spawnConfetti() {
+      const container = document.getElementById('confettiContainer');
+      const colors = ['#F9A825','#FFB300','#43A047','#fff','#E53935','#1E88E5','#8E24AA','#FB8C00'];
+      for (let i = 0; i < 60; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.width = (4 + Math.random() * 6) + 'px';
+        piece.style.height = (4 + Math.random() * 6) + 'px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+        piece.style.animationDelay = Math.random() * 0.5 + 's';
+        container.appendChild(piece);
+      }
+    }
+
+    function showSuccess(email) {
+      document.getElementById('successEmail').textContent = email;
+      document.getElementById('successOverlay').classList.add('show');
+      spawnConfetti();
+      setTimeout(() => window.location.href = 'host-dashboard.html', 3000);
+    }
+
+    async function handleHostSignup() {
+      hideError();
+
+      const name = document.getElementById('nameInput').value.trim();
+      const email = document.getElementById('emailInput').value.trim().toLowerCase();
+      const phone = document.getElementById('phoneInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+
+      if (!name) return showError('Please enter your full name');
+      if (!email) return showError('Please enter your email address');
+      if (!/\S+@\S+\.\S+/.test(email)) return showError('Please enter a valid email address');
+      if (!password || password.length < 6) return showError('Password must be at least 6 characters');
+
+      const btn = document.getElementById('hostBtn');
+      const btnText = document.getElementById('hostBtnText');
+      btn.disabled = true;
+      btnText.textContent = 'Creating account...';
+
+      try {
+        const data = await api.register(email, password, name, phone || undefined, 'host');
+        if (data.error) {
+          showError(data.error);
+          btn.disabled = false;
+          btnText.textContent = 'Start Earning';
+          return;
+        }
+        showSuccess(email);
+      } catch (err) {
+        showError('Failed to connect. Is the backend running?');
+        console.error(err);
+        btn.disabled = false;
+        btnText.textContent = 'Start Earning';
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleHostSignup();
+    });
+  </script>
+</body>
+</html>
