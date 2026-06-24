@@ -149,6 +149,22 @@ const api = {
     return res.json();
   },
 
+  // ─── PROFILE ───────────────────────────────────────────────────────────────
+  updateProfile: async (data) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/auth/profile`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (result.token) {
+      localStorage.setItem('lala_token', result.token);
+      localStorage.setItem('lala_user', JSON.stringify(result.user));
+    }
+    return result;
+  },
+
   // ─── HOST / ADMIN ──────────────────────────────────────────────────────────
   getMyListings: async () => {
     const token = localStorage.getItem('lala_token');

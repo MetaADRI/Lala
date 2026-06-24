@@ -77,6 +77,34 @@
 
     .topbar-actions button:hover { background: rgba(255,255,255,0.2); }
 
+    .profile-avatar-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.12);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Sora', sans-serif;
+      overflow: hidden;
+      transition: border-color 0.2s;
+      padding: 0;
+    }
+
+    .profile-avatar-btn:hover { border-color: rgba(255,255,255,0.7); }
+
+    .profile-avatar-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
     .topbar-greeting {
       font-size: 11px;
       color: rgba(255,255,255,0.6);
@@ -95,7 +123,7 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
       padding: 0 16px;
-      margin-top: -10px;
+      margin-top: 20px;
       position: relative;
       z-index: 2;
     }
@@ -586,7 +614,7 @@
       </a>
       <div class="topbar-actions">
         <button onclick="location.href='search.html'" title="Browse listings"><i class="ti ti-search"></i></button>
-        <button onclick="logout()" title="Sign out"><i class="ti ti-logout"></i></button>
+        <button class="profile-avatar-btn" id="profileBtn" onclick="openModal('profileModal')" title="Profile"></button>
       </div>
     </div>
     <div class="topbar-greeting">Welcome back</div>
@@ -661,6 +689,37 @@
     </div>
   </div>
 
+  <!-- PROFILE MODAL -->
+  <div class="modal" id="profileModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Profile</h2>
+        <button class="modal-close" onclick="closeModal('profileModal')"><i class="ti ti-x"></i></button>
+      </div>
+      <form id="profileForm">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="name" id="profileName" placeholder="Your name" required>
+        </div>
+        <div class="form-group">
+          <label>Avatar URL</label>
+          <input type="url" name="avatar" id="profileAvatar" placeholder="https://example.com/avatar.jpg">
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">Paste a link to your profile picture</div>
+        </div>
+        <div id="avatarPreview" style="display:none;margin-bottom:16px;text-align:center;">
+          <img src="" alt="" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--border);">
+        </div>
+        <button type="submit" class="btn-primary">Save Changes</button>
+        <button type="button" class="btn-secondary" onclick="closeModal('profileModal')">Cancel</button>
+      </form>
+      <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);">
+        <button onclick="logout()" style="background:none;border:none;color:#c62828;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;width:100%;padding:8px 0;">
+          <i class="ti ti-logout"></i> Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- FAB -->
   <button class="fab" onclick="openModal('listingModal')" title="Add listing">
     <i class="ti ti-plus"></i>
@@ -726,6 +785,17 @@
 
     document.getElementById('hostName').innerText = user.name || user.phone || 'Host';
 
+    function updateProfileBtn() {
+      const btn = document.getElementById('profileBtn');
+      if (user.avatar) {
+        btn.innerHTML = `<img src="${user.avatar}" alt="">`;
+      } else {
+        const initials = (user.name || 'H').replace(/[^a-zA-Z0-9]/g, ' ').split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+        btn.textContent = initials;
+      }
+    }
+    updateProfileBtn();
+
     // ── Tab Switching ──────────────────────────────────────────────────
     let currentTab = 'bookings';
 
@@ -741,7 +811,22 @@
     }
 
     // ── Modal ──────────────────────────────────────────────────────────
-    function openModal(id) { document.getElementById(id).classList.add('show'); }
+    function openModal(id) {
+      document.getElementById(id).classList.add('show');
+      if (id === 'profileModal') {
+        document.getElementById('profileName').value = user.name || '';
+        document.getElementById('profileAvatar').value = user.avatar || '';
+        const input = document.getElementById('profileAvatar');
+        const preview = document.getElementById('avatarPreview');
+        const img = preview.querySelector('img');
+        if (user.avatar) {
+          img.src = user.avatar;
+          preview.style.display = 'block';
+        } else {
+          preview.style.display = 'none';
+        }
+      }
+    }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
     document.querySelectorAll('.modal').forEach(m => {
@@ -915,6 +1000,36 @@
         loadListings();
       } catch (err) {
         alert('Failed to submit listing. Please try again.');
+      }
+    });
+
+    // ── Profile Form ───────────────────────────────────────────────────
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = e.target.name.value.trim();
+      const avatar = e.target.avatar.value.trim() || null;
+      if (!name) { alert('Name is required.'); return; }
+      try {
+        const result = await api.updateProfile({ name, avatar });
+        if (result.error) { alert(result.error); return; }
+        Object.assign(user, result.user);
+        localStorage.setItem('lala_user', JSON.stringify(user));
+        document.getElementById('hostName').innerText = user.name || 'Host';
+        updateProfileBtn();
+        closeModal('profileModal');
+      } catch (err) {
+        alert('Failed to update profile.');
+      }
+    });
+
+    document.getElementById('profileAvatar').addEventListener('input', function() {
+      const preview = document.getElementById('avatarPreview');
+      const img = preview.querySelector('img');
+      if (this.value.trim()) {
+        img.src = this.value.trim();
+        preview.style.display = 'block';
+      } else {
+        preview.style.display = 'none';
       }
     });
 

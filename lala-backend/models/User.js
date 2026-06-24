@@ -28,6 +28,10 @@ const User = sequelize.define('User', {
   role: {
     type: DataTypes.STRING,
     defaultValue: 'guest'
+  },
+  avatar: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 });
 

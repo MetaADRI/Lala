@@ -49,6 +49,24 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.updateProfile = async (req, res) => {
+  const { name, avatar } = req.body;
+
+  try {
+    const user = await User.findByPk(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (name !== undefined) user.name = name;
+    if (avatar !== undefined) user.avatar = avatar;
+    await user.save();
+
+    const { token, user: userData } = signToken(user);
+    res.json({ message: 'Profile updated', token, user: userData });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.setupHost = async (req, res) => {
   const { name } = req.body;
   if (!name) return res.status(400).json({ error: 'Name is required' });
