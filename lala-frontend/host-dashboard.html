@@ -5,189 +5,715 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lala — Host Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="common.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
-    /* Local overrides for Host Dashboard */
-    body { background: var(--bg); }
-    
-    .dash-nav {
-      background: var(--g-dark); padding: 16px 18px 24px; color: #fff;
-    }
-    .dash-header { display: flex; justify-content: space-between; align-items: flex-end; }
-    
-    .main-dash { padding: 20px 18px; display: flex; flex-direction: column; gap: 20px; }
-    
-    .srow { display: flex; gap: 10px; }
-    .scard { 
-      flex: 1; background: var(--g-dark); border-radius: var(--rsm); padding: 14px 10px; color: #fff;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .scard.blu { background: #1565C0; }
-    .scard.gld { background: var(--gold); color: #3E2700; }
-    .sval { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; }
-    .slbl { font-size: 10px; opacity: 0.8; margin-top: 2px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    .bitem {
-      background: var(--card); border-radius: var(--rsm); border: 1px solid var(--border);
-      padding: 12px; display: flex; align-items: center; gap: 10px;
+    body {
+      background: var(--bg);
+      min-height: 100vh;
+      padding-bottom: 80px;
     }
-    .av {
-      width: 36px; height: 36px; border-radius: 50%; background: var(--g-light);
-      color: var(--g-dark); display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 12px; font-family: 'Sora', sans-serif; flex-shrink: 0;
-    }
-    .bname { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 13px; color: var(--text); }
-    .bdates { font-size: 11px; color: var(--muted); margin-top: 1px; }
-    .bstat { 
-      margin-left: auto; font-size: 10px; font-weight: 600; padding: 4px 10px; 
-      border-radius: 99px; font-family: 'Sora', sans-serif;
-    }
-    .conf { background: var(--g-light); color: var(--g-mid); }
-    .pend { background: var(--gold-lt); color: #7B4F00; }
 
-    .dash-footer {
-      position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
-      border-top: 1px solid var(--border); padding: 10px 0 14px;
-      display: flex; justify-content: space-around;
+    /* ── Top Bar ───────────────────────────────────────────────────── */
+    .topbar {
+      background: linear-gradient(160deg, #0F2B10, #1B5E20, #2E7D32);
+      padding: 18px 20px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     }
-    .bni {
-      display: flex; flex-direction: column; align-items: center; gap: 2px;
-      color: var(--muted); font-size: 10px; font-weight: 500; font-family: 'Sora', sans-serif;
+
+    .topbar-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .topbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       text-decoration: none;
     }
-    .bni.on { color: var(--g-dark); }
-    .bni i { font-size: 20px; }
 
-    /* Modal Styling */
+    .topbar-logo img {
+      height: 26px;
+      filter: brightness(0) invert(1);
+    }
+
+    .topbar-logo span {
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topbar-actions button {
+      background: rgba(255,255,255,0.12);
+      border: none;
+      color: #fff;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: background 0.2s;
+    }
+
+    .topbar-actions button:hover { background: rgba(255,255,255,0.2); }
+
+    .topbar-greeting {
+      font-size: 11px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .topbar-name {
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      color: #fff;
+    }
+
+    /* ── Stats Row ─────────────────────────────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 0 16px;
+      margin-top: -10px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .stat-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 16px 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      animation: statSlide 0.5s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes statSlide {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stat-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .stat-icon.grn { background: var(--g-light); color: var(--g-dark); }
+    .stat-icon.blu { background: #E3F2FD; color: #1565C0; }
+    .stat-icon.gld { background: var(--gold-lt); color: #7B4F00; }
+
+    .stat-value {
+      font-family: 'Sora', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      color: var(--text);
+      line-height: 1.1;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ── Content ───────────────────────────────────────────────────── */
+    .content {
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .section-title {
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    .section-action {
+      font-size: 12px;
+      color: var(--g-dark);
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .section-action:hover { text-decoration: underline; }
+
+    /* ── Tab Bar ────────────────────────────────────────────────────── */
+    .tab-bar {
+      display: flex;
+      gap: 6px;
+      background: rgba(0,0,0,0.04);
+      border-radius: 12px;
+      padding: 4px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      font-family: 'Sora', sans-serif;
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .tab-btn.on {
+      background: #fff;
+      color: var(--g-dark);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .tab-btn:hover:not(.on) { color: var(--text); }
+
+    .tab-panel { display: none; }
+    .tab-panel.on { display: flex; flex-direction: column; gap: 12px; }
+
+    /* ── Booking / Review Items ─────────────────────────────────────── */
+    .list-item {
+      background: #fff;
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      border: 1px solid var(--border);
+      animation: itemIn 0.4s ease-out forwards;
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    @keyframes itemIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .list-item-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .li-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--g-light);
+      color: var(--g-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .li-info { flex: 1; }
+
+    .li-title {
+      font-family: 'Sora', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .li-meta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .li-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-family: 'Sora', sans-serif;
+      flex-shrink: 0;
+    }
+
+    .li-badge.conf { background: var(--g-light); color: var(--g-mid); }
+    .li-badge.pend { background: var(--gold-lt); color: #7B4F00; }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+    }
+
+    .empty-state i {
+      font-size: 40px;
+      opacity: 0.3;
+      margin-bottom: 12px;
+    }
+
+    .empty-state p {
+      font-size: 13px;
+    }
+
+    /* ── Stars ──────────────────────────────────────────────────────── */
+    .stars { color: var(--gold); font-size: 14px; letter-spacing: 1px; }
+
+    /* ── Bottom Nav ─────────────────────────────────────────────────── */
+    .botnav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 12px;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 10px;
+      font-family: 'Sora', sans-serif;
+      font-weight: 500;
+      transition: color 0.2s;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .nav-item i { font-size: 20px; transition: color 0.2s; }
+    .nav-item.on { color: var(--g-dark); }
+    .nav-item:hover { color: var(--g-dark); }
+
+    /* ── Add FAB ────────────────────────────────────────────────────── */
+    .fab {
+      position: fixed;
+      bottom: 76px;
+      right: 18px;
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #1B5E20, #2E7D32);
+      color: #fff;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(27,94,32,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      z-index: 50;
+    }
+
+    .fab:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(27,94,32,0.45);
+    }
+
+    .fab:active { transform: scale(0.95); }
+
+    /* ── Review Actions ─────────────────────────────────────────────── */
+    .resp-form {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      display: none;
+    }
+
+    .resp-form.open { display: block; }
+
+    .resp-form textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 12px;
+      min-height: 60px;
+      resize: vertical;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .resp-form textarea:focus { border-color: var(--g-mid); }
+
+    .resp-form button {
+      margin-top: 6px;
+      padding: 8px 16px;
+      background: var(--g-dark);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Sora', sans-serif;
+      font-weight: 600;
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .resp-form button:hover { background: #16401a; }
+
+    .host-resp {
+      margin-top: 8px;
+      padding: 10px;
+      background: var(--g-light);
+      border-radius: 10px;
+    }
+
+    .host-resp-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--g-dark);
+    }
+
+    .host-resp-text {
+      font-size: 12px;
+      margin-top: 3px;
+      color: var(--text);
+    }
+
+    /* ── Modal ──────────────────────────────────────────────────────── */
     .modal {
-      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
-      background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
+
+    .modal.show { display: flex; }
+
     .modal-content {
-      background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 500px;
-      max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      background: #fff;
+      border-radius: 20px;
+      padding: 24px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalIn 0.3s ease-out;
     }
-    .input-group { margin-bottom: 16px; }
-    .input-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--muted); }
-    .input-group input, .input-group select {
-      width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 8px;
-      font-size: 14px; outline: none; transition: border-color 0.2s;
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
-    .input-group input:focus { border-color: var(--g-mid); }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 18px;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      border: none;
+      background: var(--bg);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover { background: #ddd; color: var(--text); }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-family: 'Sora', sans-serif;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #fff;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--g-mid);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .form-row .form-group { flex: 1; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #1B5E20, #2E7D32);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(27,94,32,0.3);
+    }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 14px;
+      background: #fff;
+      color: var(--g-dark);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-family: 'Sora', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+
+    .btn-secondary:hover { border-color: var(--g-mid); background: var(--g-light); }
+
+    /* ── Animations ─────────────────────────────────────────────────── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Responsive ─────────────────────────────────────────────────── */
+    @media (min-width: 600px) {
+      .stats-row { grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 0 24px; }
+      .content { padding: 22px 24px; max-width: 800px; margin: 0 auto; }
+    }
   </style>
 </head>
 <body>
-  <!-- HEADER -->
-  <div class="dash-nav">
-    <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-      <img src="logo-removebg-preview.png" alt="Lala Logo" style="height: 28px; filter: brightness(0) invert(1);">
-      <button onclick="logout()" style="background:transparent; border:none; color:#fff; font-size:12px; opacity:0.7;">Logout</button>
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-top">
+      <a href="index.html" class="topbar-logo">
+        <img src="logo-removebg-preview.png" alt="Lala">
+        <span>lala</span>
+      </a>
+      <div class="topbar-actions">
+        <button onclick="location.href='search.html'" title="Browse listings"><i class="ti ti-search"></i></button>
+        <button onclick="logout()" title="Sign out"><i class="ti ti-logout"></i></button>
+      </div>
     </div>
-    <div class="dash-header">
-      <div>
-        <div style="font-size: 11px; color: rgba(255,255,255,0.7);">Welcome back</div>
-        <div class="sora" id="hostName" style="font-weight: 700; font-size: 18px;">Loading...</div>
-      </div>
-      <div style="text-align: right;">
-        <div style="font-size: 10px; color: rgba(255,255,255,0.7);">Total Revenue</div>
-        <div class="sora" id="totalRevenue" style="font-weight: 700; font-size: 20px; color: var(--gold);">K0</div>
-      </div>
+    <div class="topbar-greeting">Welcome back</div>
+    <div class="topbar-name" id="hostName">Loading...</div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon grn"><i class="ti ti-calendar-check"></i></div>
+      <div class="stat-value" id="bookingCount">0</div>
+      <div class="stat-label">Total Bookings</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blu"><i class="ti ti-trending-up"></i></div>
+      <div class="stat-value" id="totalRevenue">K0</div>
+      <div class="stat-label">Revenue</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon gld"><i class="ti ti-star"></i></div>
+      <div class="stat-value" id="hostRating">—</div>
+      <div class="stat-label">Rating</div>
     </div>
   </div>
 
   <!-- CONTENT -->
-  <div class="main-dash container">
-    <div class="srow fade-up">
-      <div class="scard"><div class="sval" id="bookingCount">0</div><div class="slbl">Bookings</div></div>
-      <div class="scard blu"><div class="sval" id="occupancyRate">87%</div><div class="slbl">Occupancy</div></div>
-      <div class="scard gld"><div class="sval" id="hostRating">—</div><div class="slbl">Rating</div></div>
-    </div>
-
-    <div style="display:flex; gap:8px; margin-bottom:12px;" class="fade-up">
-      <button class="btn-green" id="tabBookings" onclick="switchTab('bookings')" style="flex:1; font-size:12px; padding:8px;">Bookings</button>
-      <button class="btn-outline" id="tabReviews" onclick="switchTab('reviews')" style="flex:1; font-size:12px; padding:8px;">Reviews</button>
-    </div>
-
-    <div class="fade-up" id="bookingsSection">
-      <div class="sora" style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">Recent Bookings</div>
-      <div id="bookingsList" style="display: flex; flex-direction: column; gap: 10px;">
-        <div class="muted-text" style="text-align:center; padding:20px;">Loading bookings...</div>
-      </div>
-    </div>
-
-    <div class="fade-up" id="reviewsSection" style="display:none;">
-      <div class="sora" style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">Guest Reviews</div>
-      <div id="reviewsList" style="display: flex; flex-direction: column; gap: 10px;">
-        <div class="muted-text" style="text-align:center; padding:20px;">Loading reviews...</div>
-      </div>
-    </div>
-
-    <div style="display: flex; gap: 10px;" class="fade-up">
-      <button onclick="toggleModal('listingModal')" class="btn-green" style="flex: 1; font-size: 13px; padding: 12px 0;">
-        <i class="ti ti-plus"></i> Add Listing
+  <div class="content">
+    <!-- Tabs -->
+    <div class="tab-bar fade-up">
+      <button class="tab-btn on" id="tabBookings" onclick="switchTab('bookings')">
+        <i class="ti ti-bed"></i> Bookings
       </button>
+      <button class="tab-btn" id="tabReviews" onclick="switchTab('reviews')">
+        <i class="ti ti-message-star"></i> Reviews
+      </button>
+      <button class="tab-btn" id="tabListings" onclick="switchTab('listings')">
+        <i class="ti ti-building"></i> Listings
+      </button>
+    </div>
+
+    <!-- Bookings Panel -->
+    <div class="tab-panel on" id="panelBookings">
+      <div id="bookingsList"></div>
+    </div>
+
+    <!-- Reviews Panel -->
+    <div class="tab-panel" id="panelReviews">
+      <div id="reviewsList"><div class="empty-state"><i class="ti ti-message"></i><p>Loading reviews...</p></div></div>
+    </div>
+
+    <!-- Listings Panel -->
+    <div class="tab-panel" id="panelListings">
+      <div class="section-header">
+        <span class="section-title">Your Properties</span>
+        <button class="section-action" onclick="openModal('listingModal')">
+          <i class="ti ti-plus"></i> Add
+        </button>
+      </div>
+      <div id="listingsList"><div class="empty-state"><i class="ti ti-building"></i><p>Loading listings...</p></div></div>
+    </div>
+
+    <!-- Admin shortcut -->
+    <div id="adminShortcut" style="display:none;" class="fade-up">
+      <div onclick="location.href='admin-portal.html'" style="display:flex; align-items:center; gap:12px; background:#fff; border-radius:14px; padding:14px; border:1px solid var(--border); cursor:pointer;">
+        <div style="width:40px;height:40px;border-radius:12px;background:#E3F2FD;color:#1565C0;display:flex;align-items:center;justify-content:center;font-size:20px;"><i class="ti ti-shield-check"></i></div>
+        <div style="flex:1;">
+          <div style="font-family:'Sora',sans-serif;font-weight:600;font-size:13px;">Admin Portal</div>
+          <div style="font-size:11px;color:var(--muted);">Manage listings, users & approvals</div>
+        </div>
+        <i class="ti ti-chevron-right" style="color:var(--muted);"></i>
+      </div>
     </div>
   </div>
 
+  <!-- FAB -->
+  <button class="fab" onclick="openModal('listingModal')" title="Add listing">
+    <i class="ti ti-plus"></i>
+  </button>
+
   <!-- ADD LISTING MODAL -->
-  <div id="listingModal" class="modal">
+  <div class="modal" id="listingModal">
     <div class="modal-content">
-      <div class="flex-between" style="margin-bottom: 20px;">
-        <h2 class="sora" style="font-size:18px;">New Listing</h2>
-        <i class="ti ti-x" onclick="toggleModal('listingModal')" style="cursor:pointer; font-size: 20px;"></i>
+      <div class="modal-header">
+        <h2>Add Property</h2>
+        <button class="modal-close" onclick="closeModal('listingModal')"><i class="ti ti-x"></i></button>
       </div>
       <form id="listingForm">
-        <div class="input-group">
+        <div class="form-group">
           <label>Property Name</label>
           <input type="text" name="name" placeholder="e.g. Sunrise Guesthouse" required>
         </div>
-        <div class="input-group">
+        <div class="form-group">
           <label>Type</label>
           <select name="type" required>
             <option value="Guesthouse">Guesthouse</option>
             <option value="Lodge">Lodge</option>
             <option value="Hostel">Hostel</option>
             <option value="Rest House">Rest House</option>
+            <option value="Apartment">Apartment</option>
           </select>
         </div>
-        <div class="srow">
-          <div class="input-group" style="flex:1;">
+        <div class="form-row">
+          <div class="form-group">
             <label>City</label>
             <input type="text" name="city" placeholder="e.g. Lusaka" required>
           </div>
-          <div class="input-group" style="flex:1;">
+          <div class="form-group">
             <label>District</label>
             <input type="text" name="district" placeholder="e.g. Central" required>
           </div>
         </div>
-        <div class="input-group">
+        <div class="form-group">
           <label>Price per Night (ZMW)</label>
           <input type="number" name="price" placeholder="150" required>
         </div>
-        <div class="input-group">
-          <label>Amenities (comma separated)</label>
+        <div class="form-group">
+          <label>Amenities <span style="font-weight:400;color:var(--muted);">(comma separated)</span></label>
           <input type="text" name="amenities" placeholder="Wi-Fi, Parking, Hot Water">
         </div>
-        <button type="submit" class="btn-green" style="width: 100%; margin-top: 10px;">Submit for Review</button>
+        <button type="submit" class="btn-primary">Submit for Review</button>
+        <button type="button" class="btn-secondary" onclick="closeModal('listingModal')">Cancel</button>
       </form>
     </div>
   </div>
 
-  <!-- BOTTOM NAV -->
-  <div class="dash-footer">
-    <a href="#" class="bni on"><i class="ti ti-dashboard"></i><span>Overview</span></a>
-    <div id="adminLink" style="display:none;">
-      <a href="admin-portal.html" class="bni"><i class="ti ti-shield-check"></i><span>Admin</span></a>
-    </div>
-    <a href="search.html" class="bni"><i class="ti ti-search"></i><span>Browse</span></a>
-    <a href="index.html" class="bni"><i class="ti ti-home"></i><span>Home</span></a>
-  </div>
-
-  <script src="config.js"></script>
-  <script src="api.js"></script>
+  <script src="config.js?v=2"></script>
+  <script src="api.js?v=2"></script>
   <script>
     const user = JSON.parse(localStorage.getItem('lala_user'));
     if (!user || (user.role !== 'host' && user.role !== 'admin')) {
@@ -195,33 +721,85 @@
     }
 
     if (user.role === 'admin') {
-      document.getElementById('adminLink').style.display = 'block';
+      document.getElementById('adminShortcut').style.display = 'block';
     }
 
-    document.getElementById('hostName').innerText = user.name || user.phone;
+    document.getElementById('hostName').innerText = user.name || user.phone || 'Host';
+
+    // ── Tab Switching ──────────────────────────────────────────────────
+    let currentTab = 'bookings';
 
     function switchTab(tab) {
-      const bSec = document.getElementById('bookingsSection');
-      const rSec = document.getElementById('reviewsSection');
-      const bTab = document.getElementById('tabBookings');
-      const rTab = document.getElementById('tabReviews');
-      if (tab === 'bookings') {
-        bSec.style.display = 'block'; rSec.style.display = 'none';
-        bTab.className = 'btn-green'; rTab.className = 'btn-outline';
-      } else {
-        bSec.style.display = 'none'; rSec.style.display = 'block';
-        bTab.className = 'btn-outline'; rTab.className = 'btn-green';
-        loadReviews();
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('on'));
+      document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('on');
+      document.getElementById(`panel${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('on');
+
+      if (tab === 'reviews') loadReviews();
+      if (tab === 'listings') loadListings();
+    }
+
+    // ── Modal ──────────────────────────────────────────────────────────
+    function openModal(id) { document.getElementById(id).classList.add('show'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    document.querySelectorAll('.modal').forEach(m => {
+      m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
+    });
+
+    // ── Dashboard Data ─────────────────────────────────────────────────
+    async function loadDashboard() {
+      try {
+        const [bookings, ratingData] = await Promise.all([
+          api.getHostBookings(),
+          api.getHostRating().catch(() => ({}))
+        ]);
+
+        document.getElementById('bookingCount').innerText = bookings.length;
+        document.getElementById('hostRating').innerText =
+          ratingData.ratingAverage > 0 ? `${ratingData.ratingAverage}★` : '—';
+
+        const totalRev = bookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+        document.getElementById('totalRevenue').innerText = `K${totalRev}`;
+
+        const listEl = document.getElementById('bookingsList');
+        if (!bookings.length) {
+          listEl.innerHTML = '<div class="empty-state"><i class="ti ti-calendar-off"></i><p>No bookings yet</p></div>';
+          return;
+        }
+
+        listEl.innerHTML = bookings.map((b, i) => {
+          const guest = b.guest || {};
+          const guestName = guest.name || guest.phone || 'Guest';
+          const initials = guestName.replace(/[^a-zA-Z0-9]/g, ' ').split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'G';
+          return `
+            <div class="list-item" style="animation-delay:${0.05 * i}s">
+              <div class="list-item-top">
+                <div class="li-avatar">${initials}</div>
+                <div class="li-info">
+                  <div class="li-title">${guestName}</div>
+                  <div class="li-meta">${new Date(b.checkIn).toLocaleDateString()} · K${b.totalAmount} · ${b.id.split('-')[0]}</div>
+                </div>
+                <div class="li-badge ${b.status === 'confirmed' ? 'conf' : 'pend'}">${b.status}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error(err);
+        document.getElementById('bookingsList').innerHTML = '<div class="empty-state"><i class="ti ti-alert-circle"></i><p style="color:red;">Error loading data</p></div>';
       }
     }
 
+    // ── Reviews ────────────────────────────────────────────────────────
     async function loadReviews() {
       const listEl = document.getElementById('reviewsList');
-      listEl.innerHTML = '<div class="muted-text" style="text-align:center; padding:20px;">Loading reviews...</div>';
+      listEl.innerHTML = '<div class="empty-state"><i class="ti ti-message"></i><p>Loading reviews...</p></div>';
       try {
         const listings = await api.getMyListings();
-        if (!Array.isArray(listings) || listings.length === 0) {
-          listEl.innerHTML = '<div class="muted-text" style="text-align:center; padding:20px;">No listings yet.</div>';
+        if (!Array.isArray(listings) || !listings.length) {
+          listEl.innerHTML = '<div class="empty-state"><i class="ti ti-message-off"></i><p>No listings yet — add one first</p></div>';
           return;
         }
         let allReviews = [];
@@ -231,56 +809,56 @@
           allReviews = allReviews.concat(reviews);
         }
         allReviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        if (allReviews.length === 0) {
-          listEl.innerHTML = '<div class="muted-text" style="text-align:center; padding:20px;">No reviews yet.</div>';
+        if (!allReviews.length) {
+          listEl.innerHTML = '<div class="empty-state"><i class="ti ti-star-off"></i><p>No reviews yet</p></div>';
           return;
         }
-        listEl.innerHTML = allReviews.map(r => {
+        listEl.innerHTML = allReviews.map((r, i) => {
           const guestName = r.guest ? r.guest.name || r.guest.phone || 'Anonymous' : 'Anonymous';
           const initials = guestName.replace(/[^a-zA-Z0-9]/g, ' ').split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'G';
-          const fullStars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+          const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
           const hasResponse = r.hostResponse && r.hostResponse.trim();
           return `
-            <div class="bitem" style="flex-direction:column; align-items:stretch;">
-              <div style="display:flex; align-items:center; gap:10px; width:100%;">
-                <div class="av">${initials}</div>
-                <div style="flex:1;">
-                  <div class="bname">${r.listingName}</div>
-                  <div style="font-size:10px; color:var(--muted);">${guestName} · ${new Date(r.createdAt).toLocaleDateString()}</div>
-                  <div style="font-size:12px; color:var(--gold);">${fullStars}</div>
+            <div class="list-item" style="animation-delay:${0.05 * i}s">
+              <div class="list-item-top">
+                <div class="li-avatar">${initials}</div>
+                <div class="li-info">
+                  <div class="li-title">${r.listingName}</div>
+                  <div class="li-meta">${guestName} · ${new Date(r.createdAt).toLocaleDateString()}</div>
+                  <div class="stars">${stars}</div>
                 </div>
               </div>
-              ${r.comment ? `<p style="font-size:12px; color:var(--text); margin:6px 0 0 0; line-height:1.5;">"${r.comment}"</p>` : ''}
+              ${r.comment ? `<p style="font-size:12px;color:var(--text);margin:8px 0 0;line-height:1.5;">"${r.comment}"</p>` : ''}
               ${hasResponse ? `
-                <div style="margin-top:8px; padding:8px; background:var(--g-light); border-radius:8px;">
-                  <div style="font-size:10px; font-weight:600; color:var(--g-dark);">Your response:</div>
-                  <div style="font-size:11px; margin-top:2px;">${r.hostResponse}</div>
+                <div class="host-resp">
+                  <div class="host-resp-label">Your response</div>
+                  <div class="host-resp-text">${r.hostResponse}</div>
                 </div>
               ` : `
-                <button class="btn-outline" style="font-size:10px; padding:6px 12px; margin-top:8px; align-self:flex-start;" onclick="showRespondForm('${r.id}', '${r.listingId}')">
+                <button onclick="toggleRespond('${r.id}')" style="margin-top:8px;background:none;border:none;color:var(--g-dark);font-weight:600;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:4px;">
                   <i class="ti ti-message"></i> Respond
                 </button>
               `}
-              <div class="respond-form" id="respond-${r.id}" style="display:none; margin-top:8px;">
-                <textarea id="resp-text-${r.id}" style="width:100%; padding:8px; border:1.5px solid var(--border); border-radius:8px; font-size:12px; min-height:60px; resize:vertical; font-family:inherit;" placeholder="Write your response..."></textarea>
-                <button class="btn-green" style="font-size:10px; padding:6px 14px; margin-top:4px;" onclick="submitResponse('${r.id}')">Submit Response</button>
+              <div class="resp-form" id="resp-${r.id}">
+                <textarea id="respText-${r.id}" placeholder="Write your response..."></textarea>
+                <button onclick="submitResponse('${r.id}')">Submit</button>
               </div>
             </div>
           `;
         }).join('');
       } catch (err) {
         console.error(err);
-        listEl.innerHTML = '<div class="muted-text" style="text-align:center; padding:20px; color:red;">Error loading reviews.</div>';
+        listEl.innerHTML = '<div class="empty-state"><i class="ti ti-alert-circle"></i><p style="color:red;">Error loading reviews</p></div>';
       }
     }
 
-    window.showRespondForm = function(reviewId) {
-      const form = document.getElementById(`respond-${reviewId}`);
-      form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    };
+    function toggleRespond(id) {
+      const form = document.getElementById(`resp-${id}`);
+      form.classList.toggle('open');
+    }
 
-    window.submitResponse = async function(reviewId) {
-      const text = document.getElementById(`resp-text-${reviewId}`).value.trim();
+    window.submitResponse = async (reviewId) => {
+      const text = document.getElementById(`respText-${reviewId}`).value.trim();
       if (!text) { alert('Please write a response.'); return; }
       try {
         await api.hostRespond(reviewId, text);
@@ -291,99 +869,77 @@
       }
     };
 
-    async function loadDashboard() {
+    // ── Listings ────────────────────────────────────────────────────────
+    async function loadListings() {
+      const listEl = document.getElementById('listingsList');
       try {
-        const bookings = await api.getHostBookings();
-        const listEl = document.getElementById('bookingsList');
-        const totalRevEl = document.getElementById('totalRevenue');
-        const bookingCountEl = document.getElementById('bookingCount');
-        const hostRatingEl = document.getElementById('hostRating');
-
-        const ratingData = await api.getHostRating();
-        hostRatingEl.innerText = ratingData.ratingAverage > 0
-          ? `${ratingData.ratingAverage}★`
-          : '—';
-
-        bookingCountEl.innerText = bookings.length;
-        let totalRev = 0;
-        
-        listEl.innerHTML = '';
-        if (bookings.length === 0) {
-          listEl.innerHTML = '<div class="muted-text" style="text-align:center; padding:20px;">No bookings yet.</div>';
+        const listings = await api.getMyListings();
+        if (!Array.isArray(listings) || !listings.length) {
+          listEl.innerHTML = '<div class="empty-state"><i class="ti ti-building-plus"></i><p>No properties yet. Tap + to add one.</p></div>';
+          return;
         }
-
-        bookings.forEach(b => {
-          totalRev += b.totalAmount;
-          const guest = b.guest || {};
-          const guestName = guest.name || guest.phone || 'Guest';
-          const initials = guestName.replace(/[^a-zA-Z0-9]/g, ' ').split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'G';
-          listEl.insertAdjacentHTML('beforeend', `
-            <div class="bitem">
-              <div class="av">${initials}</div>
-              <div>
-                <div class="bname">Booking #${b.id.split('-')[0]}</div>
-                <div class="bdates">${new Date(b.checkIn).toLocaleDateString()} · K${b.totalAmount}</div>
+        listEl.innerHTML = listings.map((l, i) => `
+          <div class="list-item" style="animation-delay:${0.05 * i}s">
+            <div class="list-item-top">
+              <div class="li-avatar" style="background:#E3F2FD;color:#1565C0;"><i class="ti ti-building"></i></div>
+              <div class="li-info">
+                <div class="li-title">${l.name}</div>
+                <div class="li-meta">${l.city} · K${l.price}/night · ${l.type}</div>
               </div>
-              <div class="bstat ${b.status === 'confirmed' ? 'conf' : 'pend'}">${b.status}</div>
+              <div class="li-badge ${l.status === 'approved' ? 'conf' : l.status === 'pending' ? 'pend' : ''}">${l.status || 'pending'}</div>
             </div>
-          `);
-        });
-        
-        totalRevEl.innerText = `K${totalRev}`;
+          </div>
+        `).join('');
       } catch (err) {
         console.error(err);
-        document.getElementById('bookingsList').innerHTML = '<div class="muted-text" style="text-align:center; padding:20px; color:red;">Error loading bookings.</div>';
+        listEl.innerHTML = '<div class="empty-state"><i class="ti ti-alert-circle"></i><p style="color:red;">Error loading listings</p></div>';
       }
     }
 
-    function toggleModal(id) {
-      const modal = document.getElementById(id);
-      modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-    }
-
+    // ── Add Listing Form ───────────────────────────────────────────────
     document.getElementById('listingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const formData = new FormData(e.target);
       const data = {
-        name: formData.get('name'),
-        type: formData.get('type'),
-        city: formData.get('city'),
-        district: formData.get('district'),
-        price: parseFloat(formData.get('price')),
-        amenities: formData.get('amenities').split(',').map(a => a.trim()).filter(a => a)
+        name: e.target.name.value,
+        type: e.target.type.value,
+        city: e.target.city.value,
+        district: e.target.district.value,
+        price: parseFloat(e.target.price.value),
+        amenities: e.target.amenities.value.split(',').map(a => a.trim()).filter(a => a)
       };
-
       try {
         await api.createListing(data);
-        alert('Listing submitted for review!');
-        toggleModal('listingModal');
+        alert('Listing submitted for review! We\'ll notify you once approved.');
+        closeModal('listingModal');
         e.target.reset();
+        loadListings();
       } catch (err) {
-        alert('Failed to submit listing');
+        alert('Failed to submit listing. Please try again.');
       }
     });
 
+    // ── Scroll Animations ──────────────────────────────────────────────
+    (function() {
+      const faders = document.querySelectorAll('.fade-up');
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (!e.isIntersecting) return;
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        });
+      }, { threshold: 0.1 });
+      faders.forEach(f => observer.observe(f));
+    })();
+
+    // ── Logout ─────────────────────────────────────────────────────────
     function logout() {
       localStorage.removeItem('lala_token');
       localStorage.removeItem('lala_user');
       window.location.href = 'index.html';
     }
 
+    // ── Init ───────────────────────────────────────────────────────────
     loadDashboard();
-
-    // Scroll Animation
-    (function() {
-      const faders = document.querySelectorAll('.fade-up');
-      const appearOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
-      const appearOnScroll = new IntersectionObserver(function(entries, observer) {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        });
-      }, appearOptions);
-      faders.forEach(fader => appearOnScroll.observe(fader));
-    })();
   </script>
 </body>
 </html>
