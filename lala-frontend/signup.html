@@ -3,141 +3,465 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala — Sign Up</title>
+  <title>Lala — Create Account</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="common.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
-    /* Local overrides for Signup/Onboarding */
-    body { background: #E9EDE6; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
-    
-    .onboarding-card {
-      max-width: 400px; width: 100%; background: var(--card); border-radius: 24px;
-      overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.1);
-      display: flex; flex-direction: column;
-    }
-    
-    .hero-il {
-      height: 200px; display: flex; align-items: center; justify-content: center; font-size: 70px;
-      background: linear-gradient(160deg, #1B5E20, #2E7D32); color: #fff;
-    }
-    
-    .ob-header { background: var(--g-dark); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
-    .logo-txt { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 24px; color: #fff; }
-    .logo-txt span { color: var(--gold); }
-    
-    .step-ind { display: flex; gap: 5px; }
-    .sdot { height: 4px; border-radius: 99px; background: rgba(255,255,255,0.3); }
-    .sdot.on { background: #fff; width: 22px; }
-    .sdot:not(.on) { width: 7px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    .ob-body { padding: 24px 20px; display: flex; flex-direction: column; gap: 20px; }
-    .ob-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: var(--text); line-height: 1.3; }
-    .ob-sub { font-size: 13px; color: var(--muted); line-height: 1.5; }
-
-    .feat-row { display: flex; gap: 8px; }
-    .feat { 
-      flex: 1; background: var(--g-light); border-radius: 12px; padding: 12px 6px; 
-      display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
+    body {
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0F2B10 0%, #1B5E20 30%, #2E7D32 60%, #43A047 100%);
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
     }
-    .feat i { font-size: 20px; color: var(--g-dark); }
-    .feat-txt { font-size: 9px; font-weight: 600; color: var(--g-dark); font-family: 'Sora', sans-serif; line-height: 1.2; }
 
-    /* OTP Flow */
-    .otp-row { display: flex; gap: 8px; justify-content: center; margin: 10px 0; }
-    .obox { 
-      width: 42px; height: 50px; background: var(--card); border: 2.5px solid var(--border); 
-      border-radius: 10px; display: flex; align-items: center; justify-content: center;
-      font-family: 'Sora', sans-serif; font-weight: 700; font-size: 20px; color: var(--text);
+    body::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 40%, rgba(249,168,37,0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 60%, rgba(255,255,255,0.05) 0%, transparent 40%);
+      animation: bgShift 20s ease-in-out infinite alternate;
+      pointer-events: none;
     }
-    .obox.filled { border-color: var(--g-dark); }
 
-    .info-box {
-      background: var(--g-light); border-radius: 10px; padding: 12px; font-size: 11px;
-      color: var(--g-mid); line-height: 1.5; text-align: center;
+    @keyframes bgShift {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      100% { transform: translate(-5%, 5%) rotate(3deg); }
+    }
+
+    .floating-shapes {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.06;
+      animation: floatShape 25s ease-in-out infinite;
+    }
+
+    .shape:nth-child(1) {
+      width: 300px; height: 300px;
+      background: var(--gold);
+      top: 10%; left: 5%;
+      animation-delay: 0s;
+      animation-duration: 30s;
+    }
+    .shape:nth-child(2) {
+      width: 200px; height: 200px;
+      background: #fff;
+      top: 60%; right: 10%;
+      animation-delay: -5s;
+      animation-duration: 25s;
+    }
+    .shape:nth-child(3) {
+      width: 150px; height: 150px;
+      background: var(--gold);
+      bottom: 15%; left: 30%;
+      animation-delay: -12s;
+      animation-duration: 20s;
+    }
+
+    @keyframes floatShape {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -40px) scale(1.1); }
+      66% { transform: translate(-20px, 20px) scale(0.9); }
+    }
+
+    .signup-card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 28px;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1);
+      overflow: hidden;
+      animation: cardEnter 0.8s ease-out;
+    }
+
+    @keyframes cardEnter {
+      from { opacity: 0; transform: translateY(40px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .card-header {
+      background: linear-gradient(160deg, #1B5E20, #2E7D32, #388E3C);
+      padding: 24px 28px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header::after {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 160px; height: 160px;
+      background: rgba(249,168,37,0.12);
+      border-radius: 50%;
+    }
+
+    .card-header::before {
+      content: '';
+      position: absolute;
+      bottom: -30px; left: -20px;
+      width: 100px; height: 100px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+
+    .logo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+      transition: opacity 0.2s;
+    }
+
+    .logo-link:hover { opacity: 0.85; }
+
+    .logo-link img {
+      height: 34px;
+      filter: brightness(0) invert(1);
+    }
+
+    .header-title {
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      color: #fff;
+      position: relative;
+      z-index: 1;
+      line-height: 1.2;
+    }
+
+    .header-sub {
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+      margin-top: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-body {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .input-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      font-family: 'Sora', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .input-wrap {
+      display: flex;
+      align-items: center;
+      background: #F5F7F4;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 0 14px;
+      transition: all 0.25s;
+    }
+
+    .input-wrap:focus-within {
+      border-color: var(--g-dark);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(27,94,32,0.08);
+    }
+
+    .input-wrap i {
+      color: var(--muted);
+      font-size: 18px;
+      margin-right: 10px;
+      transition: color 0.25s;
+    }
+
+    .input-wrap:focus-within i {
+      color: var(--g-dark);
+    }
+
+    .input-wrap input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 14px 0;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      outline: none;
+    }
+
+    .input-wrap input::placeholder {
+      color: #aaa;
+    }
+
+    .toggle-pw {
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 18px;
+      transition: color 0.2s;
+    }
+
+    .toggle-pw:hover { color: var(--text); }
+
+    .btn-signup {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #1B5E20, #2E7D32);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-signup::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-signup:hover::before { left: 100%; }
+
+    .btn-signup:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(27,94,32,0.3);
+    }
+
+    .btn-signup:active {
+      transform: translateY(0);
+    }
+
+    .btn-signup:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .login-link {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .login-link a {
+      color: var(--g-dark);
+      font-weight: 700;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .login-link a:hover {
+      color: #0f3b12;
+      text-decoration: underline;
+    }
+
+    .features-mini {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .feat-mini {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 8px 10px;
+      background: var(--g-light);
+      border-radius: 8px;
+    }
+
+    .feat-mini i {
+      color: var(--g-dark);
+      font-size: 14px;
+    }
+
+    .error-msg {
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      color: #DC2626;
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .error-msg.visible { display: flex; }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .success-check {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--g-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+    }
+
+    .success-check i {
+      font-size: 24px;
+      color: var(--g-dark);
+    }
+
+    @media (max-width: 480px) {
+      .signup-card { border-radius: 20px; }
+      .card-header { padding: 20px 20px 28px; }
+      .card-body { padding: 22px; }
+      .features-mini { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <!-- STEP 1: WELCOME -->
-  <div class="onboarding-card fade-up visible" id="step1">
-    <div class="hero-il"><i class="ti ti-building-estate"></i></div>
-    <div class="ob-header">
-      <img src="logo-removebg-preview.png" alt="Lala Logo" style="height: 32px;">
-      <div class="step-ind"><div class="sdot on"></div><div class="sdot"></div></div>
-    </div>
-    <div class="ob-body">
-      <div class="ob-title">Affordable stays anywhere in Zambia</div>
-      <div class="ob-sub">Find verified guesthouses, lodges, and township stays. Book via WhatsApp. Pay with mobile money.</div>
-      <div class="feat-row">
-        <div class="feat"><i class="ti ti-brand-whatsapp"></i><div class="feat-txt">WhatsApp Booking</div></div>
-        <div class="feat"><i class="ti ti-device-mobile"></i><div class="feat-txt">Mobile Money</div></div>
-        <div class="feat"><i class="ti ti-rosette-discount-check"></i><div class="feat-txt">Verified Hosts</div></div>
-        <div class="feat"><i class="ti ti-wifi-off"></i><div class="feat-txt">Low-Data Mode</div></div>
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-        <input type="tel" id="phoneInput" class="input-field" placeholder="Phone (e.g. 0977...)" style="margin-bottom: 5px;">
-        <button class="btn-green" id="requestBtn" onclick="handleRequestOTP()"><i class="ti ti-phone"></i> Sign up with phone number</button>
-        <div style="text-align: center; font-size: 12px; color: var(--muted);">
-          Already have an account? <a href="guest-login.html" style="color: var(--g-dark); font-weight: 600; text-decoration: none;">Sign in</a>
-        </div>
-      </div>
-    </div>
+  <div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
   </div>
 
-  <!-- STEP 2: OTP VERIFICATION -->
-  <div class="onboarding-card fade-up" id="step2" style="display: none;">
-    <div class="ob-header">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <i class="ti ti-arrow-left" style="color: #fff; font-size: 20px; cursor: pointer;" onclick="showStep(1)"></i>
-        <div class="sora" style="font-weight: 700; font-size: 15px; color: #fff;">Verify your number</div>
-      </div>
+  <div class="signup-card" id="signupCard">
+    <div class="card-header">
+      <a href="index.html" class="logo-link">
+        <img src="logo-removebg-preview.png" alt="Lala">
+        <span style="font-family:'Sora',sans-serif; font-weight:700; font-size:18px; color:#fff;">lala</span>
+      </a>
+      <div class="header-title">Create your account</div>
+      <div class="header-sub">Join Lala and start booking stays across Zambia</div>
     </div>
-    <div class="ob-body" style="align-items: center; text-align: center; gap: 24px; padding-top: 40px;">
-      <div>
-        <i class="ti ti-message" style="font-size: 48px; color: var(--g-dark); opacity: 0.15;"></i>
-        <div class="sora" style="font-weight: 600; font-size: 16px; margin-top: 16px;">Enter verification code</div>
-        <div id="otpSentTo" style="font-size: 12px; color: var(--muted); margin-top: 4px;">We sent a 6-digit code to your phone</div>
-      </div>
-      
-      <div style="width: 100%;">
-        <input type="text" id="otpInput" class="input-field" placeholder="6-digit code" maxlength="6" style="text-align: center; font-size: 24px; letter-spacing: 8px; font-weight: 700;">
+
+    <div class="card-body">
+      <div class="error-msg" id="errorMsg">
+        <i class="ti ti-alert-circle"></i>
+        <span id="errorText">Something went wrong</span>
       </div>
 
-      <div style="width: 100%;">
-        <button class="btn-green" id="verifyBtn" style="width: 100%;" onclick="handleVerifyOTP()">Verify & Continue</button>
-        <div style="text-align: center; font-size: 12px; color: var(--muted); margin-top: 12px;">
-          Didn't receive it? <a href="#" onclick="handleRequestOTP()" style="color: var(--g-dark); font-weight: 600; text-decoration: none;">Resend</a>
+      <div class="input-group">
+        <label>Full name</label>
+        <div class="input-wrap">
+          <i class="ti ti-user"></i>
+          <input type="text" id="nameInput" placeholder="e.g. John Banda" autocomplete="name">
         </div>
       </div>
 
-      <div class="info-box">
-        No email required. Your phone number is your account. Secure and private.
+      <div class="input-group">
+        <label>Email address</label>
+        <div class="input-wrap">
+          <i class="ti ti-mail"></i>
+          <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email">
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- STEP 3: NAME + HOST SETUP -->
-  <div class="onboarding-card fade-up" id="step3" style="display: none;">
-    <div class="ob-header">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <i class="ti ti-arrow-left" style="color: #fff; font-size: 20px; cursor: pointer;" onclick="showStep(2)"></i>
-        <div class="sora" style="font-weight: 700; font-size: 15px; color: #fff;">Set up your host profile</div>
+      <div class="input-group">
+        <label>Phone (optional)</label>
+        <div class="input-wrap">
+          <i class="ti ti-phone"></i>
+          <input type="tel" id="phoneInput" placeholder="+260 97 000 0000" autocomplete="tel">
+        </div>
       </div>
-    </div>
-    <div class="ob-body" style="gap: 24px; padding-top: 40px;">
-      <div>
-        <i class="ti ti-building-estate" style="font-size: 48px; color: var(--g-dark); opacity: 0.15;"></i>
-        <div class="sora" style="font-weight: 600; font-size: 16px; margin-top: 16px;">What's your name?</div>
-        <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Guests will see this when they book your property.</div>
+
+      <div class="input-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <i class="ti ti-lock"></i>
+          <input type="password" id="passwordInput" placeholder="Create a strong password" autocomplete="new-password">
+          <i class="ti ti-eye toggle-pw" id="togglePw" onclick="togglePassword()"></i>
+        </div>
       </div>
-      <div style="width: 100%; display: flex; flex-direction: column; gap: 14px;">
-        <input type="text" id="nameInput" class="input-field" placeholder="e.g. John Banda" style="text-align: center; font-size: 18px; font-weight: 600;">
-        <button class="btn-gold" id="setupBtn" style="width: 100%;" onclick="handleSetupHost()">
-          <i class="ti ti-rosette-discount-check"></i> Start Hosting
-        </button>
+
+      <button class="btn-signup" id="signupBtn" onclick="handleSignup()">
+        <i class="ti ti-user-plus"></i>
+        <span id="signupBtnText">Create Account</span>
+      </button>
+
+      <div class="divider">or</div>
+
+      <div class="login-link">
+        Already have an account? <a href="guest-login.html">Sign in</a>
+      </div>
+
+      <div class="features-mini">
+        <div class="feat-mini"><i class="ti ti-brand-whatsapp"></i> WhatsApp Booking</div>
+        <div class="feat-mini"><i class="ti ti-wallet"></i> Mobile Money</div>
+        <div class="feat-mini"><i class="ti ti-shield-check"></i> Verified Hosts</div>
+        <div class="feat-mini"><i class="ti ti-wifi-off"></i> Low-Data Mode</div>
       </div>
     </div>
   </div>
@@ -145,88 +469,78 @@
   <script src="config.js"></script>
   <script src="api.js"></script>
   <script>
-    let currentPhone = '';
-
-    function showStep(n) {
-      document.getElementById('step1').style.display = n === 1 ? 'flex' : 'none';
-      document.getElementById('step2').style.display = n === 2 ? 'flex' : 'none';
-      document.getElementById('step3').style.display = n === 3 ? 'flex' : 'none';
-      const card = document.getElementById('step' + n);
-      if (card) setTimeout(() => card.classList.add('visible'), 50);
-    }
-
-    async function handleRequestOTP() {
-      const raw = document.getElementById('phoneInput').value.trim();
-      if (!raw) return alert('Please enter your phone number');
-      
-      const phone = raw.startsWith('260') ? raw : `260${raw.replace(/^0+/, '')}`;
-      const btn = document.getElementById('requestBtn');
-      btn.innerText = 'Sending...';
-      btn.disabled = true;
-
-      try {
-        const data = await api.requestOTP(phone);
-        currentPhone = phone;
-        document.getElementById('otpSentTo').innerText = `We sent a code to ${phone}${data.mockOtp ? ` (Dev mock code: ${data.mockOtp})` : ''}`;
-        showStep(2);
-      } catch (err) {
-        alert('Failed to send OTP. Is the backend running?');
-        console.error(err);
-      } finally {
-        btn.innerText = 'Sign up with phone number';
-        btn.disabled = false;
+    function togglePassword() {
+      const input = document.getElementById('passwordInput');
+      const icon = document.getElementById('togglePw');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'ti ti-eye-off toggle-pw';
+      } else {
+        input.type = 'password';
+        icon.className = 'ti ti-eye toggle-pw';
       }
     }
 
-    async function handleVerifyOTP() {
-      const otp = document.getElementById('otpInput').value;
-      if (!otp) return alert('Please enter the verification code');
-
-      const btn = document.getElementById('verifyBtn');
-      btn.innerText = 'Verifying...';
-      btn.disabled = true;
-
-      try {
-        const data = await api.verifyOTP(currentPhone, otp);
-        if (data.token) {
-          showStep(3);
-        } else {
-          alert(data.error || 'Invalid code');
-        }
-      } catch (err) {
-        alert('Verification failed');
-        console.error(err);
-      } finally {
-        btn.innerText = 'Verify & Continue';
-        btn.disabled = false;
-      }
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      document.getElementById('errorText').textContent = msg;
+      el.classList.add('visible');
     }
 
-    async function handleSetupHost() {
+    function hideError() {
+      document.getElementById('errorMsg').classList.remove('visible');
+    }
+
+    async function handleSignup() {
+      hideError();
+
       const name = document.getElementById('nameInput').value.trim();
-      if (!name) return alert('Please enter your name.');
+      const email = document.getElementById('emailInput').value.trim().toLowerCase();
+      const phone = document.getElementById('phoneInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
 
-      const setupBtn = document.getElementById('setupBtn');
-      setupBtn.disabled = true;
-      setupBtn.innerText = 'Setting up...';
+      if (!name) return showError('Please enter your full name');
+      if (!email) return showError('Please enter your email address');
+      if (!/\S+@\S+\.\S+/.test(email)) return showError('Please enter a valid email address');
+      if (!password || password.length < 6) return showError('Password must be at least 6 characters');
+
+      const btn = document.getElementById('signupBtn');
+      const btnText = document.getElementById('signupBtnText');
+      btn.disabled = true;
+      btnText.textContent = 'Creating account...';
 
       try {
-        const data = await api.setupHost(name);
-        if (data.token) {
-          localStorage.setItem('lala_token', data.token);
-          localStorage.setItem('lala_user', JSON.stringify(data.user));
+        const data = await api.register(email, password, name, phone || undefined);
+        if (data.error) {
+          showError(data.error);
+          btn.disabled = false;
+          btnText.textContent = 'Create Account';
+          return;
+        }
+
+        // Redirect based on role
+        if (data.user && data.user.role === 'host') {
           window.location.href = 'host-dashboard.html';
         } else {
-          alert(data.error || 'Setup failed');
+          const redirect = sessionStorage.getItem('redirect_after_login');
+          if (redirect) {
+            sessionStorage.removeItem('redirect_after_login');
+            window.location.href = redirect;
+          } else {
+            window.location.href = 'index.html';
+          }
         }
       } catch (err) {
-        alert('Setup failed. Is the backend running?');
+        showError('Failed to connect. Is the backend running?');
         console.error(err);
-      } finally {
-        setupBtn.disabled = false;
-        setupBtn.innerHTML = '<i class="ti ti-rosette-discount-check"></i> Start Hosting';
+        btn.disabled = false;
+        btnText.textContent = 'Create Account';
       }
     }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleSignup();
+    });
   </script>
 </body>
 </html>

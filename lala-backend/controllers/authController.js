@@ -1,61 +1,47 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const smsService = require('../services/smsService');
+const bcrypt = require('bcryptjs');
 
 function signToken(user) {
   const token = jwt.sign(
-    { id: user.id, phone: user.phone, role: user.role },
+    { id: user.id, email: user.email, role: user.role, name: user.name },
     process.env.JWT_SECRET || 'lala_secret_key_2026',
     { expiresIn: '7d' }
   );
-  return { token, user: { id: user.id, phone: user.phone, role: user.role } };
+  return { token, user: { id: user.id, email: user.email, role: user.role, name: user.name } };
 }
 
-exports.requestOTP = async (req, res) => {
-  const { phone } = req.body;
-  if (!phone) return res.status(400).json({ error: 'Phone number is required' });
+exports.register = async (req, res) => {
+  const { email, password, name, phone } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
 
   try {
-    let user = await User.findOne({ where: { phone } });
-    if (!user) {
-      user = await User.create({ phone });
-    }
+    const existing = await User.findOne({ where: { email } });
+    if (existing) return res.status(400).json({ error: 'An account with this email already exists' });
 
-    // Generate 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.otp = otp;
-    await user.save();
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({ email, password: hashedPassword, name, phone, role: 'guest' });
 
-    // Send via SMS Service
-    const smsResult = await smsService.sendOTP(phone, otp);
-
-    if (smsResult.success) {
-      res.json({ message: 'OTP sent successfully', phone, mockOtp: process.env.NODE_ENV === 'development' ? otp : undefined });
-    } else {
-      res.status(500).json({ error: 'Failed to send OTP' });
-    }
+    const { token, user: userData } = signToken(user);
+    res.status(201).json({ message: 'Account created successfully', token, user: userData });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-exports.verifyOTP = async (req, res) => {
-  const { phone, otp } = req.body;
-  if (!phone || !otp) return res.status(400).json({ error: 'Phone and OTP are required' });
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
 
   try {
-    let user = await User.findOne({ where: { phone, otp } });
-    if (!user && process.env.NODE_ENV === 'development' && otp === '123456') {
-      user = await User.findOne({ where: { phone } });
-    }
-    if (!user) return res.status(400).json({ error: 'Invalid OTP' });
+    const user = await User.findOne({ where: { email } });
+    if (!user) return res.status(400).json({ error: 'Invalid email or password' });
 
-    user.otp = null;
-    user.isVerified = true;
-    await user.save();
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ error: 'Invalid email or password' });
 
     const { token, user: userData } = signToken(user);
-    res.json({ message: 'Verification successful', token, user: userData });
+    res.json({ message: 'Login successful', token, user: userData });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -74,7 +60,7 @@ exports.setupHost = async (req, res) => {
     await user.save();
 
     const { token, user: userData } = signToken(user);
-    res.json({ message: 'Host profile created', token, user: { ...userData, name: user.name } });
+    res.json({ message: 'Host profile created', token, user: userData });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

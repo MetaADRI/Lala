@@ -5,20 +5,25 @@ console.log('🔗 Connected to API:', API_BASE);
 
 const api = {
   // ─── AUTH ──────────────────────────────────────────────────────────────────
-  requestOTP: async (phone) => {
-    const res = await fetch(`${API_BASE}/auth/request-otp`, {
+  register: async (email, password, name, phone) => {
+    const res = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone })
+      body: JSON.stringify({ email, password, name, phone })
     });
-    return res.json();
+    const data = await res.json();
+    if (data.token) {
+      localStorage.setItem('lala_token', data.token);
+      localStorage.setItem('lala_user', JSON.stringify(data.user));
+    }
+    return data;
   },
 
-  verifyOTP: async (phone, otp) => {
-    const res = await fetch(`${API_BASE}/auth/verify-otp`, {
+  login: async (email, password) => {
+    const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone, otp })
+      body: JSON.stringify({ email, password })
     });
     const data = await res.json();
     if (data.token) {
@@ -240,7 +245,7 @@ const api = {
   logout: () => {
     localStorage.removeItem('lala_token');
     localStorage.removeItem('lala_user');
-    window.location.href = 'signup.html';
+    window.location.href = 'guest-login.html';
   },
 
   isLoggedIn: () => {
