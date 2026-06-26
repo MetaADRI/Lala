@@ -181,9 +181,97 @@ exports.getHostBookings = async (req, res) => {
       order: [['createdAt', 'DESC']]
     });
 
+    // Fetch guest names
+    const guestIds = [...new Set(bookings.map(b => b.guestId))];
+    const guests = await User.findAll({ where: { id: guestIds }, attributes: ['id', 'name', 'phone'] });
+    const guestMap = Object.fromEntries(guests.map(g => [g.id, { name: g.name, phone: g.phone }]));
+
     const enriched = bookings.map(b => ({
       ...b.toJSON(),
-      listingName: listingMap[b.listingId] || 'Unknown'
+      listingName: listingMap[b.listingId] || 'Unknown',
+      guest: guestMap[b.guestId] || { name: 'Guest', phone: '' }
+    }));
+
+    res.json(enriched);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * POST /api/bookings/:id/cancel
+ * Guest cancels their own booking (only if pending or awaiting_payment).
+ */
+exports.cancelBooking = async (req, res) => {
+  try {
+    const booking = await Booking.findByPk(req.params.id);
+    if (!booking) return res.status(404).json({ error: 'Booking not found' });
+
+    if (booking.guestId !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    if (!['pending', 'awaiting_payment'].includes(booking.status)) {
+      return res.status(400).json({ error: 'Only pending bookings can be cancelled' });
+    }
+
+    booking.status = 'cancelled';
+    await booking.save();
+
+    res.json({ message: 'Booking cancelled', booking });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * POST /api/bookings/:id/host-cancel
+ * Host cancels a booking on their listing.
+ */
+exports.hostCancelBooking = async (req, res) => {
+  try {
+    const booking = await Booking.findByPk(req.params.id);
+    if (!booking) return res.status(404).json({ error: 'Booking not found' });
+
+    const listing = await Listing.findByPk(booking.listingId);
+    if (!listing || (listing.hostId !== req.user.id && req.user.role !== 'admin')) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    booking.status = 'cancelled';
+    await booking.save();
+
+    res.json({ message: 'Booking cancelled by host', booking });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * GET /api/bookings/admin/all
+ * Admin views all bookings across the platform.
+ */
+exports.getAllBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.findAll({
+      order: [['createdAt', 'DESC']],
+      limit: 200
+    });
+
+    // Fetch all listing names and guest names
+    const listingIds = [...new Set(bookings.map(b => b.listingId))];
+    const guestIds = [...new Set(bookings.map(b => b.guestId))];
+
+    const listings = await Listing.findAll({ where: { id: listingIds }, attributes: ['id', 'name'] });
+    const guests = await User.findAll({ where: { id: guestIds }, attributes: ['id', 'name', 'phone'] });
+
+    const listingMap = Object.fromEntries(listings.map(l => [l.id, l.name]));
+    const guestMap = Object.fromEntries(guests.map(g => [g.id, { name: g.name, phone: g.phone }]));
+
+    const enriched = bookings.map(b => ({
+      ...b.toJSON(),
+      listingName: listingMap[b.listingId] || 'Unknown',
+      guest: guestMap[b.guestId] || { name: 'Guest', phone: '' }
     }));
 
     res.json(enriched);

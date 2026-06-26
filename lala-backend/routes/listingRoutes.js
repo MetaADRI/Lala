@@ -10,5 +10,6 @@ router.get('/:id', listingController.getListingById);
 router.post('/', authMiddleware, roleMiddleware(['host', 'admin']), listingController.createListing);
 router.patch('/:id/approve', authMiddleware, roleMiddleware(['admin']), listingController.approveListing);
 router.delete('/:id/reject', authMiddleware, roleMiddleware(['admin']), listingController.rejectListing);
+router.put('/:id', authMiddleware, roleMiddleware(['host', 'admin']), listingController.updateListing);
 
 module.exports = router;

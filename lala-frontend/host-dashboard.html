@@ -765,8 +765,63 @@
           <label>Amenities <span style="font-weight:400;color:var(--muted);">(comma separated)</span></label>
           <input type="text" name="amenities" placeholder="Wi-Fi, Parking, Hot Water">
         </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" placeholder="Describe your property..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;min-height:60px;resize:vertical;"></textarea>
+        </div>
         <button type="submit" class="btn-primary">Submit for Review</button>
         <button type="button" class="btn-secondary" onclick="closeModal('listingModal')">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT LISTING MODAL -->
+  <div class="modal" id="editListingModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Property</h2>
+        <button class="modal-close" onclick="closeModal('editListingModal')"><i class="ti ti-x"></i></button>
+      </div>
+      <form id="editListingForm">
+        <input type="hidden" name="id" id="editListingId">
+        <div class="form-group">
+          <label>Property Name</label>
+          <input type="text" name="name" id="editName" required>
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select name="type" id="editType" required>
+            <option value="Guesthouse">Guesthouse</option>
+            <option value="Lodge">Lodge</option>
+            <option value="Hostel">Hostel</option>
+            <option value="Rest House">Rest House</option>
+            <option value="Apartment">Apartment</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" name="city" id="editCity" required>
+          </div>
+          <div class="form-group">
+            <label>District</label>
+            <input type="text" name="district" id="editDistrict" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Price per Night (ZMW)</label>
+          <input type="number" name="price" id="editPrice" required>
+        </div>
+        <div class="form-group">
+          <label>Amenities <span style="font-weight:400;color:var(--muted);">(comma separated)</span></label>
+          <input type="text" name="amenities" id="editAmenities" placeholder="Wi-Fi, Parking, Hot Water">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" id="editDescription" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;min-height:60px;resize:vertical;"></textarea>
+        </div>
+        <button type="submit" class="btn-primary">Save Changes</button>
+        <button type="button" class="btn-secondary" onclick="closeModal('editListingModal')">Cancel</button>
       </form>
     </div>
   </div>
@@ -858,6 +913,7 @@
           const guest = b.guest || {};
           const guestName = guest.name || guest.phone || 'Guest';
           const initials = guestName.replace(/[^a-zA-Z0-9]/g, ' ').split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'G';
+          const isPending = ['pending', 'awaiting_payment'].includes(b.status);
           return `
             <div class="list-item" style="animation-delay:${0.05 * i}s">
               <div class="list-item-top">
@@ -868,6 +924,12 @@
                 </div>
                 <div class="li-badge ${b.status === 'confirmed' ? 'conf' : 'pend'}">${b.status}</div>
               </div>
+              ${isPending ? `
+                <div style="display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+                  <button onclick="hostConfirmBooking('${b.id}')" style="flex:1;padding:8px;background:var(--g-dark);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;">Confirm</button>
+                  <button onclick="hostCancelBooking('${b.id}')" style="flex:1;padding:8px;background:#fff;color:#c62828;border:1px solid #e0e0e0;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;">Decline</button>
+                </div>
+              ` : ''}
             </div>
           `;
         }).join('');
@@ -971,8 +1033,9 @@
                 <div class="li-title">${l.name}</div>
                 <div class="li-meta">${l.city} · K${l.price}/night · ${l.type}</div>
               </div>
-              <div class="li-badge ${l.status === 'approved' ? 'conf' : l.status === 'pending' ? 'pend' : ''}">${l.status || 'pending'}</div>
+              <div class="li-badge ${l.isApproved ? 'conf' : 'pend'}">${l.isApproved ? 'approved' : 'pending'}</div>
             </div>
+            <button onclick="openEditListing('${l.id}')" style="margin-top:8px;background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;color:var(--g-dark);width:100%;"><i class="ti ti-edit"></i> Edit</button>
           </div>
         `).join('');
       } catch (err) {
@@ -990,7 +1053,8 @@
         city: e.target.city.value,
         district: e.target.district.value,
         price: parseFloat(e.target.price.value),
-        amenities: e.target.amenities.value.split(',').map(a => a.trim()).filter(a => a)
+        amenities: e.target.amenities.value.split(',').map(a => a.trim()).filter(a => a),
+        description: e.target.description.value.trim() || undefined
       };
       try {
         await api.createListing(data);
@@ -1002,6 +1066,50 @@
         alert('Failed to submit listing. Please try again.');
       }
     });
+
+    // ── Edit Listing ───────────────────────────────────────────────────
+    async function openEditListing(id) {
+      try {
+        const listing = await api.getListing(id);
+        if (listing.error) throw new Error(listing.error);
+        document.getElementById('editListingId').value = listing.id;
+        document.getElementById('editName').value = listing.name || '';
+        document.getElementById('editType').value = listing.type || 'Guesthouse';
+        document.getElementById('editCity').value = listing.city || '';
+        document.getElementById('editDistrict').value = listing.district || '';
+        document.getElementById('editPrice').value = listing.price || '';
+        document.getElementById('editAmenities').value = (listing.amenities || []).join(', ');
+        document.getElementById('editDescription').value = listing.description || '';
+        openModal('editListingModal');
+      } catch (err) {
+        alert('Failed to load listing details.');
+      }
+    }
+
+    document.getElementById('editListingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editListingId').value;
+      const data = {
+        name: document.getElementById('editName').value,
+        type: document.getElementById('editType').value,
+        city: document.getElementById('editCity').value,
+        district: document.getElementById('editDistrict').value,
+        price: parseFloat(document.getElementById('editPrice').value),
+        amenities: document.getElementById('editAmenities').value.split(',').map(a => a.trim()).filter(a => a),
+        description: document.getElementById('editDescription').value.trim() || undefined
+      };
+      try {
+        const result = await api.updateListing(id, data);
+        if (result.error) throw new Error(result.error);
+        alert('Listing updated!');
+        closeModal('editListingModal');
+        loadListings();
+      } catch (err) {
+        alert('Failed to update listing.');
+      }
+    });
+
+    window.openEditListing = openEditListing;
 
     // ── Profile Form ───────────────────────────────────────────────────
     document.getElementById('profileForm').addEventListener('submit', async (e) => {
@@ -1052,6 +1160,30 @@
       localStorage.removeItem('lala_user');
       window.location.href = 'index.html';
     }
+
+    // ── Host Booking Actions ───────────────────────────────────────────
+    async function hostConfirmBooking(id) {
+      if (!confirm('Confirm this booking?')) return;
+      try {
+        await api.confirmBooking(id);
+        loadDashboard();
+      } catch (err) {
+        alert('Failed to confirm booking');
+      }
+    }
+
+    async function hostCancelBooking(id) {
+      if (!confirm('Decline this booking?')) return;
+      try {
+        await api.hostCancelBooking(id);
+        loadDashboard();
+      } catch (err) {
+        alert('Failed to cancel booking');
+      }
+    }
+
+    window.hostConfirmBooking = hostConfirmBooking;
+    window.hostCancelBooking = hostCancelBooking;
 
     // ── Init ───────────────────────────────────────────────────────────
     loadDashboard();

@@ -43,6 +43,7 @@
     </div>
     <div style="display: flex; gap: 20px; align-items: center;">
       <a href="host-dashboard.html" style="color: #fff; text-decoration: none; font-size: 13px; font-weight: 500;">Dashboard</a>
+      <a href="admin-bookings.html" style="color: #fff; text-decoration: none; font-size: 13px; font-weight: 500;">Bookings</a>
       <button onclick="logout()" style="background:transparent; border:1px solid rgba(255,255,255,0.3); color:#fff; font-size:12px; padding: 6px 12px; border-radius: 4px; cursor:pointer;">Logout</button>
     </div>
   </div>
@@ -122,8 +123,14 @@
       }
     }
 
-    function rejectListing(id) {
-      alert('Reject functionality coming soon (requires manual host notification).');
+    async function rejectListing(id) {
+      if (!confirm('Reject and remove this listing permanently?')) return;
+      try {
+        await api.rejectListing(id);
+        loadQueue();
+      } catch (err) {
+        alert('Failed to reject listing');
+      }
     }
 
     function logout() {

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lala — All Bookings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="logo-removebg-preview.png">
+  <style>
+    body { background: #F8F9FA; }
+    .admin-nav { background: #1B5E20; color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .admin-container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+    th { background: #F5F5F5; font-family: 'Sora', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: #666; padding: 14px 12px; text-align: left; }
+    td { padding: 12px; font-size: 13px; border-top: 1px solid #eee; }
+    tr:hover td { background: #FAFFFA; }
+    .sb { padding: 3px 10px; border-radius: 99px; font-size: 10px; font-weight: 700; font-family: 'Sora', sans-serif; display: inline-block; }
+    .sb-conf { background: #E8F5E9; color: #1B5E20; }
+    .sb-pend { background: #FFF8E1; color: #F57F17; }
+    .sb-canc { background: #F5F5F5; color: #757575; }
+    .sb-await { background: #FFF3E0; color: #E65100; }
+    .sb-fail { background: #FFEBEE; color: #C62828; }
+    .empty-state { text-align: center; padding: 60px 20px; color: #888; }
+    .empty-state i { font-size: 48px; color: #DDD; margin-bottom: 16px; }
+    @media (max-width: 768px) {
+      table { font-size: 12px; }
+      th, td { padding: 8px 6px; }
+      .hide-mobile { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-nav">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <img src="logo-removebg-preview.png" alt="Lala" style="height: 24px; filter: brightness(0) invert(1);">
+      <div class="sora" style="font-weight: 700; font-size: 16px; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 12px;">All Bookings</div>
+    </div>
+    <div style="display: flex; gap: 20px; align-items: center;">
+      <a href="admin-portal.html" style="color: #fff; text-decoration: none; font-size: 13px; font-weight: 500;">Verification</a>
+      <a href="host-dashboard.html" style="color: #fff; text-decoration: none; font-size: 13px; font-weight: 500;">Dashboard</a>
+      <button onclick="logout()" style="background:transparent; border:1px solid rgba(255,255,255,0.3); color:#fff; font-size:12px; padding: 6px 12px; border-radius: 4px; cursor:pointer;">Logout</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h1 class="sora" style="font-size: 20px;">Booking Records</h1>
+      <select id="statusFilter" onchange="loadBookings()" style="padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:12px;font-family:'Sora',sans-serif;">
+        <option value="">All Statuses</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="pending">Pending</option>
+        <option value="awaiting_payment">Awaiting Payment</option>
+        <option value="payment_failed">Payment Failed</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+
+    <div id="bookingsContainer">
+      <div class="empty-state">
+        <i class="ti ti-loader"></i>
+        <p>Loading bookings...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script>
+    const user = JSON.parse(localStorage.getItem('lala_user'));
+    if (!user || user.role !== 'admin') window.location.href = 'index.html';
+
+    function statusBadge(status) {
+      const map = {
+        'confirmed': '<span class="sb sb-conf">Confirmed</span>',
+        'pending': '<span class="sb sb-pend">Pending</span>',
+        'cancelled': '<span class="sb sb-canc">Cancelled</span>',
+        'awaiting_payment': '<span class="sb sb-await">Awaiting Payment</span>',
+        'payment_failed': '<span class="sb sb-fail">Payment Failed</span>'
+      };
+      return map[status] || status;
+    }
+
+    async function loadBookings() {
+      const container = document.getElementById('bookingsContainer');
+      const filter = document.getElementById('statusFilter').value;
+
+      try {
+        const allBookings = await api.getAllBookings();
+
+        let filtered = allBookings;
+        if (filter) filtered = allBookings.filter(b => b.status === filter);
+
+        if (!filtered.length) {
+          container.innerHTML = '<div class="empty-state"><i class="ti ti-calendar-off"></i><p>No bookings found</p></div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <div style="overflow-x:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Listing</th>
+                  <th>Guest</th>
+                  <th class="hide-mobile">Dates</th>
+                  <th>Amount</th>
+                  <th class="hide-mobile">Provider</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filtered.map(b => `
+                  <tr>
+                    <td><strong>${b.listingName || 'Unknown'}</strong></td>
+                    <td>${(b.guest && b.guest.name) || (b.guest && b.guest.phone) || 'Guest'}</td>
+                    <td class="hide-mobile">${new Date(b.checkIn).toLocaleDateString()} — ${new Date(b.checkOut).toLocaleDateString()}</td>
+                    <td><strong>K${b.totalAmount}</strong></td>
+                    <td class="hide-mobile">${b.provider || '—'}</td>
+                    <td>${statusBadge(b.status)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          <div style="text-align:center;margin-top:12px;font-size:12px;color:#888;">
+            ${filtered.length} booking${filtered.length !== 1 ? 's' : ''}
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = '<div class="empty-state"><p style="color:red;">Failed to load bookings</p></div>';
+        console.error(err);
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('lala_token');
+      localStorage.removeItem('lala_user');
+      window.location.href = 'index.html';
+    }
+
+    loadBookings();
+  </script>
+</body>
+</html>

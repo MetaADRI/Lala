@@ -144,3 +144,32 @@ exports.rejectListing = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.updateListing = async (req, res) => {
+  try {
+    const listing = await Listing.findByPk(req.params.id);
+    if (!listing) return res.status(404).json({ error: 'Listing not found' });
+
+    // Only the host who owns it or an admin can update
+    if (req.user.role !== 'admin' && listing.hostId !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const allowedFields = ['name', 'type', 'city', 'district', 'price', 'description', 'amenities', 'cancellationPolicy', 'photos'];
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        listing[field] = req.body[field];
+      }
+    });
+
+    // If admin updates, they can also change approval status
+    if (req.user.role === 'admin' && req.body.isApproved !== undefined) {
+      listing.isApproved = req.body.isApproved;
+    }
+
+    await listing.save();
+    res.json({ message: 'Listing updated', listing });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

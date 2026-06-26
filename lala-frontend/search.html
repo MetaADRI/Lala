@@ -209,6 +209,8 @@
   <script>
     let currentFilters = { city: '', type: '', sort: 'newest', minPrice: '', maxPrice: '' };
     let savedIds = new Set(JSON.parse(localStorage.getItem('lala_saved') || '[]'));
+    let allListings = [];
+    let isLoadingMore = false;
 
     function togglePriceFilter() {
       const panel = document.getElementById('priceFilterPanel');
@@ -243,71 +245,101 @@
       btn.innerHTML = savedIds.has(listingId) ? '<i class="ti ti-heart-filled"></i>' : '<i class="ti ti-heart"></i>';
     }
 
+    function renderListingCard(listing) {
+      const isSaved = savedIds.has(listing.id);
+      const photoUrl = (listing.photos && listing.photos[0]) || '';
+      return `
+        <a href="listing-detail.html?id=${listing.id}" class="lcard fade-up visible">
+          <div class="limg ${photoUrl ? '' : 'green'}">
+            ${photoUrl ? `<img src="${photoUrl}" loading="lazy" alt="${listing.name}">` : '<i class="ti ti-home"></i>'}
+            <button class="save-btn-card ${isSaved ? 'saved' : ''}" onclick="toggleSaveCard(event, '${listing.id}')">
+              <i class="ti ${isSaved ? 'ti-heart-filled' : 'ti-heart'}"></i>
+            </button>
+            <span class="property-badge-card">${listing.type}</span>
+          </div>
+          <div class="lbody">
+            <div class="lname">${listing.name}</div>
+            <div class="lloc"><i class="ti ti-map-pin"></i> ${listing.district}, ${listing.city}</div>
+            <div class="card-mid">
+              ${getScoreBadge(listing.ratingAverage)}
+              <span class="review-count-label">${listing.reviewCount > 0 ? `${listing.reviewCount} review${listing.reviewCount !== 1 ? 's' : ''}` : 'No reviews'}</span>
+            </div>
+            ${listing.amenities && listing.amenities.length > 0 ? `
+            <div class="amenity-pills">
+              ${listing.amenities.slice(0, 3).map(a => `<span class="amenity-pill-card">${a}</span>`).join('')}
+            </div>` : ''}
+            <div class="lrow">
+              <div class="lprice">K${listing.price} <span class="lprice-sub">/night</span></div>
+              <div class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified</div>
+            </div>
+          </div>
+        </a>
+      `;
+    }
+
+    function renderLoadMore() {
+      const existing = document.getElementById('loadMoreBtn');
+      if (existing) existing.remove();
+      const container = document.getElementById('listingsContainer');
+      container.insertAdjacentHTML('beforeend', `
+        <button id="loadMoreBtn" onclick="loadMore()" style="padding:14px;background:#fff;border:1.5px solid var(--border);border-radius:12px;font-family:'Sora',sans-serif;font-weight:600;font-size:13px;color:var(--g-dark);cursor:pointer;width:100%;transition:all 0.2s;">
+          <i class="ti ti-plus"></i> Load More
+        </button>
+      `);
+    }
+
     async function loadListings() {
       const container = document.getElementById('listingsContainer');
       const countEl = document.getElementById('resultsCount');
       
       try {
+        currentFilters.limit = 10;
+        currentFilters.offset = 0;
         const listings = await api.getListings(currentFilters);
+        allListings = listings || [];
         
-        // Sort client-side
-        const sorted = [...listings];
-        switch (currentFilters.sort) {
-          case 'price_asc': sorted.sort((a, b) => a.price - b.price); break;
-          case 'price_desc': sorted.sort((a, b) => b.price - a.price); break;
-          case 'rating': sorted.sort((a, b) => (b.ratingAverage || 0) - (a.ratingAverage || 0)); break;
-          default: break; // newest first (default from backend)
-        }
-        
-        countEl.innerText = `${sorted.length} stay${sorted.length !== 1 ? 's' : ''} found`;
+        countEl.innerText = `${allListings.length} stay${allListings.length !== 1 ? 's' : ''} found`;
         
         const header = container.querySelector('.flex-between');
         container.innerHTML = '';
         container.appendChild(header);
 
-        if (sorted.length === 0) {
+        if (allListings.length === 0) {
           container.insertAdjacentHTML('beforeend', '<div class="sora" style="text-align:center; padding:40px; color:var(--muted);">No stays found matching your search.</div>');
           return;
         }
 
-        sorted.forEach(listing => {
-          const isSaved = savedIds.has(listing.id);
-          const photoUrl = (listing.photos && listing.photos[0]) || '';
-          const showIcon = !photoUrl;
-          
-          const card = `
-            <a href="listing-detail.html?id=${listing.id}" class="lcard fade-up visible">
-              <div class="limg ${photoUrl ? '' : 'green'}">
-                ${photoUrl ? `<img src="${photoUrl}" loading="lazy" alt="${listing.name}">` : '<i class="ti ti-home"></i>'}
-                <button class="save-btn-card ${isSaved ? 'saved' : ''}" onclick="toggleSaveCard(event, '${listing.id}')">
-                  <i class="ti ${isSaved ? 'ti-heart-filled' : 'ti-heart'}"></i>
-                </button>
-                <span class="property-badge-card">${listing.type}</span>
-              </div>
-              <div class="lbody">
-                <div class="lname">${listing.name}</div>
-                <div class="lloc"><i class="ti ti-map-pin"></i> ${listing.district}, ${listing.city}</div>
-                <div class="card-mid">
-                  ${getScoreBadge(listing.ratingAverage)}
-                  <span class="review-count-label">${listing.reviewCount > 0 ? `${listing.reviewCount} review${listing.reviewCount !== 1 ? 's' : ''}` : 'No reviews'}</span>
-                </div>
-                ${listing.amenities && listing.amenities.length > 0 ? `
-                <div class="amenity-pills">
-                  ${listing.amenities.slice(0, 3).map(a => `<span class="amenity-pill-card">${a}</span>`).join('')}
-                </div>` : ''}
-                <div class="lrow">
-                  <div class="lprice">K${listing.price} <span class="lprice-sub">/night</span></div>
-                  <div class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified</div>
-                </div>
-              </div>
-            </a>
-          `;
-          container.insertAdjacentHTML('beforeend', card);
-        });
+        allListings.forEach(l => container.insertAdjacentHTML('beforeend', renderListingCard(l)));
+        renderLoadMore();
       } catch (err) {
         countEl.innerText = 'Failed to load stays';
         console.error(err);
       }
+    }
+
+    async function loadMore() {
+      if (isLoadingMore) return;
+      isLoadingMore = true;
+      const btn = document.getElementById('loadMoreBtn');
+      if (btn) { btn.disabled = true; btn.innerHTML = 'Loading...'; }
+      
+      try {
+        currentFilters.offset = allListings.length;
+        currentFilters.limit = 10;
+        const more = await api.getListings(currentFilters);
+        if (more && more.length > 0) {
+          more.forEach(l => {
+            allListings.push(l);
+            document.getElementById('listingsContainer').insertAdjacentHTML('beforeend', renderListingCard(l));
+          });
+          renderLoadMore();
+        } else {
+          if (btn) btn.remove();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+      isLoadingMore = false;
     }
 
     function applyFilters() {

@@ -1,6 +1,11 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+const emailService = require('../services/email');
+
+// In-memory store for reset tokens (use Redis/DB in production)
+const resetTokens = {};
 
 function signToken(user) {
   const token = jwt.sign(
@@ -81,6 +86,56 @@ exports.setupHost = async (req, res) => {
 
     const { token, user: userData } = signToken(user);
     res.json({ message: 'Host profile created', token, user: userData });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email is required' });
+
+  try {
+    const user = await User.findOne({ where: { email } });
+    if (!user) return res.status(404).json({ error: 'No account found with this email' });
+
+    const resetCode = crypto.randomInt(100000, 999999).toString();
+    const expiresAt = Date.now() + 30 * 60 * 1000;
+
+    resetTokens[email] = { code: resetCode, expiresAt };
+
+    await emailService.sendPasswordResetCode(email, resetCode);
+
+    res.json({ message: 'Reset code sent to your email', expiresIn: '30 minutes' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  const { email, code, password } = req.body;
+  if (!email || !code || !password) {
+    return res.status(400).json({ error: 'Email, code, and new password are required' });
+  }
+
+  try {
+    const stored = resetTokens[email];
+    if (!stored) return res.status(400).json({ error: 'No reset code requested for this email' });
+    if (Date.now() > stored.expiresAt) {
+      delete resetTokens[email];
+      return res.status(400).json({ error: 'Reset code has expired' });
+    }
+    if (stored.code !== code) return res.status(400).json({ error: 'Invalid reset code' });
+
+    const user = await User.findOne({ where: { email } });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    user.password = await bcrypt.hash(password, 10);
+    await user.save();
+
+    delete resetTokens[email];
+
+    res.json({ message: 'Password reset successful. You can now log in with your new password.' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

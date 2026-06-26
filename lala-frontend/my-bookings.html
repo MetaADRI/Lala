@@ -203,7 +203,10 @@
               <div class="bcard-amount">K${b.totalAmount.toLocaleString()}</div>
               ${getProviderBadge(b.provider)}
             </div>
-            ${getStatusBadgeHTML(b.status)}
+            <div style="display:flex;align-items:center;gap:8px;">
+              ${getStatusBadgeHTML(b.status)}
+              ${['pending', 'awaiting_payment'].includes(b.status) ? `<button onclick="cancelBooking('${b.id}')" style="background:none;border:1px solid #ccc;border-radius:6px;padding:4px 8px;font-size:10px;cursor:pointer;color:#c62828;"><i class="ti ti-x"></i></button>` : ''}
+            </div>
           </div>
         </div>
       `).join('');
@@ -252,6 +255,19 @@
     });
 
     loadBookings();
+
+    async function cancelBooking(id) {
+      if (!confirm('Cancel this booking?')) return;
+      try {
+        const result = await api.cancelBooking(id);
+        if (result.error) throw new Error(result.error);
+        loadBookings();
+      } catch (err) {
+        alert('Failed to cancel: ' + (err.message || 'Please try again.'));
+      }
+    }
+
+    window.cancelBooking = cancelBooking;
   </script>
 </body>
 </html>
