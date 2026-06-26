@@ -120,7 +120,8 @@
           </div>
         `).join('');
       } catch (err) {
-        container.innerHTML = '<div class="empty"><p style="color:red;">Failed to load</p></div>';
+        console.error('loadCars error:', err);
+        container.innerHTML = '<div class="empty"><p style="color:red;">Failed to load</p><p style="font-size:12px;color:#999;">' + (err.message || '') + '</p></div>';
       }
     }
 
