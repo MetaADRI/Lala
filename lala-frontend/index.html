@@ -142,7 +142,8 @@
     </a>
     <div class="nav-links">
       <a href="index.html" class="active">Home</a>
-      <a href="search.html">Search</a>
+      <a href="search.html">Stays</a>
+      <a href="transfers.html">Transfers</a>
       <a href="my-bookings.html">My Trips</a>
       <a href="host-signup.html">List Stays</a>
       <a href="guest-login.html">Login</a>
@@ -179,6 +180,18 @@
         <input type="text" placeholder="Where are you going? (e.g. Lusaka, Kitwe)" onkeypress="if(event.key==='Enter') window.location.href='search.html'">
       </div>
       <button class="btn-green" onclick="window.location.href='search.html'"><i class="ti ti-search"></i> Search</button>
+    </div>
+
+    <!-- TRANSFERS CTA -->
+    <div class="search-box fade-up" style="margin-top:10px;margin-bottom:20px;cursor:pointer;" onclick="location.href='transfers.html'">
+      <div style="display:flex;align-items:center;gap:12px;flex:1;padding:0 16px;">
+        <i class="ti ti-car" style="color:var(--g-mid);font-size:20px;"></i>
+        <div style="flex:1;">
+          <div style="font-family:'Sora',sans-serif;font-weight:600;font-size:14px;">Need a ride too?</div>
+          <div style="font-size:12px;color:var(--muted);">Airport transfers & city taxis</div>
+        </div>
+      </div>
+      <span class="btn-green" style="pointer-events:none;"><i class="ti ti-arrow-right"></i></span>
     </div>
 
     <!-- POPULAR DESTINATIONS -->

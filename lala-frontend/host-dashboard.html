@@ -653,6 +653,9 @@
       <button class="tab-btn" id="tabListings" onclick="switchTab('listings')">
         <i class="ti ti-building"></i> Listings
       </button>
+      <button class="tab-btn" id="tabTransfers" onclick="switchTab('transfers')">
+        <i class="ti ti-car"></i> Transfers
+      </button>
     </div>
 
     <!-- Bookings Panel -->
@@ -674,6 +677,21 @@
         </button>
       </div>
       <div id="listingsList"><div class="empty-state"><i class="ti ti-building"></i><p>Loading listings...</p></div></div>
+    </div>
+
+    <!-- Transfers Panel -->
+    <div class="tab-panel" id="panelTransfers">
+      <div class="section-header">
+        <span class="section-title">Your Vehicles</span>
+        <button class="section-action" onclick="openModal('carModal')">
+          <i class="ti ti-plus"></i> Add Vehicle
+        </button>
+      </div>
+      <div id="transfersList"><div class="empty-state"><i class="ti ti-car"></i><p>Loading vehicles...</p></div></div>
+      <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
+        <div class="section-title" style="font-size:13px;margin-bottom:10px;">Ride Requests</div>
+        <div id="driverBookingsList"><div class="empty-state"><i class="ti ti-clock"></i><p>Loading ride requests...</p></div></div>
+      </div>
     </div>
 
     <!-- Admin shortcut -->
@@ -826,6 +844,64 @@
     </div>
   </div>
 
+  <!-- ADD VEHICLE MODAL -->
+  <div class="modal" id="carModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add Vehicle</h2>
+        <button class="modal-close" onclick="closeModal('carModal')"><i class="ti ti-x"></i></button>
+      </div>
+      <form id="carForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Driver Name</label>
+            <input type="text" name="driverName" placeholder="Driver's name" required>
+          </div>
+          <div class="form-group">
+            <label>Driver Phone</label>
+            <input type="text" name="driverPhone" placeholder="+260..." required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Car Model</label>
+            <input type="text" name="model" placeholder="e.g. Toyota Corolla" required>
+          </div>
+          <div class="form-group">
+            <label>Plate Number</label>
+            <input type="text" name="plateNumber" placeholder="e.g. BAP 1234" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Seats</label>
+            <input type="number" name="seats" value="4" min="1" required>
+          </div>
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" name="city" placeholder="e.g. Lusaka" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Airport Price (ZMW)</label>
+            <input type="number" name="airportPrice" placeholder="e.g. 150">
+          </div>
+          <div class="form-group">
+            <label>Price per Km (ZMW)</label>
+            <input type="number" name="pricePerKm" placeholder="e.g. 5" step="0.5">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" placeholder="Anything to note about the vehicle..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;min-height:60px;resize:vertical;"></textarea>
+        </div>
+        <button type="submit" class="btn-primary">Register Vehicle</button>
+        <button type="button" class="btn-secondary" onclick="closeModal('carModal')">Cancel</button>
+      </form>
+    </div>
+  </div>
+
   <script src="config.js?v=2"></script>
   <script src="api.js?v=2"></script>
   <script>
@@ -863,6 +939,7 @@
 
       if (tab === 'reviews') loadReviews();
       if (tab === 'listings') loadListings();
+      if (tab === 'transfers') { loadTransfers(); loadDriverBookings(); }
     }
 
     // ── Modal ──────────────────────────────────────────────────────────
@@ -1184,6 +1261,110 @@
 
     window.hostConfirmBooking = hostConfirmBooking;
     window.hostCancelBooking = hostCancelBooking;
+
+    // ── Transfers ──────────────────────────────────────────────────────
+    async function loadTransfers() {
+      const container = document.getElementById('transfersList');
+      try {
+        const cars = await api.getMyCars();
+        if (!cars.length) {
+          container.innerHTML = '<div class="empty-state"><i class="ti ti-car-off"></i><p>No vehicles registered. Add one above!</p></div>';
+          return;
+        }
+        container.innerHTML = cars.map(c => `
+          <div style="background:var(--card);border-radius:var(--rsm);border:1px solid var(--border);padding:12px 14px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:start;">
+              <div>
+                <strong style="font-family:'Sora',sans-serif;font-size:14px;">${c.model}</strong>
+                <div style="font-size:12px;color:var(--muted);">👤 ${c.driverName} · ${c.plateNumber} · ${c.seats} seats · ${c.city}</div>
+                <div style="display:flex;gap:8px;margin-top:6px;">
+                  ${c.airportPrice ? `<span style="font-size:11px;background:#E8F5E9;padding:2px 8px;border-radius:99px;">Airport K${c.airportPrice}</span>` : ''}
+                  ${c.pricePerKm ? `<span style="font-size:11px;background:#E3F2FD;padding:2px 8px;border-radius:99px;">K${c.pricePerKm}/km</span>` : ''}
+                </div>
+              </div>
+              <button onclick="deleteCar('${c.id}')" style="background:none;border:none;color:#c62828;cursor:pointer;font-size:16px;"><i class="ti ti-trash"></i></button>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        container.innerHTML = '<div class="empty-state"><p style="color:red;">Failed to load vehicles</p></div>';
+      }
+    }
+
+    async function deleteCar(id) {
+      if (!confirm('Remove this vehicle?')) return;
+      try {
+        await api.deleteCar(id);
+        loadTransfers();
+      } catch (err) {
+        alert('Failed to remove vehicle');
+      }
+    }
+
+    async function loadDriverBookings() {
+      const container = document.getElementById('driverBookingsList');
+      try {
+        const bookings = await api.getDriverCarBookings();
+        if (!bookings.length) {
+          container.innerHTML = '<div class="empty-state"><i class="ti ti-calendar-off"></i><p>No ride requests yet</p></div>';
+          return;
+        }
+        container.innerHTML = bookings.map(b => `
+          <div style="background:var(--card);border-radius:var(--rsm);border:1px solid var(--border);padding:12px 14px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:start;">
+              <div>
+                <strong style="font-family:'Sora',sans-serif;font-size:13px;">${b.tripType === 'airport' ? '✈️ Airport' : '📍 City'} — ${b.car ? b.car.model : 'Car'}</strong>
+                <div style="font-size:12px;color:var(--muted);margin:2px 0;">
+                  ${b.pickupLocation} → ${b.dropoffLocation} · ${b.pickupDate} ${b.pickupTime}
+                </div>
+                <div style="font-size:12px;color:var(--muted);">K${b.totalAmount} · ${b.passengerCount} pax</div>
+              </div>
+              <span class="sb ${b.status === 'confirmed' ? 'sb-conf' : b.status === 'cancelled' ? 'sb-canc' : 'sb-pend'}">${b.status}</span>
+            </div>
+            ${b.status === 'pending' ? `
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <button onclick="driverAccept('${b.id}')" style="flex:1;padding:8px;background:#1B5E20;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;">Accept</button>
+              <button onclick="driverDecline('${b.id}')" style="flex:1;padding:8px;background:#f5f5f5;color:#666;border:1px solid #ddd;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;">Decline</button>
+            </div>` : ''}
+          </div>
+        `).join('');
+      } catch (err) {
+        container.innerHTML = '<div class="empty-state"><p style="color:red;">Failed to load ride requests</p></div>';
+      }
+    }
+
+    async function driverAccept(id) {
+      try { await api.updateCarBookingStatus(id, 'confirmed'); loadDriverBookings(); }
+      catch (err) { alert('Failed to accept'); }
+    }
+
+    async function driverDecline(id) {
+      try { await api.updateCarBookingStatus(id, 'cancelled'); loadDriverBookings(); }
+      catch (err) { alert('Failed to decline'); }
+    }
+
+    window.deleteCar = deleteCar;
+    window.driverAccept = driverAccept;
+    window.driverDecline = driverDecline;
+
+    // ── Car Form ────────────────────────────────────────────────────────
+    document.getElementById('carForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      if (data.airportPrice) data.airportPrice = parseFloat(data.airportPrice);
+      if (data.pricePerKm) data.pricePerKm = parseFloat(data.pricePerKm);
+      data.seats = parseInt(data.seats);
+      try {
+        const result = await api.createCar(data);
+        if (result.error) throw new Error(result.error);
+        alert('Vehicle registered!');
+        closeModal('carModal');
+        e.target.reset();
+        loadTransfers();
+      } catch (err) {
+        alert('Failed to register vehicle');
+      }
+    });
 
     // ── Init ───────────────────────────────────────────────────────────
     loadDashboard();

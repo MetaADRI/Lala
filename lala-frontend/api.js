@@ -321,6 +321,110 @@ const api = {
     return res.json();
   },
 
+  // ─── TRANSFERS ─────────────────────────────────────────────────────────────
+  getCars: async (filters = {}) => {
+    const clean = Object.fromEntries(Object.entries(filters).filter(([_, v]) => v !== '' && v != null));
+    const params = new URLSearchParams(clean).toString();
+    const res = await fetch(`${API_BASE}/cars${params ? '?' + params : ''}`);
+    return res.json();
+  },
+
+  getCar: async (id) => {
+    const res = await fetch(`${API_BASE}/cars/${id}`);
+    return res.json();
+  },
+
+  getMyCars: async () => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/cars/mine`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  createCar: async (data) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/cars`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(data)
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  updateCar: async (id, data) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/cars/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(data)
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  deleteCar: async (id) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/cars/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  createCarBooking: async (data) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/car-bookings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(data)
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  getGuestCarBookings: async () => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/car-bookings/guest/all`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  getDriverCarBookings: async () => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/car-bookings/driver/all`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  updateCarBookingStatus: async (id, status) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/car-bookings/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ status })
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  cancelCarBooking: async (id) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/car-bookings/${id}/cancel`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
   // ─── HELPERS ───────────────────────────────────────────────────────────────
   logout: () => {
     localStorage.removeItem('lala_token');
