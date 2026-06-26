@@ -1,5 +1,5 @@
-const CACHE_NAME = 'lala-v2';
-const DATA_CACHE_NAME = 'lala-data-v2';
+const CACHE_NAME = 'lala-v3';
+const DATA_CACHE_NAME = 'lala-data-v3';
 const ASSETS = [
   '/',
   '/search.html',
@@ -67,7 +67,13 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Static assets - Cache first, network fallback
+  // api.js and config.js - Always network (no cache)
+  if (url.pathname.endsWith('/api.js') || url.pathname.endsWith('/config.js')) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // Other static assets - Cache first, network fallback
   event.respondWith(
     caches.match(request).then(response => {
       return response || fetch(request);
