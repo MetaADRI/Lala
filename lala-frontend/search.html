@@ -5,201 +5,328 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lala — Search Stays</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="common.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
-    /* Local overrides for search.html */
-    body { background: var(--bg); }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, system-ui, 'Helvetica Neue', sans-serif;
+      background: var(--canvas);
+      color: var(--ink);
+      line-height: 1.5;
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    h1, h2, h3, h4 { font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
 
-    /* ---- TOP NAV ---- */
-    .search-nav {
-      background: var(--g-dark); padding: 14px 18px 18px; color: #fff;
-      position: sticky; top: 0; z-index: 100;
+    /* ---- NAV ---- */
+    nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 40px; height: 72px;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: var(--canvas);
+      border-bottom: 1px solid var(--hairline);
     }
-    .search-nav-top {
-      display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+    .logo-img { height: 32px; display: block; }
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+    .nav-links a {
+      font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px;
+      color: var(--ink); text-decoration: none; padding: 8px 14px;
+      border-radius: 9999px; transition: all 0.2s;
     }
-    .back-icon { font-size: 20px; color: #fff; text-decoration: none; }
-    
-    .sbar-field {
-      flex: 1; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.22);
-      border-radius: var(--rsm); padding: 10px 13px; display: flex; align-items: center; gap: 9px;
+    .nav-links a:hover, .nav-links a.active { background: var(--surface-strong); }
+    .nav-cta {
+      background: var(--accent) !important;
+      color: #fff !important;
+      font-weight: 600 !important;
     }
-    .sbar-field i { color: rgba(255,255,255,0.8); font-size: 18px; }
-    .sbar-field span { color: #fff; font-size: 14px; font-weight: 500; }
+    .nav-cta:hover { background: var(--accent-hover) !important; }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 16px; }
+      .nav-links a:not(.nav-cta):not([href="index.html"]) { display: none; }
+    }
+
+    /* ---- SEARCH HEADER ---- */
+    .search-header {
+      margin-top: 72px; padding: 24px 24px 16px;
+      background: var(--canvas);
+      position: sticky; top: 72px; z-index: 50;
+      border-bottom: 1px solid var(--hairline-soft);
+    }
+    .search-header-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .search-input-wrap {
+      flex: 1; display: flex; align-items: center;
+      background: var(--surface-soft); border-radius: 9999px;
+      padding: 0 16px; height: 48px;
+      border: 1.5px solid transparent;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .search-input-wrap:focus-within {
+      border-color: var(--accent);
+      background: var(--canvas);
+    }
+    .search-input-wrap i { color: var(--muted); font-size: 18px; margin-right: 10px; }
+    .search-input-wrap input {
+      flex: 1; border: none; background: transparent; font-size: 15px;
+      color: var(--ink); outline: none; font-family: 'Inter', sans-serif;
+    }
+    .search-input-wrap input::placeholder { color: var(--muted-soft); }
 
     /* ---- FILTER ROW ---- */
-    .frow {
-      display: flex; gap: 8px; overflow-x: auto; padding: 4px 0;
+    .filter-bar {
+      max-width: 1200px; margin: 12px auto 0;
+      padding: 0 24px;
+      display: flex; gap: 8px; overflow-x: auto;
       scrollbar-width: none;
     }
-    .frow::-webkit-scrollbar { display: none; }
-    
+    .filter-bar::-webkit-scrollbar { display: none; }
     .fchip {
-      padding: 6px 14px; border-radius: 99px; font-family: 'Sora', sans-serif;
-      font-size: 11px; font-weight: 500; border: 1.5px solid rgba(255,255,255,0.2);
-      background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8);
-      white-space: nowrap; cursor: pointer; transition: all 0.2s;
+      padding: 8px 16px; border-radius: 9999px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px; font-weight: 500;
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--ink);
+      white-space: nowrap; cursor: pointer;
+      transition: all 0.2s; flex-shrink: 0;
     }
-    .fchip.on { background: #fff; color: var(--g-dark); border-color: #fff; }
+    .fchip:hover { border-color: var(--ink); }
+    .fchip.on {
+      background: var(--ink); color: #fff; border-color: var(--ink);
+    }
 
-    /* ---- SORT DROPDOWN ---- */
-    .sort-dropdown {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--rsm);
-      padding: 6px 12px;
-      font-family: 'Sora', sans-serif;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text);
+    .filter-actions {
+      display: flex; align-items: center; gap: 12px;
+      margin-left: auto; flex-shrink: 0;
+    }
+    .price-toggle {
+      font-size: 13px; color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; gap: 4px;
+      font-family: 'Inter', sans-serif; font-weight: 500;
+      padding: 8px 14px; border-radius: 9999px;
+      border: 1px solid var(--hairline);
+      transition: all 0.2s;
+    }
+    .price-toggle:hover { border-color: var(--ink); }
+
+    .sort-select {
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      border-radius: 9999px;
+      padding: 8px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px; font-weight: 500;
+      color: var(--ink);
       outline: none;
       cursor: pointer;
-      min-height: 36px;
     }
 
-    /* ---- RESULTS ---- */
-    .results-container { padding: 20px 18px; display: flex; flex-direction: column; gap: 14px; }
-    
-    .lcard {
-      background: var(--card); border-radius: var(--r); border: 1px solid var(--border);
-      overflow: hidden; display: block; text-decoration: none; color: inherit;
-      transition: transform 0.2s, box-shadow 0.2s;
+    /* ---- PRICE FILTER PANEL ---- */
+    .price-panel {
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 24px;
+      display: none;
     }
-    .lcard:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
-    
+    .price-panel.open { display: block; }
+    .price-panel-inner {
+      display: flex; gap: 12px; align-items: center;
+      padding: 12px 16px; background: var(--surface-soft);
+      border-radius: 14px; margin-top: 8px;
+    }
+    .price-group { display: flex; align-items: center; gap: 6px; }
+    .price-group label { font-size: 12px; color: var(--muted); font-weight: 500; }
+    .price-group input {
+      width: 90px; background: var(--canvas); border: 1px solid var(--hairline);
+      border-radius: 8px; padding: 8px 10px; font-size: 13px;
+      color: var(--ink); outline: none; font-family: 'Inter', sans-serif;
+    }
+    .price-group input:focus { border-color: var(--accent); }
+    .price-apply {
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 8px; padding: 8px 18px;
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; margin-left: auto;
+    }
+    .price-apply:hover { background: var(--accent-hover); }
+
+    /* ---- RESULTS ---- */
+    .results-area {
+      max-width: 1200px; margin: 0 auto;
+      padding: 24px;
+    }
+    .results-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px;
+    }
+    .results-count {
+      font-family: 'Inter', sans-serif;
+      font-size: 15px; font-weight: 600; color: var(--ink);
+    }
+
+    .listings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px;
+    }
+
+    .lcard {
+      background: var(--canvas); border-radius: 14px;
+      border: 1px solid var(--hairline);
+      overflow: hidden; display: block; text-decoration: none; color: inherit;
+      transition: all 0.25s;
+      box-shadow: var(--shadow-card);
+    }
+    .lcard:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.02), 0 6px 16px rgba(0,0,0,0.08);
+    }
+
     .limg {
-      height: 140px; display: flex; align-items: center; justify-content: center;
+      height: 180px; display: flex; align-items: center; justify-content: center;
       font-size: 40px; position: relative; overflow: hidden;
     }
     .limg img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
     .limg.green { background: linear-gradient(135deg, #A5D6A7, #66BB6A); }
-    .limg.warm { background: linear-gradient(135deg, #FFCC80, #FFA726); }
-    .limg.blue { background: linear-gradient(135deg, #90CAF9, #42A5F5); }
 
-    .save-btn-card {
-      position: absolute; top: 8px; right: 8px; width: 34px; height: 34px;
-      border-radius: 50%; background: rgba(0,0,0,0.35); backdrop-filter: blur(4px);
-      border: none; color: #fff; font-size: 16px; cursor: pointer;
+    .save-btn {
+      position: absolute; top: 10px; right: 10px; width: 36px; height: 36px;
+      border-radius: 50%; background: rgba(255,255,255,0.9);
+      border: none; color: var(--ink); font-size: 17px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      z-index: 2; transition: background 0.2s;
+      z-index: 2; transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    .save-btn-card:hover { background: rgba(0,0,0,0.5); }
-    .save-btn-card.saved { background: var(--red); }
-    .property-badge-card {
-      position: absolute; bottom: 8px; left: 8px;
-      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-      color: #fff; font-size: 10px; font-weight: 600;
-      padding: 2px 10px; border-radius: 99px;
-      font-family: 'Sora', sans-serif;
-    }
-    
-    .lbody { padding: 14px; }
-    .lname { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 15px; color: var(--text); }
-    .lloc { font-size: 12px; color: var(--muted); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
-    
-    .card-mid { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
-    .score-badge {
-      display: inline-flex; align-items: center; gap: 3px;
-      padding: 2px 8px; border-radius: 6px; font-size: 12px;
-      font-weight: 700; font-family: 'Sora', sans-serif;
-    }
-    .score-badge i { font-size: 10px; }
-    .score-excellent { background: #1B5E20; color: #fff; }
-    .score-very-good { background: #2E7D32; color: #fff; }
-    .score-good { background: #1565C0; color: #fff; }
-    .score-fair { background: #757575; color: #fff; }
-    .score-new { background: var(--gold-lt); color: var(--gold); }
-    
-    .review-count-label { font-size: 11px; color: var(--muted); }
-    .amenity-pills { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
-    .amenity-pill-card {
-      background: var(--g-light); color: var(--g-mid); font-size: 9px;
-      font-weight: 500; padding: 1px 8px; border-radius: 99px;
-      font-family: 'Sora', sans-serif;
-    }
-    
-    .lrow { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-    .lprice { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: var(--g-dark); }
-    .lprice-sub { font-size: 11px; color: var(--muted); font-weight: 400; }
+    .save-btn:hover { transform: scale(1.1); }
+    .save-btn.saved { color: var(--red); }
 
-    /* ---- PRICE FILTER ---- */
-    .price-filter-toggle {
-      font-size: 11px; color: rgba(255,255,255,0.7); cursor: pointer;
-      display: flex; align-items: center; gap: 4px; padding: 4px 0;
-      font-family: 'Sora', sans-serif; font-weight: 500;
+    .pbadge {
+      position: absolute; bottom: 10px; left: 10px;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+      color: #fff; font-size: 11px; font-weight: 600;
+      padding: 3px 10px; border-radius: 9999px;
+      font-family: 'Inter', sans-serif;
     }
-    .price-filter-toggle:hover { color: #fff; }
-    .price-filter-panel {
-      display: none; margin-top: 6px; padding: 10px; background: rgba(255,255,255,0.1);
-      border-radius: 10px; gap: 8px;
+
+    .lbody { padding: 16px; }
+    .lname { font-weight: 600; font-size: 16px; color: var(--ink); }
+    .lloc { font-size: 13px; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+    .lmid { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+    .review-label { font-size: 12px; color: var(--muted-soft); }
+    .amenities { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+    .apill-card {
+      background: var(--accent-light); color: var(--accent-hover); font-size: 10px;
+      font-weight: 500; padding: 2px 8px; border-radius: 9999px;
     }
-    .price-filter-panel.open { display: flex; flex-wrap: wrap; }
-    .price-input-group { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 120px; }
-    .price-input-group label { font-size: 10px; color: rgba(255,255,255,0.6); white-space: nowrap; }
-    .price-input-group input {
-      flex: 1; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 8px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none; width: 70px;
+    .lrow { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+    .lprice { font-weight: 700; font-size: 18px; color: var(--accent-hover); }
+    .lprice sub { font-size: 12px; color: var(--muted); font-weight: 400; }
+
+    /* ---- LOAD MORE ---- */
+    .load-more-wrap { text-align: center; margin-top: 28px; }
+    .load-more-btn {
+      background: var(--canvas); color: var(--ink);
+      border: 1.5px solid var(--hairline); border-radius: 9999px;
+      padding: 12px 32px; font-family: 'Inter', sans-serif;
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      transition: all 0.2s;
     }
-    .price-input-group input::placeholder { color: rgba(255,255,255,0.4); }
-    .apply-price-btn {
-      background: #fff; color: var(--g-dark); border: none; border-radius: 8px;
-      padding: 6px 14px; font-size: 11px; font-weight: 600; cursor: pointer;
-      font-family: 'Sora', sans-serif;
+    .load-more-btn:hover { border-color: var(--ink); }
+
+    /* ---- FADE UP ---- */
+    .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    .fade-up-d1 { transition-delay: 0.1s; }
+    .fade-up-d2 { transition-delay: 0.2s; }
+
+    @media (max-width: 768px) {
+      .search-header { padding: 16px; }
+      .filter-bar { padding: 0 16px; }
+      .results-area { padding: 16px; }
+      .listings-grid { grid-template-columns: 1fr; }
+      .search-header-inner { flex-direction: column; align-items: stretch; }
+      .sort-select { width: 100%; }
     }
   </style>
 </head>
 <body>
-  <!-- TOP NAV -->
-  <div class="search-nav">
-    <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
-      <a href="index.html" class="back-icon"><i class="ti ti-arrow-left"></i></a>
-      <img src="logo-removebg-preview.png" alt="Lala Logo" style="height: 24px; filter: brightness(0) invert(1);">
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="logo">
+      <img src="logo-removebg-preview.png" alt="Lala Logo" class="logo-img">
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="search.html" class="active">Stays</a>
+      <a href="transfers.html">Transfers</a>
+      <a href="my-bookings.html">My Trips</a>
+      <a href="host-signup.html" class="nav-cta">List Stays</a>
+      <a href="guest-login.html">Sign In</a>
     </div>
-    <div class="search-nav-top">
-      <div class="sbar-field">
+  </nav>
+
+  <!-- STICKY SEARCH HEADER -->
+  <div class="search-header">
+    <div class="search-header-inner">
+      <div class="search-input-wrap">
         <i class="ti ti-search"></i>
-        <input type="text" id="citySearch" placeholder="Enter city (e.g. Lusaka)" onkeydown="if(event.key==='Enter') applyFilters()" style="background:transparent; border:none; color:#fff; outline:none; font-size:14px; width:100%;">
+        <input type="text" id="citySearch" placeholder="Search by city (e.g. Lusaka)" onkeydown="if(event.key==='Enter') applyFilters()">
       </div>
-      <button onclick="applyFilters()" style="background:transparent; border:none; color:#fff; cursor:pointer;"><i class="ti ti-search" style="font-size: 20px;"></i></button>
+      <button onclick="applyFilters()" style="background:var(--accent);color:#fff;border:none;border-radius:9999px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+        <i class="ti ti-search" style="font-size:20px;"></i>
+      </button>
     </div>
-    <div class="frow" id="typeFilters">
+    <div class="filter-bar" id="typeFilters">
       <div class="fchip on" data-type="">All Stays</div>
       <div class="fchip" data-type="Guesthouse">Guesthouse</div>
       <div class="fchip" data-type="Lodge">Lodge</div>
       <div class="fchip" data-type="Hostel">Hostel</div>
       <div class="fchip" data-type="Rest House">Rest House</div>
-    </div>
-    <div class="price-filter-toggle" onclick="togglePriceFilter()">
-      <i class="ti ti-filter"></i> Price range <i class="ti ti-chevron-down" id="priceChevron"></i>
-    </div>
-    <div class="price-filter-panel" id="priceFilterPanel">
-      <div class="price-input-group">
-        <label>Min</label>
-        <input type="number" id="minPrice" placeholder="K0" min="0">
+      <div class="filter-actions">
+        <div class="price-toggle" onclick="togglePriceFilter()">
+          <i class="ti ti-filter"></i> Price
+          <i class="ti ti-chevron-down" id="priceChevron"></i>
+        </div>
+        <select class="sort-select" id="sortSelect" onchange="applySort()">
+          <option value="newest">Newest</option>
+          <option value="price_asc">Price: Low</option>
+          <option value="price_desc">Price: High</option>
+          <option value="rating">Best Rated</option>
+        </select>
       </div>
-      <div class="price-input-group">
-        <label>Max</label>
-        <input type="number" id="maxPrice" placeholder="K5000" min="0">
-      </div>
-      <button class="apply-price-btn" onclick="applyPriceFilter()">Apply</button>
     </div>
   </div>
 
-  <!-- CONTENT -->
-  <div class="results-container container" id="listingsContainer">
-    <div class="flex-between fade-up">
-      <div class="sora" style="font-size: 14px; font-weight: 600;" id="resultsCount">Loading stays...</div>
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <i class="ti ti-arrows-sort" style="color: var(--muted); font-size: 14px;"></i>
-        <select class="sort-dropdown" id="sortSelect" onchange="applySort()">
-          <option value="newest">Newest First</option>
-          <option value="price_asc">Price: Low to High</option>
-          <option value="price_desc">Price: High to Low</option>
-          <option value="rating">Best Rated</option>
-        </select>
+  <!-- PRICE PANEL -->
+  <div class="price-panel" id="pricePanel">
+    <div class="price-panel-inner">
+      <div class="price-group">
+        <label>Min</label>
+        <input type="number" id="minPrice" placeholder="K0" min="0">
+      </div>
+      <div class="price-group">
+        <label>Max</label>
+        <input type="number" id="maxPrice" placeholder="K5000" min="0">
+      </div>
+      <button class="price-apply" onclick="applyPriceFilter()">Apply</button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-area" id="listingsContainer">
+    <div class="results-header fade-up visible">
+      <div class="results-count" id="resultsCount">Loading stays...</div>
+    </div>
+    <div class="listings-grid" id="listingsGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted-soft);font-size:14px;">
+        <i class="ti ti-loader" style="font-size:32px;display:block;margin-bottom:12px;"></i>
+        Loading...
       </div>
     </div>
   </div>
@@ -213,7 +340,7 @@
     let isLoadingMore = false;
 
     function togglePriceFilter() {
-      const panel = document.getElementById('priceFilterPanel');
+      const panel = document.getElementById('pricePanel');
       const chevron = document.getElementById('priceChevron');
       panel.classList.toggle('open');
       chevron.classList.toggle('ti-chevron-down');
@@ -252,65 +379,49 @@
         <a href="listing-detail.html?id=${listing.id}" class="lcard fade-up visible">
           <div class="limg ${photoUrl ? '' : 'green'}">
             ${photoUrl ? `<img src="${photoUrl}" loading="lazy" alt="${listing.name}">` : '<i class="ti ti-home"></i>'}
-            <button class="save-btn-card ${isSaved ? 'saved' : ''}" onclick="toggleSaveCard(event, '${listing.id}')">
+            <button class="save-btn ${isSaved ? 'saved' : ''}" onclick="toggleSaveCard(event, '${listing.id}')">
               <i class="ti ${isSaved ? 'ti-heart-filled' : 'ti-heart'}"></i>
             </button>
-            <span class="property-badge-card">${listing.type}</span>
+            <span class="pbadge">${listing.type}</span>
           </div>
           <div class="lbody">
             <div class="lname">${listing.name}</div>
             <div class="lloc"><i class="ti ti-map-pin"></i> ${listing.district}, ${listing.city}</div>
-            <div class="card-mid">
+            <div class="lmid">
               ${getScoreBadge(listing.ratingAverage)}
-              <span class="review-count-label">${listing.reviewCount > 0 ? `${listing.reviewCount} review${listing.reviewCount !== 1 ? 's' : ''}` : 'No reviews'}</span>
+              <span class="review-label">${listing.reviewCount > 0 ? `${listing.reviewCount} review${listing.reviewCount !== 1 ? 's' : ''}` : 'No reviews'}</span>
             </div>
             ${listing.amenities && listing.amenities.length > 0 ? `
-            <div class="amenity-pills">
-              ${listing.amenities.slice(0, 3).map(a => `<span class="amenity-pill-card">${a}</span>`).join('')}
+            <div class="amenities">
+              ${listing.amenities.slice(0, 3).map(a => `<span class="apill-card">${a}</span>`).join('')}
             </div>` : ''}
             <div class="lrow">
-              <div class="lprice">K${listing.price} <span class="lprice-sub">/night</span></div>
-              <div class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified</div>
+              <div class="lprice">K${listing.price} <sub>/night</sub></div>
+              <span class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified</span>
             </div>
           </div>
         </a>
       `;
     }
 
-    function renderLoadMore() {
-      const existing = document.getElementById('loadMoreBtn');
-      if (existing) existing.remove();
-      const container = document.getElementById('listingsContainer');
-      container.insertAdjacentHTML('beforeend', `
-        <button id="loadMoreBtn" onclick="loadMore()" style="padding:14px;background:#fff;border:1.5px solid var(--border);border-radius:12px;font-family:'Sora',sans-serif;font-weight:600;font-size:13px;color:var(--g-dark);cursor:pointer;width:100%;transition:all 0.2s;">
-          <i class="ti ti-plus"></i> Load More
-        </button>
-      `);
-    }
-
     async function loadListings() {
-      const container = document.getElementById('listingsContainer');
+      const grid = document.getElementById('listingsGrid');
       const countEl = document.getElementById('resultsCount');
-      
       try {
         currentFilters.limit = 10;
         currentFilters.offset = 0;
         const listings = await api.getListings(currentFilters);
         allListings = listings || [];
-        
         countEl.innerText = `${allListings.length} stay${allListings.length !== 1 ? 's' : ''} found`;
-        
-        const header = container.querySelector('.flex-between');
-        container.innerHTML = '';
-        container.appendChild(header);
-
+        grid.innerHTML = '';
         if (allListings.length === 0) {
-          container.insertAdjacentHTML('beforeend', '<div class="sora" style="text-align:center; padding:40px; color:var(--muted);">No stays found matching your search.</div>');
+          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted-soft);font-size:14px;">No stays found. Try a different search.</div>';
           return;
         }
-
-        allListings.forEach(l => container.insertAdjacentHTML('beforeend', renderListingCard(l)));
-        renderLoadMore();
+        allListings.forEach(l => grid.insertAdjacentHTML('beforeend', renderListingCard(l)));
+        if (allListings.length >= 10) {
+          grid.insertAdjacentHTML('afterend', '<div class="load-more-wrap"><button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()"><i class="ti ti-plus"></i> Load More</button></div>');
+        }
       } catch (err) {
         countEl.innerText = 'Failed to load stays';
         console.error(err);
@@ -322,23 +433,21 @@
       isLoadingMore = true;
       const btn = document.getElementById('loadMoreBtn');
       if (btn) { btn.disabled = true; btn.innerHTML = 'Loading...'; }
-      
       try {
         currentFilters.offset = allListings.length;
         currentFilters.limit = 10;
         const more = await api.getListings(currentFilters);
+        const grid = document.getElementById('listingsGrid');
+        const existingBtn = document.getElementById('loadMoreBtn')?.closest('.load-more-wrap');
+        if (existingBtn) existingBtn.remove();
         if (more && more.length > 0) {
           more.forEach(l => {
             allListings.push(l);
-            document.getElementById('listingsContainer').insertAdjacentHTML('beforeend', renderListingCard(l));
+            grid.insertAdjacentHTML('beforeend', renderListingCard(l));
           });
-          renderLoadMore();
-        } else {
-          if (btn) btn.remove();
+          grid.insertAdjacentHTML('afterend', '<div class="load-more-wrap"><button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()"><i class="ti ti-plus"></i> Load More</button></div>');
         }
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) { console.error(err); }
       isLoadingMore = false;
     }
 
@@ -371,14 +480,6 @@
       document.getElementById('sortSelect').value = currentFilters.sort;
     }
     loadListings();
-
-    function handleWhatsAppBooking(id, name) {
-      const message = `Hi, I'm interested in booking ${name}. Is it available? (via Lala)`;
-      const encoded = encodeURIComponent(message);
-      const hostPhone = "260977000111"; 
-      const waUrl = `https://wa.me/${hostPhone}?text=${encoded}`;
-      window.open(waUrl, '_blank');
-    }
   </script>
 </body>
 </html>

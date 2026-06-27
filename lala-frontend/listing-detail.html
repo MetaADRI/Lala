@@ -5,151 +5,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lala — Listing Details</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="common.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
-    body { background: var(--bg); padding-bottom: 100px; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, system-ui, 'Helvetica Neue', sans-serif;
+      background: var(--canvas);
+      color: var(--ink);
+      line-height: 1.5;
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 100px;
+    }
+    h1, h2, h3, h4 { font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
 
-    /* ── IMAGE HEADER ──────────────────────────────────────────────── */
-    .detail-img {
-      height: 220px; position: relative; overflow: hidden;
-      background: linear-gradient(135deg, #A5D6A7, #388E3C);
-      display: flex; align-items: center; justify-content: center; font-size: 70px;
+    /* ---- NAV ---- */
+    nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 40px; height: 72px;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: var(--canvas);
+      border-bottom: 1px solid var(--hairline);
     }
-    .detail-img img.hero-photo {
-      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    .logo-img { height: 32px; display: block; }
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+    .nav-links a {
+      font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px;
+      color: var(--ink); text-decoration: none; padding: 8px 14px;
+      border-radius: 9999px; transition: all 0.2s;
     }
-    .detail-back {
-      position: absolute; top: 16px; left: 16px; width: 36px; height: 36px;
-      border-radius: 50%; background: rgba(0,0,0,0.38); backdrop-filter: blur(6px);
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; text-decoration: none; z-index: 2; font-size: 18px;
+    .nav-links a:hover, .nav-links a.active { background: var(--surface-strong); }
+    .nav-cta {
+      background: var(--accent) !important;
+      color: #fff !important;
+      font-weight: 600 !important;
     }
-    .detail-save {
-      position: absolute; top: 16px; right: 16px; width: 36px; height: 36px;
-      border-radius: 50%; background: rgba(0,0,0,0.38); backdrop-filter: blur(6px);
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; z-index: 2; font-size: 18px; cursor: pointer;
-      transition: background 0.2s;
-    }
-    .detail-save.saved { background: #C62828; }
-    .logo-overlay {
-      position: absolute; top: 16px; left: 62px; z-index: 2;
-    }
+    .nav-cta:hover { background: var(--accent-hover) !important; }
 
-    /* ── BODY SECTIONS ─────────────────────────────────────────────── */
-    .detail-body { padding: 0 18px 20px; display: flex; flex-direction: column; gap: 16px; }
-
-    .name-row {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      padding: 20px 18px 0; gap: 12px;
-    }
-    .listing-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 20px; color: var(--text); }
-    .price-block { text-align: right; flex-shrink: 0; }
-    .price-main { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 26px; color: var(--g-dark); }
-    .price-sub { font-size: 11px; color: var(--muted); }
-
-    /* ── DATES CARD ─────────────────────────────────────────────────── */
-    .dates-card {
-      background: var(--card); border-radius: var(--r); border: 1px solid var(--border);
-      padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-    .dates-title { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; margin-bottom: 12px; }
-    .dates-row { display: flex; gap: 10px; }
-    .date-field {
-      flex: 1; background: var(--bg); border-radius: 10px; padding: 10px 12px;
-      border: 1.5px solid var(--border); transition: border-color 0.2s;
-    }
-    .date-field:focus-within { border-color: var(--g-dark); }
-    .date-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
-    .date-field input[type="date"] {
-      border: none; background: transparent; font-family: 'Sora', sans-serif;
-      font-weight: 600; font-size: 13px; color: var(--text); outline: none; width: 100%; cursor: pointer;
+    @media (max-width: 768px) {
+      nav { padding: 0 16px; }
+      .nav-links a:not(.nav-cta):not([href="index.html"]) { display: none; }
     }
 
-    /* ── TOTAL CALC ──────────────────────────────────────────────────── */
-    .price-summary {
-      background: var(--g-light); border-radius: 10px; padding: 12px 14px;
-      display: none;
-      border: 1px solid rgba(46,125,50,0.15);
+    /* ---- PHOTO GALLERY ---- */
+    .gallery-wrap {
+      margin-top: 72px; position: relative;
     }
-    .price-summary.visible { display: block; }
-    .ps-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
-    .ps-label { font-size: 12px; color: var(--g-mid); }
-    .ps-value { font-size: 12px; color: var(--text); font-weight: 500; }
-    .ps-total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(46,125,50,0.2); }
-    .ps-total-label { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; color: var(--text); }
-    .ps-total { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: var(--g-dark); }
-
-    /* ── INFO CARD ───────────────────────────────────────────────────── */
-    .info-card {
-      background: var(--card); border-radius: var(--r); border: 1px solid var(--border);
-      padding: 16px;
-    }
-    .info-title { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; margin-bottom: 10px; }
-    .arow { display: flex; gap: 8px; flex-wrap: wrap; }
-
-    /* ── HOST ROW ────────────────────────────────────────────────────── */
-    .host-row {
-      background: var(--card); border-radius: var(--r); border: 1px solid var(--border);
-      padding: 14px; display: flex; align-items: center; gap: 12px;
-    }
-    .host-av {
-      width: 44px; height: 44px; border-radius: 50%; background: var(--g-dark);
-      color: #fff; display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-family: 'Sora', sans-serif; font-size: 16px; flex-shrink: 0;
-    }
-    .host-name { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; }
-    .host-phone { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-    /* ── REVIEWS ─────────────────────────────────────────────────────── */
-    .rcard {
-      background: var(--card); border-radius: var(--rsm); border: 1px solid var(--border);
-      padding: 14px; margin-top: 8px;
-    }
-    .rav {
-      width: 32px; height: 32px; border-radius: 50%; background: var(--g-light);
-      color: var(--g-dark); display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 12px; font-family: 'Sora', sans-serif;
-    }
-    .rstars { color: var(--gold); font-size: 12px; margin-top: 1px; }
-    .rtext { font-size: 13px; color: var(--text); margin-top: 8px; line-height: 1.5; }
-
-    /* Star rating interactives */
-    .star-rating span {
-      transition: transform 0.15s, color 0.15s;
-    }
-    .star-rating span:hover {
-      transform: scale(1.2);
-    }
-
-    /* ── STICKY ACTION BAR ───────────────────────────────────────────── */
-    .action-bar {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(255,255,255,0.96); backdrop-filter: blur(10px);
-      border-top: 1px solid var(--border); padding: 12px 18px 20px;
-      display: flex; gap: 10px; z-index: 50;
-    }
-    .action-bar .btn-green { flex: 1; }
-    .action-bar .btn-gold { flex: 1; }
-
-    /* ── PHOTO GALLERY ────────────────────────────────────────────────── */
-    .photo-gallery {
+    .gallery-main {
       position: relative; overflow: hidden;
     }
-    .photo-gallery .hero-img {
-      width: 100%; height: 220px; object-fit: cover; display: block;
+    .gallery-main .hero-img {
+      width: 100%; height: 260px; object-fit: cover; display: block;
+      background: linear-gradient(135deg, #A5D6A7, #388E3C);
     }
-    .gallery-thumbs {
-      display: none;
-    }
+    .gallery-thumbs { display: none; }
     @media (min-width: 768px) {
-      .photo-gallery {
-        display: grid; grid-template-columns: 2fr 1fr; gap: 3px; height: 280px;
+      .gallery-main {
+        display: grid; grid-template-columns: 2fr 1fr; gap: 3px; height: 320px;
       }
-      .photo-gallery .hero-img { height: 100%; }
+      .gallery-main .hero-img { height: 100%; }
       .gallery-thumbs {
         display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
         gap: 3px;
@@ -160,6 +78,20 @@
       }
       .gallery-thumbs img:hover { opacity: 0.85; }
     }
+    .gallery-back {
+      position: absolute; top: 16px; left: 16px; width: 36px; height: 36px;
+      border-radius: 50%; background: rgba(0,0,0,0.38); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; text-decoration: none; z-index: 2; font-size: 18px;
+    }
+    .gallery-save {
+      position: absolute; top: 16px; right: 16px; width: 36px; height: 36px;
+      border-radius: 50%; background: rgba(0,0,0,0.38); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; z-index: 2; font-size: 17px; cursor: pointer;
+      transition: background 0.2s; border: none;
+    }
+    .gallery-save.saved { background: var(--red); }
     .gallery-dots {
       position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
       display: flex; gap: 6px; z-index: 2;
@@ -170,7 +102,7 @@
     }
     .gallery-dots span.active { background: #fff; }
 
-    /* ── LIGHTBOX ─────────────────────────────────────────────────────── */
+    /* ---- LIGHTBOX ---- */
     .lightbox {
       position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 999;
       display: none; align-items: center; justify-content: center;
@@ -189,23 +121,132 @@
     .lightbox-prev { left: 20px; }
     .lightbox-next { right: 20px; }
 
-    /* Date unavailability */
-    input[type="date"]::-webkit-calendar-picker-indicator { 
-      opacity: 0.5; cursor: pointer;
+    /* ---- CONTENT ---- */
+    .detail-wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+    .name-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 24px 0 16px; gap: 12px;
+    }
+    .listing-title { font-weight: 700; font-size: 22px; color: var(--ink); }
+    .price-block { text-align: right; flex-shrink: 0; }
+    .price-main { font-weight: 700; font-size: 26px; color: var(--accent-hover); }
+    .price-sub { font-size: 12px; color: var(--muted); }
+
+    .section-card {
+      background: var(--canvas); border-radius: 14px;
+      border: 1px solid var(--hairline);
+      padding: 20px; margin-bottom: 16px;
+    }
+    .section-title {
+      font-weight: 600; font-size: 15px; margin-bottom: 12px; color: var(--ink);
+    }
+    .section-title i { color: var(--accent); margin-right: 6px; }
+
+    /* ---- DATES ---- */
+    .dates-row { display: flex; gap: 12px; }
+    .date-field {
+      flex: 1; background: var(--surface-soft); border-radius: 10px; padding: 10px 12px;
+      border: 1.5px solid var(--hairline); transition: border-color 0.2s;
+    }
+    .date-field:focus-within { border-color: var(--accent); }
+    .date-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; font-weight: 500; }
+    .date-field input[type="date"] {
+      border: none; background: transparent; font-family: 'Inter', sans-serif;
+      font-weight: 600; font-size: 13px; color: var(--ink); outline: none; width: 100%; cursor: pointer;
+    }
+
+    .price-summary {
+      background: var(--accent-light); border-radius: 12px; padding: 14px 16px;
+      display: none; margin-top: 12px;
+    }
+    .price-summary.visible { display: block; }
+    .ps-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
+    .ps-label { font-size: 13px; color: var(--accent-hover); }
+    .ps-value { font-size: 13px; color: var(--ink); font-weight: 500; }
+    .ps-total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(46,125,50,0.2); }
+    .ps-total-label { font-weight: 700; font-size: 15px; color: var(--ink); }
+    .ps-total { font-weight: 700; font-size: 20px; color: var(--accent-hover); }
+
+    /* ---- HOST ---- */
+    .host-row {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .host-av {
+      width: 44px; height: 44px; border-radius: 50%; background: var(--accent);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 16px; flex-shrink: 0;
+    }
+    .host-name { font-weight: 600; font-size: 14px; }
+    .host-phone { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* ---- AMENITIES ---- */
+    .am-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* ---- REVIEWS ---- */
+    .rcard {
+      background: var(--surface-soft); border-radius: 12px;
+      padding: 16px; margin-top: 10px;
+    }
+    .rav {
+      width: 34px; height: 34px; border-radius: 50%; background: var(--accent-light);
+      color: var(--accent-hover); display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 12px; flex-shrink: 0;
+    }
+    .rstars { color: var(--gold); font-size: 13px; margin-top: 1px; }
+    .rtext { font-size: 13px; color: var(--ink); margin-top: 8px; line-height: 1.5; }
+
+    /* ---- ACTION BAR ---- */
+    .action-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(10px);
+      border-top: 1px solid var(--hairline); padding: 12px 24px 20px;
+      display: flex; gap: 10px; z-index: 50;
+      max-width: 900px; margin: 0 auto;
+    }
+    .action-bar .btn-primary { flex: 1; text-align: center; justify-content: center; }
+    .action-bar .btn-secondary { flex: 1; text-align: center; justify-content: center; border-color: var(--gold); color: var(--gold); }
+    .action-bar .btn-secondary:hover { background: rgba(249,168,37,0.1); }
+
+    .star-rating span { transition: transform 0.15s, color 0.15s; }
+    .star-rating span:hover { transform: scale(1.2); }
+
+    input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
+
+    .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 768px) {
+      .detail-wrap { padding: 0 16px; }
+      .action-bar { padding: 12px 16px 20px; }
     }
   </style>
 </head>
 <body>
-  <!-- PHOTO GALLERY -->
-  <div class="photo-gallery" id="photoGallery">
-    <img class="hero-img" id="heroImg" src="" alt="Listing photo" style="display:none;">
-    <div class="gallery-thumbs" id="galleryThumbs"></div>
-    <a href="search.html" class="detail-back"><i class="ti ti-arrow-left"></i></a>
-    <div class="logo-overlay">
-      <img src="logo-removebg-preview.png" alt="Lala" style="height: 22px; filter: brightness(0) invert(1);">
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="logo">
+      <img src="logo-removebg-preview.png" alt="Lala Logo" class="logo-img">
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="search.html">Stays</a>
+      <a href="transfers.html">Transfers</a>
+      <a href="my-bookings.html">My Trips</a>
+      <a href="host-signup.html" class="nav-cta">List Stays</a>
+      <a href="guest-login.html">Sign In</a>
     </div>
-    <div class="detail-save" id="saveBtn" onclick="toggleSave()"><i class="ti ti-heart"></i></div>
-    <div class="gallery-dots" id="galleryDots"></div>
+  </nav>
+
+  <!-- GALLERY -->
+  <div class="gallery-wrap" id="photoGallery">
+    <div class="gallery-main">
+      <img class="hero-img" id="heroImg" src="" alt="Listing photo" style="display:none;">
+      <div class="gallery-thumbs" id="galleryThumbs"></div>
+      <a href="search.html" class="gallery-back"><i class="ti ti-arrow-left"></i></a>
+      <button class="gallery-save" id="saveBtn" onclick="toggleSave()"><i class="ti ti-heart"></i></button>
+      <div class="gallery-dots" id="galleryDots"></div>
+    </div>
   </div>
 
   <!-- LIGHTBOX -->
@@ -216,24 +257,22 @@
     <button class="lightbox-next" onclick="changePhoto(1)">&#8250;</button>
   </div>
 
-  <!-- NAME + PRICE (populated by JS) -->
-  <div class="name-row fade-up" id="nameRow" style="display:none;">
-    <div>
-      <div class="listing-title" id="listingName">Loading...</div>
-      <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;" id="badgeRow"></div>
-    </div>
-    <div class="price-block">
+  <!-- CONTENT -->
+  <div class="detail-wrap">
+    <div class="name-row fade-up" id="nameRow" style="display:none;">
+      <div>
+        <div class="listing-title" id="listingName">Loading...</div>
+        <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;" id="badgeRow"></div>
+      </div>
+      <div class="price-block">
         <div class="price-main" id="listingPrice">K—</div>
         <div class="price-sub" id="priceSubLabel">/night</div>
+      </div>
     </div>
-  </div>
 
-  <!-- BODY CONTENT -->
-  <div class="detail-body">
-
-    <!-- DATE PICKER CARD -->
-    <div class="dates-card fade-up" id="datesCard" style="display:none;">
-      <div class="dates-title"><i class="ti ti-calendar" style="color:var(--g-dark);"></i> Select your dates</div>
+    <!-- DATES -->
+    <div class="section-card fade-up" id="datesCard" style="display:none;">
+      <div class="section-title"><i class="ti ti-calendar"></i> Select dates</div>
       <div class="dates-row">
         <div class="date-field">
           <div class="date-label">Check-in</div>
@@ -251,46 +290,46 @@
       </div>
     </div>
 
-    <!-- LOCATION / DESCRIPTION -->
-    <div class="info-card fade-up" id="locationCard" style="display:none;">
-      <div class="info-title"><i class="ti ti-map-pin" style="color:var(--g-dark);"></i> Location</div>
+    <!-- LOCATION -->
+    <div class="section-card fade-up" id="locationCard" style="display:none;">
+      <div class="section-title"><i class="ti ti-map-pin"></i> Location</div>
       <div style="font-size:14px; color:var(--muted);" id="locationText"></div>
-      <div style="font-size:13px; color:var(--text); margin-top:8px; line-height:1.6;" id="descriptionText"></div>
+      <div style="font-size:14px; color:var(--ink); margin-top:10px; line-height:1.6;" id="descriptionText"></div>
     </div>
 
     <!-- AMENITIES -->
-    <div class="info-card fade-up" id="amenitiesCard" style="display:none;">
-      <div class="info-title"><i class="ti ti-check" style="color:var(--g-dark);"></i> Amenities</div>
-      <div class="arow" id="amenitiesRow"></div>
+    <div class="section-card fade-up" id="amenitiesCard" style="display:none;">
+      <div class="section-title"><i class="ti ti-check"></i> Amenities</div>
+      <div class="am-row" id="amenitiesRow"></div>
     </div>
 
-    <!-- HOST INFO -->
-    <div class="host-row fade-up" id="hostRow" style="display:none;">
-      <div class="host-av" id="hostInitials">?</div>
-      <div>
-        <div class="host-name" id="hostName">Host</div>
-        <div class="host-phone" id="hostPhone"></div>
-      </div>
-      <div style="margin-left:auto;">
-        <div class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified</div>
+    <!-- HOST -->
+    <div class="section-card fade-up" id="hostCard" style="display:none;">
+      <div class="section-title"><i class="ti ti-user"></i> Host</div>
+      <div class="host-row">
+        <div class="host-av" id="hostInitials">?</div>
+        <div>
+          <div class="host-name" id="hostName">Host</div>
+          <div class="host-phone" id="hostPhone"></div>
+        </div>
+        <div style="margin-left:auto;">
+          <span class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified</span>
+        </div>
       </div>
     </div>
 
     <!-- REVIEWS -->
-    <div class="fade-up" id="reviewsSection" style="display:none;">
-      <div class="info-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:14px;">
-        <i class="ti ti-star-filled" style="color:var(--gold);"></i> Guest Reviews
-        <span style="font-size:11px; color:var(--muted); font-weight:400;" id="ratingBadge"></span>
+    <div class="section-card fade-up" id="reviewsSection" style="display:none;">
+      <div class="section-title">
+        <i class="ti ti-star-filled" style="color:var(--gold);"></i> Reviews
+        <span style="font-size:12px; color:var(--muted); font-weight:400;" id="ratingBadge"></span>
       </div>
-      <!-- Dynamic review cards will be appended here -->
     </div>
 
-    <!-- REVIEW SUBMISSION FORM (shown only if logged-in guest has a confirmed stay) -->
-    <div class="fade-up" id="reviewFormCard" style="display:none; margin-top: 24px; margin-bottom: 24px;">
-      <div class="info-title" style="font-family:'Sora',sans-serif; font-weight:600; font-size:14px;">
-        <i class="ti ti-edit" style="color:var(--g-dark);"></i> Write a Review
-      </div>
-      <div class="rcard" style="padding: 18px; border-color: rgba(46, 125, 50, 0.3);">
+    <!-- REVIEW FORM -->
+    <div class="fade-up" id="reviewFormCard" style="display:none; margin-bottom: 24px;">
+      <div class="section-card" style="border-color: var(--accent-light);">
+        <div class="section-title"><i class="ti ti-edit"></i> Write a Review</div>
         <form id="submitReviewForm" onsubmit="handleReviewSubmit(event)">
           <div style="margin-bottom: 14px;">
             <label style="display:block; font-size:12px; font-weight:600; margin-bottom: 6px; color:var(--muted);">Overall Rating</label>
@@ -337,18 +376,18 @@
             <label for="reviewComment" style="display:block; font-size:12px; font-weight:600; margin-bottom: 6px; color:var(--muted);">Your Comment</label>
             <textarea id="reviewComment" class="input-field" placeholder="Share your experience staying here..." style="min-height: 80px; font-family: inherit; resize: vertical;" required></textarea>
           </div>
-          <button type="submit" class="btn-green" id="submitReviewBtn" style="width:100%;">Submit Review</button>
+          <button type="submit" class="btn-primary" id="submitReviewBtn" style="width:100%; justify-content:center;">Submit Review</button>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- STICKY ACTION BAR -->
+  <!-- ACTION BAR -->
   <div class="action-bar" id="actionBar" style="display:none;">
-    <button class="btn-green" id="whatsappBtn" onclick="handleWhatsAppBooking()">
+    <button class="btn-primary" id="whatsappBtn" onclick="handleWhatsAppBooking()">
       <i class="ti ti-brand-whatsapp"></i> Book via WhatsApp
     </button>
-    <button class="btn-gold" id="payBtn" onclick="handlePayNow()">
+    <button class="btn-secondary" id="payBtn" onclick="handlePayNow()">
       <i class="ti ti-device-mobile"></i> Pay Now
     </button>
   </div>
@@ -362,7 +401,6 @@
     let currentPhotoIndex = 0;
     let photos = [];
 
-    // ── Set today + tomorrow as default dates ──────────────────────────
     function initDates() {
       const today = new Date();
       const tomorrow = new Date(today);
@@ -375,62 +413,47 @@
       recalculate();
     }
 
-    // ── Recalculate total when dates change ────────────────────────────
     function recalculate() {
       const ci = document.getElementById('checkIn').value;
       const co = document.getElementById('checkOut').value;
       const summary = document.getElementById('priceSummary');
       const checkOutEl = document.getElementById('checkOut');
-
       if (!ci || !co) { summary.classList.remove('visible'); return; }
-
       const ciDate = new Date(ci);
       const coDate = new Date(co);
-
       if (coDate <= ciDate) {
         const next = new Date(ciDate);
         next.setDate(next.getDate() + 1);
         checkOutEl.value = next.toISOString().split('T')[0];
         checkOutEl.min = checkOutEl.value;
       }
-
       const nights = Math.max(1, Math.ceil((new Date(checkOutEl.value) - ciDate) / (1000 * 60 * 60 * 24)));
       const subtotal = nights * pricePerNight;
       const serviceFee = Math.round(subtotal * 0.05);
       const total = subtotal + serviceFee;
-
       document.getElementById('nightsLabel').textContent = `${nights} night${nights > 1 ? 's' : ''} × K${pricePerNight}`;
       document.getElementById('subtotalPrice').textContent = `K${subtotal.toLocaleString()}`;
       document.getElementById('serviceFeePrice').textContent = `K${serviceFee.toLocaleString()}`;
       document.getElementById('totalPrice').textContent = `K${total.toLocaleString()}`;
       summary.classList.add('visible');
-
       const payBtn = document.getElementById('payBtn');
       if (payBtn) payBtn.innerHTML = `<i class="ti ti-device-mobile"></i> Pay K${total.toLocaleString()}`;
     }
 
-    // ── Photo Gallery ───────────────────────────────────────────────────
     function setupGallery(photosArr) {
       photos = photosArr;
       const heroImg = document.getElementById('heroImg');
       const thumbs = document.getElementById('galleryThumbs');
       const dots = document.getElementById('galleryDots');
-
-      if (!photos || photos.length === 0) {
-        heroImg.style.display = 'none';
-        return;
-      }
-
+      if (!photos || photos.length === 0) { heroImg.style.display = 'none'; return; }
       heroImg.src = photos[0];
       heroImg.style.display = 'block';
       dots.innerHTML = photos.map((_, i) => `<span class="${i === 0 ? 'active' : ''}" onclick="showPhoto(${i})"></span>`).join('');
-
       if (photos.length > 1) {
         thumbs.innerHTML = photos.slice(1, 5).map((p, i) =>
           `<img src="${p}" loading="lazy" onclick="openLightbox(${i + 1})" alt="Photo ${i + 2}">`
         ).join('');
       }
-
       heroImg.onclick = () => openLightbox(0);
     }
 
@@ -442,7 +465,6 @@
       });
     }
 
-    // ── Lightbox ────────────────────────────────────────────────────────
     function openLightbox(index) {
       currentPhotoIndex = index;
       document.getElementById('lightboxImg').src = photos[index];
@@ -468,11 +490,10 @@
       if (e.key === 'ArrowRight') changePhoto(1);
     });
 
-    // ── Toggle save ────────────────────────────────────────────────────
     function toggleSave() {
       isSaved = !isSaved;
       const btn = document.getElementById('saveBtn');
-      btn.innerHTML = isSaved ? '<i class="ti ti-heart-filled" style="color:#ff6b6b;"></i>' : '<i class="ti ti-heart"></i>';
+      btn.innerHTML = isSaved ? '<i class="ti ti-heart-filled"></i>' : '<i class="ti ti-heart"></i>';
       btn.classList.toggle('saved', isSaved);
       const saved = new Set(JSON.parse(localStorage.getItem('lala_saved') || '[]'));
       if (isSaved) saved.add(listing.id);
@@ -480,190 +501,120 @@
       localStorage.setItem('lala_saved', JSON.stringify([...saved]));
     }
 
-    // ── WhatsApp deep-link booking ─────────────────────────────────────
     function handleWhatsAppBooking() {
       if (!listing) return;
       const name = listing.name;
       const hostPhone = listing.hostPhone || '260977000111';
       const checkIn = document.getElementById('checkIn').value || '(date TBD)';
       const checkOut = document.getElementById('checkOut').value || '(date TBD)';
-
       const message = `Hi, I'd like to book ${name} from ${checkIn} to ${checkOut} for 1 guest(s). Is it available? (via Lala)`;
-      const encoded = encodeURIComponent(message);
-
-      window.open(`https://wa.me/${hostPhone}?text=${encoded}`, '_blank');
+      window.open(`https://wa.me/${hostPhone}?text=${encodeURIComponent(message)}`, '_blank');
     }
 
-    // ── Mobile Money pay flow ──────────────────────────────────────────
     function handlePayNow() {
       const checkIn = document.getElementById('checkIn').value;
       const checkOut = document.getElementById('checkOut').value;
-
       if (!checkIn || !checkOut) {
         alert('Please select your check-in and check-out dates first.');
         return;
       }
-
       if (!api.isLoggedIn()) {
-        sessionStorage.setItem('booking_intent', JSON.stringify({
-          listingId: listing.id, checkIn, checkOut
-        }));
+        sessionStorage.setItem('booking_intent', JSON.stringify({ listingId: listing.id, checkIn, checkOut }));
         window.location.href = `guest-login.html?redirect=${encodeURIComponent(`listing-detail.html?id=${listing.id}`)}`;
         return;
       }
-
       const nights = Math.max(1, Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)));
       const total = nights * pricePerNight;
-
-      const params = new URLSearchParams({
-        id: listing.id,
-        name: listing.name,
-        checkIn,
-        checkOut,
-        nights,
-        total,
-        hostPhone: listing.hostPhone || ''
-      });
-
+      const params = new URLSearchParams({ id: listing.id, name: listing.name, checkIn, checkOut, nights, total, hostPhone: listing.hostPhone || '' });
       window.location.href = `payment.html?${params.toString()}`;
     }
 
-    // ── Load listing from API ──────────────────────────────────────────
     async function loadListingDetail() {
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id');
-
       if (!id) {
         document.body.innerHTML = '<div style="padding:40px;text-align:center;">No listing ID provided.</div>';
         return;
       }
-
       try {
         listing = await api.getListing(id);
         if (listing.error) throw new Error(listing.error);
-
         pricePerNight = listing.price;
         document.title = `Lala — ${listing.name}`;
-
-        // Check saved state
         const saved = new Set(JSON.parse(localStorage.getItem('lala_saved') || '[]'));
         isSaved = saved.has(listing.id);
         if (isSaved) {
-          document.getElementById('saveBtn').innerHTML = '<i class="ti ti-heart-filled" style="color:#ff6b6b;"></i>';
+          document.getElementById('saveBtn').innerHTML = '<i class="ti ti-heart-filled"></i>';
           document.getElementById('saveBtn').classList.add('saved');
         }
-
-        // Photo gallery
         setupGallery(listing.photos || []);
-
-        // Name + Price row
         document.getElementById('listingName').textContent = listing.name;
         document.getElementById('listingPrice').textContent = `K${listing.price}`;
-        
-        // Badge row
-        const scoreColor = !listing.ratingAverage || listing.ratingAverage === 0 ? 'score-new' :
-          listing.ratingAverage >= 4.5 ? 'score-excellent' :
-          listing.ratingAverage >= 4.0 ? 'score-very-good' :
-          listing.ratingAverage >= 3.0 ? 'score-good' : 'score-fair';
-        const dynamicRatingText = listing.ratingAverage > 0 
-          ? `${listing.ratingAverage.toFixed(1)} (${listing.reviewCount} review${listing.reviewCount !== 1 ? 's' : ''})` 
+        const dynamicRatingText = listing.ratingAverage > 0
+          ? `${listing.ratingAverage.toFixed(1)} (${listing.reviewCount} review${listing.reviewCount !== 1 ? 's' : ''})`
           : 'New';
         document.getElementById('badgeRow').innerHTML = `
-          <div class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified</div>
-          <div class="star-badge"><i class="ti ti-star-filled"></i> ${dynamicRatingText}</div>
-          <div class="apill"><i class="ti ti-home"></i> ${listing.type}</div>
+          <span class="vbadge"><i class="ti ti-rosette-discount-check"></i> Verified</span>
+          <span class="star-badge"><i class="ti ti-star-filled"></i> ${dynamicRatingText}</span>
+          <span class="apill"><i class="ti ti-home"></i> ${listing.type}</span>
         `;
         document.getElementById('nameRow').style.display = 'flex';
-
-        // Location card
         document.getElementById('locationText').textContent = `${listing.district}, ${listing.city}, Zambia`;
-        document.getElementById('descriptionText').textContent = listing.description || 'A comfortable and affordable stay in the heart of the city, close to public transport and local amenities.';
+        document.getElementById('descriptionText').textContent = listing.description || 'A comfortable and affordable stay in the heart of the city.';
         document.getElementById('locationCard').style.display = 'block';
-
-        // Amenities
         if (listing.amenities && listing.amenities.length > 0) {
           const icons = { 'Wi-Fi': 'ti-wifi', 'Parking': 'ti-parking', 'Hot Water': 'ti-droplet', 'Security': 'ti-shield', 'CCTV': 'ti-camera', 'Generator': 'ti-bolt', 'Breakfast': 'ti-egg', 'TV': 'ti-tv' };
-          document.getElementById('amenitiesRow').innerHTML = listing.amenities
-            .map(a => `<div class="apill"><i class="ti ${icons[a] || 'ti-check'}"></i> ${a}</div>`).join('');
+          document.getElementById('amenitiesRow').innerHTML = listing.amenities.map(a => `<span class="apill"><i class="ti ${icons[a] || 'ti-check'}"></i> ${a}</span>`).join('');
           document.getElementById('amenitiesCard').style.display = 'block';
         }
-
-        // Host row
         const hostPhone = listing.hostPhone || '';
         document.getElementById('hostInitials').textContent = listing.name ? listing.name[0].toUpperCase() : 'H';
         document.getElementById('hostName').textContent = 'Verified Host';
         const hostSince = listing.createdAt ? new Date(listing.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '';
         document.getElementById('hostPhone').innerHTML = hostPhone ? `+${hostPhone}${hostSince ? `<br><span style="font-size:10px;color:#999;">Host since ${hostSince}</span>` : ''}` : 'Contact via WhatsApp';
-        document.getElementById('hostRow').style.display = 'flex';
-
-        // Reviews
-        const reviewText = listing.reviewCount > 0 
-          ? ` — ${listing.ratingAverage.toFixed(1)} avg (${listing.reviewCount} review${listing.reviewCount !== 1 ? 's' : ''})` 
-          : ' — No reviews yet';
+        document.getElementById('hostCard').style.display = 'block';
+        const reviewText = listing.reviewCount > 0 ? ` — ${listing.ratingAverage.toFixed(1)} avg (${listing.reviewCount} review${listing.reviewCount !== 1 ? 's' : ''})` : ' — No reviews yet';
         document.getElementById('ratingBadge').textContent = reviewText;
         document.getElementById('reviewsSection').style.display = 'block';
-
         await loadReviews();
-
-        // Check if guest can review
         if (api.isLoggedIn()) {
           try {
             const check = await api.checkCanReview(listing.id);
             if (check.canReview && !check.alreadyReviewed) {
               document.getElementById('reviewFormCard').style.display = 'block';
-            } else {
-              document.getElementById('reviewFormCard').style.display = 'none';
             }
-          } catch (err) {
-            console.error('Error checking review privileges:', err);
-          }
+          } catch (err) { console.error('Error checking review privileges:', err); }
         }
-
-        // Dates card
         document.getElementById('datesCard').style.display = 'block';
         initDates();
-
-        // Action bar
         document.getElementById('actionBar').style.display = 'flex';
-
-        // Animate everything
         document.querySelectorAll('.fade-up').forEach(el => {
           setTimeout(() => el.classList.add('visible'), 50);
         });
-
       } catch (err) {
-        document.getElementById('heroImg').style.display = 'none';
-        document.querySelector('.detail-body').innerHTML = `
-          <div style="text-align:center; padding:40px; color:var(--muted);">
+        document.querySelector('.detail-wrap').innerHTML = `
+          <div style="text-align:center; padding:60px 20px; color:var(--muted);">
             <i class="ti ti-alert-circle" style="font-size:40px;"></i>
-            <div style="margin-top:12px; font-family:'Sora',sans-serif;">Failed to load listing details.</div>
-            <a href="search.html" class="btn-outline" style="margin-top:16px; display:inline-flex;">Back to Search</a>
+            <div style="margin-top:12px; font-weight:600;">Failed to load listing details.</div>
+            <a href="search.html" class="btn-primary" style="margin-top:16px; display:inline-flex;">Back to Search</a>
           </div>`;
         console.error(err);
       }
     }
 
-    // ── Review UI Helpers ──────────────────────────────────────────────
     let selectedRating = 0;
     const catValues = { cleanliness: 0, comfort: 0, location: 0, value: 0 };
-    
+
     window.setRating = function(rating) {
       selectedRating = rating;
       document.getElementById('reviewRating').value = rating;
       updateStars(rating);
     }
-    
-    window.highlightStars = function(rating) {
-      updateStars(rating);
-    }
-    
-    window.resetStars = function() {
-      updateStars(selectedRating);
-    }
-    
+    window.highlightStars = function(rating) { updateStars(rating); }
+    window.resetStars = function() { updateStars(selectedRating); }
+
     function updateStars(rating) {
-      const stars = document.querySelectorAll('.star-rating span');
-      stars.forEach((star, idx) => {
+      document.querySelectorAll('.star-rating span').forEach((star, idx) => {
         star.style.color = idx < rating ? 'var(--gold)' : '#ccc';
       });
     }
@@ -675,45 +626,33 @@
           const val = parseInt(star.dataset.val, 10);
           catValues[cat] = val;
           document.getElementById(`review${cat.charAt(0).toUpperCase() + cat.slice(1)}`).value = val;
-          container.querySelectorAll('span').forEach((s, i) => {
-            s.style.color = i < val ? 'var(--g-dark)' : '#ccc';
-          });
+          container.querySelectorAll('span').forEach((s, i) => { s.style.color = i < val ? 'var(--accent-hover)' : '#ccc'; });
         });
         star.addEventListener('mouseover', () => {
           const val = parseInt(star.dataset.val, 10);
-          container.querySelectorAll('span').forEach((s, i) => {
-            s.style.color = i < val ? '#66BB6A' : '#ccc';
-          });
+          container.querySelectorAll('span').forEach((s, i) => { s.style.color = i < val ? '#66BB6A' : '#ccc'; });
         });
         star.addEventListener('mouseout', () => {
           const val = catValues[cat] || 0;
-          container.querySelectorAll('span').forEach((s, i) => {
-            s.style.color = i < val ? 'var(--g-dark)' : '#ccc';
-          });
+          container.querySelectorAll('span').forEach((s, i) => { s.style.color = i < val ? 'var(--accent-hover)' : '#ccc'; });
         });
       });
     });
 
     function getReviewBreakdownHTML(r) {
-      const cats = [
-        { key: 'cleanliness', label: 'Cleanliness' },
-        { key: 'comfort', label: 'Comfort' },
-        { key: 'location', label: 'Location' },
-        { key: 'value', label: 'Value' }
-      ];
+      const cats = [{ key: 'cleanliness', label: 'Cleanliness' }, { key: 'comfort', label: 'Comfort' }, { key: 'location', label: 'Location' }, { key: 'value', label: 'Value' }];
       const hasCategories = cats.some(c => r[c.key]);
       if (!hasCategories) return '';
       return `<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0;">
         ${cats.map(c => {
           const val = r[c.key] || 0;
-          const pct = val / 5 * 100;
           return `<div style="font-size:11px;">
             <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
               <span style="color:var(--muted);">${c.label}</span>
               <span style="font-weight:600;">${val}/5</span>
             </div>
             <div style="background:#e0e0e0; height:4px; border-radius:2px; overflow:hidden;">
-              <div style="background:var(--g-dark); height:100%; width:${pct}%; border-radius:2px;"></div>
+              <div style="background:var(--accent); height:100%; width:${val / 5 * 100}%; border-radius:2px;"></div>
             </div>
           </div>`;
         }).join('')}
@@ -724,98 +663,65 @@
       try {
         const reviews = await api.getReviews(listing.id);
         const reviewsContainer = document.getElementById('reviewsSection');
-        
         const existingCards = reviewsContainer.querySelectorAll('.rcard');
         existingCards.forEach(card => card.remove());
-        
         const noRev = reviewsContainer.querySelector('.no-reviews-card');
         if (noRev) noRev.remove();
-
         if (reviews.length === 0) {
-          reviewsContainer.insertAdjacentHTML('beforeend', `
-            <div class="rcard no-reviews-card" style="text-align: center; padding: 20px; color: var(--muted); border-style: dashed;">
-              No reviews yet. Be the first to leave a review!
-            </div>
-          `);
+          reviewsContainer.insertAdjacentHTML('beforeend', '<div class="rcard no-reviews-card" style="text-align:center;padding:20px;color:var(--muted);border:1px dashed var(--hairline);">No reviews yet. Be the first to leave a review!</div>');
         } else {
           reviews.forEach(r => {
             const guestName = r.guest ? r.guest.name || r.guest.phone || 'Anonymous' : 'Anonymous';
             const initials = guestName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-            const fullStars = '★'.repeat(r.rating);
-            const emptyStars = '☆'.repeat(5 - r.rating);
-            const hasHostResponse = r.hostResponse && r.hostResponse.trim();
-            
             reviewsContainer.insertAdjacentHTML('beforeend', `
               <div class="rcard">
                 <div style="display:flex; align-items:center; gap:10px;">
                   <div class="rav">${initials}</div>
                   <div>
-                    <div style="font-family:'Sora',sans-serif; font-weight:600; font-size:12px;">${guestName}</div>
-                    <div class="rstars">${fullStars}${emptyStars}</div>
+                    <div style="font-weight:600; font-size:13px;">${guestName}</div>
+                    <div class="rstars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
                   </div>
-                  <div style="margin-left: auto; font-size: 10px; color: var(--muted);">
-                    ${new Date(r.createdAt).toLocaleDateString()}
-                  </div>
+                  <div style="margin-left:auto; font-size:10px; color:var(--muted-soft);">${new Date(r.createdAt).toLocaleDateString()}</div>
                 </div>
                 <p class="rtext">"${r.comment || ''}"</p>
                 ${getReviewBreakdownHTML(r)}
-                ${hasHostResponse ? `
-                  <div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--border); background:var(--g-light); border-radius:8px; padding:10px;">
-                    <div style="font-size:10px; font-weight:600; color:var(--g-dark); margin-bottom:4px;">
-                      <i class="ti ti-rosette-discount-check"></i> Host Response
-                    </div>
-                    <div style="font-size:12px; color:var(--text);">${r.hostResponse}</div>
+                ${r.hostResponse && r.hostResponse.trim() ? `
+                  <div style="margin-top:10px; background:var(--accent-light); border-radius:8px; padding:10px;">
+                    <div style="font-size:10px; font-weight:600; color:var(--accent-hover); margin-bottom:4px;"><i class="ti ti-rosette-discount-check"></i> Host Response</div>
+                    <div style="font-size:12px; color:var(--ink);">${r.hostResponse}</div>
                     <div style="font-size:9px; color:var(--muted); margin-top:4px;">${new Date(r.hostRespondedAt).toLocaleDateString()}</div>
-                  </div>
-                ` : ''}
+                  </div>` : ''}
               </div>
             `);
           });
         }
-      } catch (err) {
-        console.error('Failed to load reviews:', err);
-      }
+      } catch (err) { console.error('Failed to load reviews:', err); }
     }
 
     window.handleReviewSubmit = async function(e) {
       e.preventDefault();
       const ratingVal = document.getElementById('reviewRating').value;
       const commentVal = document.getElementById('reviewComment').value.trim();
-      const cleanlinessVal = document.getElementById('reviewCleanliness').value;
-      const comfortVal = document.getElementById('reviewComfort').value;
-      const locationVal = document.getElementById('reviewLocation').value;
-      const valueVal = document.getElementById('reviewValue').value;
-      
-      if (!ratingVal) {
-        alert('Please select a star rating.');
-        return;
-      }
-      
+      if (!ratingVal) { alert('Please select a star rating.'); return; }
       const btn = document.getElementById('submitReviewBtn');
-      btn.disabled = true;
-      btn.innerText = 'Submitting...';
-      
+      btn.disabled = true; btn.innerText = 'Submitting...';
       try {
         const result = await api.createReview({
           listingId: listing.id,
           rating: parseInt(ratingVal, 10),
-          cleanliness: cleanlinessVal ? parseInt(cleanlinessVal, 10) : null,
-          comfort: comfortVal ? parseInt(comfortVal, 10) : null,
-          location: locationVal ? parseInt(locationVal, 10) : null,
-          value: valueVal ? parseInt(valueVal, 10) : null,
+          cleanliness: parseInt(document.getElementById('reviewCleanliness').value) || null,
+          comfort: parseInt(document.getElementById('reviewComfort').value) || null,
+          location: parseInt(document.getElementById('reviewLocation').value) || null,
+          value: parseInt(document.getElementById('reviewValue').value) || null,
           comment: commentVal
         });
-        
         if (result.error) throw new Error(result.error);
-        
         alert('Thank you! Your review has been submitted.');
         document.getElementById('reviewFormCard').style.display = 'none';
         await loadListingDetail();
-        
       } catch (err) {
-        alert(err.message || 'Failed to submit review. Please try again.');
-        btn.disabled = false;
-        btn.innerText = 'Submit Review';
+        alert(err.message || 'Failed to submit review.');
+        btn.disabled = false; btn.innerText = 'Submit Review';
       }
     }
 

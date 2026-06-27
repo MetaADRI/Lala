@@ -12,12 +12,29 @@
   --red: #C62828;     
   --r: 14px;          
   --rsm: 10px;
+
+  /* Airbnb-style tokens (green) */
+  --accent: #2E7D32;
+  --accent-hover: #1B5E20;
+  --accent-light: #E8F5E9;
+  --accent-disabled: #C8E6C9;
+  --ink: #222222;
+  --body: #3f3f3f;
+  --muted-soft: #929292;
+  --canvas: #ffffff;
+  --surface-soft: #f7f7f7;
+  --surface-strong: #f2f2f2;
+  --hairline: #dddddd;
+  --hairline-soft: #ebebeb;
+  --border-strong: #c1c1c1;
+  --star-color: #222222;
+  --shadow-card: 0 0 0 1px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.04), 0 4px 8px rgba(0,0,0,0.1);
 }
 
 html { scroll-behavior: smooth; }
 
 body { 
-  font-family: 'DM Sans', sans-serif; 
+  font-family: 'Inter', sans-serif; 
   background: #E9EDE6; 
   margin: 0; 
   color: var(--text); 
@@ -25,7 +42,7 @@ body {
 }
 
 h1, h2, h3, h4, .sora {
-  font-family: 'Sora', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 /* ---- BUTTONS ---- */
@@ -35,7 +52,7 @@ h1, h2, h3, h4, .sora {
   border: none; 
   border-radius: var(--rsm);
   padding: 12px 24px; 
-  font-family: 'Sora', sans-serif; 
+  font-family: 'Inter', sans-serif; 
   font-weight: 600; 
   font-size: 14px;
   cursor: pointer; 
@@ -58,7 +75,7 @@ h1, h2, h3, h4, .sora {
   border: none; 
   border-radius: var(--rsm);
   padding: 12px 24px; 
-  font-family: 'Sora', sans-serif; 
+  font-family: 'Inter', sans-serif; 
   font-weight: 700; 
   font-size: 14px;
   cursor: pointer; 
@@ -81,7 +98,7 @@ h1, h2, h3, h4, .sora {
   border: 1.5px solid var(--g-dark);
   border-radius: var(--rsm);
   padding: 10px 22px;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
@@ -114,7 +131,7 @@ h1, h2, h3, h4, .sora {
 .score-badge {
   display: inline-flex; align-items: center; gap: 3px;
   padding: 2px 8px; border-radius: 6px; font-size: 12px;
-  font-weight: 700; font-family: 'Sora', sans-serif;
+  font-weight: 700; font-family: 'Inter', sans-serif;
 }
 .score-badge i { font-size: 10px; }
 .score-excellent { background: #1B5E20; color: #fff; }
@@ -134,7 +151,7 @@ h1, h2, h3, h4, .sora {
   background: var(--gold-lt);
   padding: 3px 8px;
   border-radius: 99px;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .vbadge {
@@ -147,7 +164,7 @@ h1, h2, h3, h4, .sora {
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 99px;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .apill {
@@ -157,7 +174,7 @@ h1, h2, h3, h4, .sora {
   font-weight: 500;
   padding: 4px 10px;
   border-radius: 99px;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Inter', sans-serif;
   display: inline-flex;
   align-items: center;
   gap: 4px;

@@ -5,105 +5,192 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lala — Book Transfer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="common.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
-    body { background: var(--bg); }
-    .tnav { background: var(--g-dark); padding: 14px 18px; color: #fff; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 12px; }
-    .tnav a { color: #fff; text-decoration: none; font-size: 20px; }
-    .tnav h1 { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 600; margin: 0; }
-    .detail { padding: 20px 18px; max-width: 480px; margin: 0 auto; }
-    .dimg { height: 180px; background: linear-gradient(135deg, #A5D6A7, #66BB6A); border-radius: var(--r); display: flex; align-items: center; justify-content: center; font-size: 56px; color: #fff; margin-bottom: 16px; overflow: hidden; }
-    .dimg img { width: 100%; height: 100%; object-fit: cover; }
-    .dmodel { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; }
-    .dinfo { font-size: 13px; color: #666; margin: 4px 0 16px; }
-    .dprices { display: flex; gap: 16px; margin-bottom: 20px; }
-    .dprice { background: var(--card); border: 1px solid var(--border); border-radius: var(--rsm); padding: 12px 16px; flex: 1; text-align: center; }
-    .dprice .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: #888; font-family: 'Sora', sans-serif; }
-    .dprice .value { font-size: 18px; font-weight: 700; color: var(--g-dark); }
-    .section-title { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; margin: 20px 0 10px; }
-    .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 12px; font-weight: 600; color: #555; margin-bottom: 4px; font-family: 'Sora', sans-serif; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--rsm); font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; background: var(--card); box-sizing: border-box; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--g-dark); }
-    .form-row { display: flex; gap: 10px; }
-    .form-row .form-group { flex: 1; }
-    .book-btn { width: 100%; padding: 14px; background: var(--g-dark); color: #fff; border: none; border-radius: var(--rsm); font-size: 14px; font-weight: 700; font-family: 'Sora', sans-serif; cursor: pointer; margin-top: 8px; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, system-ui, 'Helvetica Neue', sans-serif;
+      background: var(--surface-soft);
+      color: var(--ink);
+      line-height: 1.5;
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    h1, h2, h3, h4 { font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
+
+    nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 40px; height: 72px;
+      background: var(--canvas);
+      border-bottom: 1px solid var(--hairline);
+    }
+    .logo-img { height: 32px; display: block; }
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+    .nav-links a {
+      font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px;
+      color: var(--ink); text-decoration: none; padding: 8px 14px;
+      border-radius: 9999px; transition: all 0.2s;
+    }
+    .nav-links a:hover { background: var(--surface-strong); }
+    @media (max-width: 768px) {
+      nav { padding: 0 16px; }
+      .nav-links a:not([href="index.html"]):not(.nav-cta) { display: none; }
+    }
+
+    .detail-wrap { max-width: 560px; margin: 0 auto; padding: 24px; }
+
+    .car-card {
+      background: var(--canvas); border-radius: 14px;
+      border: 1px solid var(--hairline); overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+    .car-img {
+      height: 200px; background: linear-gradient(135deg, #A5D6A7, #66BB6A);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 64px; overflow: hidden;
+    }
+    .car-img img { width: 100%; height: 100%; object-fit: cover; }
+    .car-body { padding: 20px; }
+    .car-model { font-weight: 700; font-size: 20px; }
+    .car-info { font-size: 14px; color: var(--muted); margin: 4px 0 16px; }
+    .prices { display: flex; gap: 12px; }
+    .price-box {
+      flex: 1; background: var(--surface-soft); border-radius: 10px;
+      padding: 14px; text-align: center;
+    }
+    .price-box .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted-soft); font-weight: 500; }
+    .price-box .val { font-size: 20px; font-weight: 700; color: var(--accent-hover); margin-top: 4px; }
+
+    .form-card {
+      background: var(--canvas); border-radius: 14px;
+      border: 1px solid var(--hairline); padding: 24px;
+      margin-top: 20px; box-shadow: var(--shadow-card);
+    }
+    .form-title { font-weight: 600; font-size: 16px; margin-bottom: 16px; }
+    .form-title i { color: var(--accent); margin-right: 6px; }
+
+    .fg { margin-bottom: 16px; }
+    .fg label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
+    .fg input, .fg select, .fg textarea {
+      width: 100%; padding: 10px 14px; border: 1.5px solid var(--hairline);
+      border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif;
+      outline: none; background: var(--canvas); box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    .fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--accent); }
+    .form-row { display: flex; gap: 12px; }
+    .form-row .fg { flex: 1; }
+
+    .book-btn {
+      width: 100%; padding: 14px; background: var(--accent); color: #fff;
+      border: none; border-radius: 12px; font-size: 15px; font-weight: 600;
+      font-family: 'Inter', sans-serif; cursor: pointer;
+      transition: background 0.2s; display: flex; align-items: center;
+      justify-content: center; gap: 8px;
+    }
+    .book-btn:hover { background: var(--accent-hover); }
     .book-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .msg { padding: 12px; border-radius: var(--rsm); font-size: 13px; margin-top: 12px; display: none; }
-    .msg.ok { background: #E8F5E9; color: #1B5E20; display: block; }
+
+    .msg { padding: 14px; border-radius: 12px; font-size: 13px; margin-top: 16px; display: none; }
+    .msg.ok { background: var(--accent-light); color: var(--accent-hover); display: block; }
     .msg.err { background: #FFEBEE; color: #C62828; display: block; }
+
+    @media (max-width: 768px) {
+      .detail-wrap { padding: 16px; }
+      .form-row { flex-direction: column; gap: 0; }
+    }
   </style>
 </head>
 <body>
-  <div class="tnav">
-    <a href="transfers.html"><i class="ti ti-arrow-left"></i></a>
-    <h1>Book Transfer</h1>
-  </div>
-
-  <div class="detail" id="detail">
-    <div class="dimg" id="carImg">🚗</div>
-    <div class="dmodel" id="carModel">Loading...</div>
-    <div class="dinfo" id="carInfo"></div>
-    <div class="dprices" id="carPrices"></div>
-
-    <div class="section-title">Booking Details</div>
-
-    <div class="form-group">
-      <label>Trip Type</label>
-      <select id="tripType" onchange="toggleTripType()">
-        <option value="airport">Airport Transfer (fixed price)</option>
-        <option value="city">City Ride (per km)</option>
-      </select>
+  <nav>
+    <a href="index.html" class="logo">
+      <img src="logo-removebg-preview.png" alt="Lala Logo" class="logo-img">
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="search.html">Stays</a>
+      <a href="transfers.html">Transfers</a>
+      <a href="my-bookings.html">My Trips</a>
+      <a href="host-signup.html" style="background:var(--accent);color:#fff;font-weight:600;">List Stays</a>
+      <a href="guest-login.html">Sign In</a>
     </div>
+  </nav>
 
-    <div class="form-row">
-      <div class="form-group">
-        <label>Pickup Location</label>
-        <input type="text" id="pickupLocation" placeholder="e.g. Airport, Hotel...">
-      </div>
-      <div class="form-group">
-        <label>Drop-off</label>
-        <input type="text" id="dropoffLocation" placeholder="Destination...">
+  <div class="detail-wrap">
+    <a href="transfers.html" style="display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);text-decoration:none;margin-bottom:16px;">
+      <i class="ti ti-arrow-left"></i> Back to transfers
+    </a>
+
+    <div class="car-card" id="detail">
+      <div class="car-img" id="carImg">🚗</div>
+      <div class="car-body">
+        <div class="car-model" id="carModel">Loading...</div>
+        <div class="car-info" id="carInfo"></div>
+        <div class="prices" id="carPrices"></div>
       </div>
     </div>
 
-    <div class="form-row">
-      <div class="form-group">
-        <label>Date</label>
-        <input type="date" id="pickupDate">
-      </div>
-      <div class="form-group">
-        <label>Time</label>
-        <input type="time" id="pickupTime">
-      </div>
-    </div>
+    <div class="form-card">
+      <div class="form-title"><i class="ti ti-clipboard-list"></i> Booking Details</div>
 
-    <div class="form-group" id="flightGroup" style="display:none;">
-      <label>Flight Number (optional)</label>
-      <input type="text" id="flightNumber" placeholder="e.g. ET 873">
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label>Passengers</label>
-        <input type="number" id="passengerCount" value="1" min="1">
+      <div class="fg">
+        <label>Trip Type</label>
+        <select id="tripType" onchange="toggleTripType()">
+          <option value="airport">Airport Transfer (fixed price)</option>
+          <option value="city">City Ride (per km)</option>
+        </select>
       </div>
-      <div class="form-group">
-        <label>Your Phone</label>
-        <input type="text" id="guestPhone" placeholder="+260...">
+
+      <div class="form-row">
+        <div class="fg">
+          <label>Pickup</label>
+          <input type="text" id="pickupLocation" placeholder="e.g. Airport, Hotel...">
+        </div>
+        <div class="fg">
+          <label>Drop-off</label>
+          <input type="text" id="dropoffLocation" placeholder="Destination...">
+        </div>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label>Notes (optional)</label>
-      <textarea id="notes" rows="2" placeholder="Luggage, special requests..."></textarea>
-    </div>
+      <div class="form-row">
+        <div class="fg">
+          <label>Date</label>
+          <input type="date" id="pickupDate">
+        </div>
+        <div class="fg">
+          <label>Time</label>
+          <input type="time" id="pickupTime">
+        </div>
+      </div>
 
-    <button class="book-btn" onclick="book()" id="bookBtn">Confirm Booking</button>
-    <div id="msg" class="msg"></div>
+      <div class="fg" id="flightGroup" style="display:none;">
+        <label>Flight Number (optional)</label>
+        <input type="text" id="flightNumber" placeholder="e.g. ET 873">
+      </div>
+
+      <div class="form-row">
+        <div class="fg">
+          <label>Passengers</label>
+          <input type="number" id="passengerCount" value="1" min="1">
+        </div>
+        <div class="fg">
+          <label>Your Phone</label>
+          <input type="text" id="guestPhone" placeholder="+260...">
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>Notes (optional)</label>
+        <textarea id="notes" rows="2" placeholder="Luggage, special requests..."></textarea>
+      </div>
+
+      <button class="book-btn" onclick="book()" id="bookBtn"><i class="ti ti-check"></i> Confirm Booking</button>
+      <div id="msg" class="msg"></div>
+    </div>
   </div>
 
   <script src="config.js"></script>
@@ -114,7 +201,7 @@
     let car = null;
 
     if (!api.isLoggedIn()) {
-      document.getElementById('detail').innerHTML = '<div class="empty" style="text-align:center;padding:60px 20px;color:#888;"><p>Please <a href="guest-login.html" style="color:var(--g-dark);">log in</a> to book a transfer.</p></div>';
+      document.getElementById('detail').innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">Please <a href="guest-login.html" style="color:var(--accent);font-weight:600;">log in</a> to book a transfer.</div>';
     }
 
     async function loadCar() {
@@ -123,21 +210,15 @@
         document.getElementById('carModel').textContent = car.model;
         document.getElementById('carInfo').textContent = `👤 ${car.driverName} · ${car.plateNumber} · ${car.seats} seats · ${car.city}`;
         document.getElementById('carImg').innerHTML = car.photos && car.photos[0] ? `<img src="${car.photos[0]}" alt="">` : '🚗';
-
         let html = '';
-        if (car.airportPrice) html += `<div class="dprice"><div class="label">Airport</div><div class="value">K${car.airportPrice}</div></div>`;
-        if (car.pricePerKm) html += `<div class="dprice"><div class="label">Per km</div><div class="value">K${car.pricePerKm}</div></div>`;
+        if (car.airportPrice) html += `<div class="price-box"><div class="lbl">Airport</div><div class="val">K${car.airportPrice}</div></div>`;
+        if (car.pricePerKm) html += `<div class="price-box"><div class="lbl">Per km</div><div class="val">K${car.pricePerKm}</div></div>`;
         document.getElementById('carPrices').innerHTML = html;
-
-        // Set default date to tomorrow
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         document.getElementById('pickupDate').value = tomorrow.toISOString().split('T')[0];
-
-        // Pre-fill phone from user
         const user = api.getUser();
         if (user) document.getElementById('guestPhone').value = user.phone || '';
-
         toggleTripType();
       } catch (err) {
         document.getElementById('carModel').textContent = 'Failed to load';
@@ -182,7 +263,7 @@
           msg.textContent = result.error;
         } else {
           msg.className = 'msg ok';
-          msg.textContent = '✅ Transfer booked! The driver will contact you.';
+          msg.textContent = 'Transfer booked! The driver will contact you.';
           btn.textContent = 'Booked ✓';
         }
       } catch (err) {

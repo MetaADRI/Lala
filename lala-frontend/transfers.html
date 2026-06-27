@@ -5,71 +5,165 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lala — Transfers & Taxis</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="common.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
-    body { background: var(--bg); }
-    .tnav { background: var(--g-dark); padding: 14px 18px; color: #fff; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 12px; }
-    .tnav a { color: #fff; text-decoration: none; font-size: 20px; }
-    .tnav h1 { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 600; margin: 0; }
-
-    .hero-pick {
-      background: linear-gradient(135deg, #1B5E20, #2E7D32); color: #fff;
-      padding: 24px 18px; text-align: center;
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, system-ui, 'Helvetica Neue', sans-serif;
+      background: var(--surface-soft);
+      color: var(--ink);
+      line-height: 1.5;
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
     }
-    .hero-pick h2 { font-family: 'Sora', sans-serif; font-size: 20px; margin: 0 0 4px; }
-    .hero-pick p { margin: 0 0 16px; font-size: 13px; opacity: 0.85; }
+    h1, h2, h3, h4 { font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
+
+    nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 40px; height: 72px;
+      background: var(--canvas);
+      border-bottom: 1px solid var(--hairline);
+    }
+    .logo-img { height: 32px; display: block; }
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+    .nav-links a {
+      font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px;
+      color: var(--ink); text-decoration: none; padding: 8px 14px;
+      border-radius: 9999px; transition: all 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { background: var(--surface-strong); }
+    .nav-cta {
+      background: var(--accent) !important; color: #fff !important; font-weight: 600 !important;
+    }
+    .nav-cta:hover { background: var(--accent-hover) !important; }
+    @media (max-width: 768px) {
+      nav { padding: 0 16px; }
+      .nav-links a:not(.nav-cta):not([href="index.html"]) { display: none; }
+    }
+
+    /* ---- HERO ---- */
+    .hero-pick {
+      background: linear-gradient(135deg, var(--accent-hover), var(--accent));
+      color: #fff; padding: 32px 24px; text-align: center;
+    }
+    .hero-pick h2 { font-size: 22px; margin: 0 0 4px; color: #fff; }
+    .hero-pick p { margin: 0 0 20px; font-size: 14px; opacity: 0.85; }
 
     .type-toggle { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
-    .type-btn { padding: 8px 20px; border-radius: 99px; border: 1.5px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: #fff; font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-    .type-btn.on { background: #fff; color: #1B5E20; border-color: #fff; }
+    .type-btn {
+      padding: 8px 20px; border-radius: 9999px;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1); color: #fff;
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .type-btn.on { background: #fff; color: var(--accent-hover); border-color: #fff; font-weight: 600; }
 
-    .city-input-wrap { display: flex; background: rgba(255,255,255,0.15); border-radius: 12px; padding: 10px 14px; align-items: center; gap: 10px; max-width: 320px; margin: 0 auto; }
-    .city-input-wrap i { color: rgba(255,255,255,0.7); font-size: 18px; }
-    .city-input-wrap input { background: transparent; border: none; color: #fff; font-size: 14px; width: 100%; outline: none; font-family: 'DM Sans', sans-serif; }
-    .city-input-wrap input::placeholder { color: rgba(255,255,255,0.5); }
+    .city-wrap {
+      display: flex; background: rgba(255,255,255,0.15);
+      border-radius: 9999px; padding: 10px 16px; align-items: center; gap: 10px;
+      max-width: 360px; margin: 0 auto; backdrop-filter: blur(4px);
+    }
+    .city-wrap i { color: rgba(255,255,255,0.7); font-size: 18px; }
+    .city-wrap input {
+      background: transparent; border: none; color: #fff; font-size: 14px;
+      width: 100%; outline: none; font-family: 'Inter', sans-serif;
+    }
+    .city-wrap input::placeholder { color: rgba(255,255,255,0.5); }
 
-    .results { padding: 20px 18px; display: flex; flex-direction: column; gap: 14px; }
-    .ccard { background: var(--card); border-radius: var(--r); border: 1px solid var(--border); overflow: hidden; }
-    .cimg { height: 120px; background: linear-gradient(135deg, #A5D6A7, #66BB6A); display: flex; align-items: center; justify-content: center; font-size: 40px; color: #fff; position: relative; }
+    /* ---- RESULTS ---- */
+    .results { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .ccard {
+      background: var(--canvas); border-radius: 14px;
+      border: 1px solid var(--hairline); overflow: hidden;
+      transition: all 0.25s;
+      box-shadow: var(--shadow-card);
+    }
+    .ccard:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.02), 0 6px 16px rgba(0,0,0,0.08);
+    }
+
+    .cimg {
+      height: 140px; background: linear-gradient(135deg, #A5D6A7, #66BB6A);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 44px; position: relative; overflow: hidden;
+    }
     .cimg img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
-    .cbody { padding: 14px; }
-    .cmodel { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 15px; }
-    .cdriver { font-size: 12px; color: #666; margin: 2px 0 6px; }
-    .cbadges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-    .cbadge { padding: 2px 10px; border-radius: 99px; font-size: 10px; font-weight: 600; font-family: 'Sora', sans-serif; background: #E8F5E9; color: #1B5E20; }
-    .cprices { display: flex; gap: 14px; font-size: 12px; color: #555; }
-    .cprices strong { color: var(--text); font-size: 14px; }
-    .cbook { display: block; margin-top: 10px; text-align: center; padding: 10px; background: var(--g-dark); color: #fff; border-radius: 8px; text-decoration: none; font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 600; }
 
-    .empty { text-align: center; padding: 60px 20px; color: #888; }
-    .empty i { font-size: 48px; color: #DDD; margin-bottom: 16px; }
+    .cbody { padding: 16px; }
+    .cmodel { font-weight: 600; font-size: 16px; }
+    .cdriver { font-size: 13px; color: var(--muted); margin: 2px 0 8px; }
+
+    .cbadges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .cbadge {
+      background: var(--accent-light); color: var(--accent-hover);
+      padding: 3px 10px; border-radius: 9999px; font-size: 10px; font-weight: 600;
+    }
+
+    .cprices { display: flex; gap: 16px; font-size: 13px; color: var(--muted); }
+    .cprices strong { color: var(--ink); font-size: 15px; }
+
+    .cbook {
+      display: block; margin-top: 12px; text-align: center; padding: 10px;
+      background: var(--accent); color: #fff; border-radius: 10px;
+      text-decoration: none; font-family: 'Inter', sans-serif;
+      font-size: 13px; font-weight: 600; transition: background 0.2s;
+    }
+    .cbook:hover { background: var(--accent-hover); }
+
+    .empty { text-align: center; padding: 60px 20px; color: var(--muted-soft); }
+    .empty i { font-size: 48px; margin-bottom: 16px; }
+
+    @media (max-width: 768px) {
+      .results { padding: 16px; }
+      .results-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <div class="tnav">
-    <a href="index.html"><i class="ti ti-arrow-left"></i></a>
-    <h1>Transfers & Taxis</h1>
-  </div>
+  <nav>
+    <a href="index.html" class="logo">
+      <img src="logo-removebg-preview.png" alt="Lala Logo" class="logo-img">
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="search.html">Stays</a>
+      <a href="transfers.html" class="active">Transfers</a>
+      <a href="my-bookings.html">My Trips</a>
+      <a href="host-signup.html" class="nav-cta">List Stays</a>
+      <a href="guest-login.html">Sign In</a>
+    </div>
+  </nav>
 
   <div class="hero-pick">
     <h2>Where to?</h2>
-    <p>Airport transfers & city rides</p>
+    <p>Airport transfers & city rides across Zambia</p>
     <div class="type-toggle">
       <button class="type-btn on" data-type="" onclick="setType(this)">All</button>
       <button class="type-btn" data-type="airport" onclick="setType(this)">Airport</button>
       <button class="type-btn" data-type="city" onclick="setType(this)">City</button>
     </div>
-    <div class="city-input-wrap">
+    <div class="city-wrap">
       <i class="ti ti-map-pin"></i>
-      <input type="text" id="cityInput" placeholder="Search city..." oninput="loadCars()">
+      <input type="text" id="cityInput" placeholder="Search by city..." oninput="loadCars()">
     </div>
   </div>
 
-  <div class="results" id="results">
-    <div class="empty"><i class="ti ti-car"></i><p>Loading drivers...</p></div>
+  <div class="results">
+    <div class="results-grid" id="resultsGrid">
+      <div class="empty" style="grid-column:1/-1;"><i class="ti ti-car"></i><p>Loading drivers...</p></div>
+    </div>
   </div>
 
   <script src="config.js"></script>
@@ -85,7 +179,7 @@
     }
 
     async function loadCars() {
-      const container = document.getElementById('results');
+      const grid = document.getElementById('resultsGrid');
       const city = document.getElementById('cityInput').value;
       const filters = {};
       if (city) filters.city = city;
@@ -96,11 +190,11 @@
         else if (activeType === 'city') cars = cars.filter(c => c.pricePerKm);
 
         if (!cars.length) {
-          container.innerHTML = '<div class="empty"><i class="ti ti-car-off"></i><p>No drivers found in this area</p></div>';
+          grid.innerHTML = '<div class="empty" style="grid-column:1/-1;"><i class="ti ti-car-off"></i><p>No drivers found in this area</p></div>';
           return;
         }
 
-        container.innerHTML = cars.map(c => `
+        grid.innerHTML = cars.map(c => `
           <div class="ccard">
             <div class="cimg">${c.photos && c.photos[0] ? `<img src="${c.photos[0]}" alt="">` : '🚗'}</div>
             <div class="cbody">
@@ -121,7 +215,7 @@
         `).join('');
       } catch (err) {
         console.error('loadCars error:', err);
-        container.innerHTML = '<div class="empty"><p style="color:red;">Failed to load</p><p style="font-size:12px;color:#999;">' + (err.message || '') + '</p></div>';
+        grid.innerHTML = '<div class="empty" style="grid-column:1/-1;color:var(--red);"><p>Failed to load</p></div>';
       }
     }
 
