@@ -102,7 +102,7 @@ async function confirmBooking(booking) {
  * GET /api/bookings/:id
  * Returns booking details (guest can only access their own bookings).
  */
-exports.getBookingDetails = async (req, res) => {
+async function getBookingDetails(req, res) {
   try {
     const booking = await Booking.findByPk(req.params.id);
     if (!booking) return res.status(404).json({ error: 'Booking not found' });
@@ -129,7 +129,7 @@ exports.getBookingDetails = async (req, res) => {
  * GET /api/bookings/guest/all
  * Returns all bookings for the logged-in guest.
  */
-exports.getGuestBookings = async (req, res) => {
+async function getGuestBookings(req, res) {
   try {
     const bookings = await Booking.findAll({
       where: { guestId: req.user.id },
@@ -156,7 +156,7 @@ exports.getGuestBookings = async (req, res) => {
  * GET /api/bookings/host/all
  * Returns all bookings for the logged-in host's listings.
  */
-exports.getHostBookings = async (req, res) => {
+async function getHostBookings(req, res) {
   try {
     const listings = await Listing.findAll({ where: { hostId: req.user.id }, attributes: ['id', 'name'] });
     const listingIds = listings.map(l => l.id);
@@ -188,7 +188,7 @@ exports.getHostBookings = async (req, res) => {
  * POST /api/bookings/:id/cancel
  * Guest cancels their own booking (only if pending or awaiting_payment).
  */
-exports.cancelBooking = async (req, res) => {
+async function cancelBooking(req, res) {
   try {
     const booking = await Booking.findByPk(req.params.id);
     if (!booking) return res.status(404).json({ error: 'Booking not found' });
@@ -214,7 +214,7 @@ exports.cancelBooking = async (req, res) => {
  * POST /api/bookings/:id/host-cancel
  * Host cancels a booking on their listing.
  */
-exports.hostCancelBooking = async (req, res) => {
+async function hostCancelBooking(req, res) {
   try {
     const booking = await Booking.findByPk(req.params.id);
     if (!booking) return res.status(404).json({ error: 'Booking not found' });
@@ -237,7 +237,7 @@ exports.hostCancelBooking = async (req, res) => {
  * GET /api/bookings/admin/all
  * Admin views all bookings across the platform.
  */
-exports.getAllBookings = async (req, res) => {
+async function getAllBookings(req, res) {
   try {
     const bookings = await Booking.findAll({
       order: [['createdAt', 'DESC']],
