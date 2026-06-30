@@ -60,6 +60,10 @@
       background: var(--canvas);
       position: sticky; top: 72px; z-index: 50;
       border-bottom: 1px solid var(--hairline-soft);
+      transition: transform 0.3s ease;
+    }
+    .search-header.hidden {
+      transform: translateY(-100%);
     }
     .search-header-inner {
       max-width: 1200px; margin: 0 auto;
@@ -493,10 +497,10 @@
       const currentScroll = window.scrollY;
       if (currentScroll > lastScroll && currentScroll > 80) {
         nav.classList.add('hidden');
-        searchHeader.style.top = '0';
+        searchHeader.classList.add('hidden');
       } else {
         nav.classList.remove('hidden');
-        searchHeader.style.top = '72px';
+        searchHeader.classList.remove('hidden');
       }
       lastScroll = currentScroll;
     });
