@@ -90,6 +90,7 @@
       display: inline-flex; align-items: center; gap: 6px; border-radius: 99px;
       padding: 4px 12px; font-size: 12px; font-weight: 700; font-family: 'Sora', sans-serif;
     }
+    .prov-badge img { height: 14px; width: auto; border-radius: 2px; }
     .prov-mtn    { background: #FFF9C4; color: #7B6000; }
     .prov-airtel { background: #FFEBEE; color: #B71C1C; }
     .prov-zamtel { background: var(--g-light); color: var(--g-dark); }
@@ -257,8 +258,9 @@
     // Provider badge
     const badge = document.getElementById('provBadge');
     const provClass = { MTN: 'prov-mtn', Airtel: 'prov-airtel', Zamtel: 'prov-zamtel' };
+    const provLogo = { MTN: 'MTN-Logo.png', Airtel: 'Airtel-logo-500x281-removebg-preview.png', Zamtel: 'zamtel_logo-removebg-preview.png' };
     badge.className = `prov-badge ${provClass[provider] || 'prov-mtn'}`;
-    badge.textContent = `${provider} Mobile Money`;
+    badge.innerHTML = `<img src="${provLogo[provider] || 'MTN-Logo.png'}" alt=""> ${provider} Mobile Money`;
 
     // Page title
     document.title = `Lala — ${listingName} Confirmed!`;

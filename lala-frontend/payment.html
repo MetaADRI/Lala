@@ -45,12 +45,12 @@
     .plogo {
       width: 44px; height: 44px; border-radius: 12px; display: flex;
       align-items: center; justify-content: center;
-      font-weight: 800; font-size: 10px; font-family: 'Sora', sans-serif;
-      color: #fff; flex-shrink: 0; letter-spacing: 0.02em;
+      flex-shrink: 0; overflow: hidden;
     }
-    .mtn  { background: #FFCC00; color: #222; font-size: 11px; }
-    .airtel { background: #E0001B; }
-    .zamtel { background: #1B5E20; }
+    .plogo img { width: 100%; height: 100%; object-fit: contain; }
+    .mtn  { background: #FFCC00; padding: 6px; }
+    .airtel { background: #fff; padding: 8px; }
+    .zamtel { background: #fff; padding: 8px; }
     .pname { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; color: var(--text); }
     .psub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
     .pchk  { color: var(--g-dark); font-size: 22px; margin-left: auto; display: none; }
@@ -142,7 +142,7 @@
       <div class="section-title" style="margin-bottom:10px;">Select your provider</div>
 
       <div class="pprov on" id="prov-MTN" onclick="selectProvider('MTN')">
-        <div class="plogo mtn">MTN</div>
+        <div class="plogo mtn"><img src="MTN-Logo.png" alt="MTN"></div>
         <div>
           <div class="pname">MTN Mobile Money</div>
           <div class="psub">Fast USSD push · ~50% market share</div>
@@ -151,7 +151,7 @@
       </div>
 
       <div class="pprov" id="prov-Airtel" onclick="selectProvider('Airtel')" style="margin-top:10px;">
-        <div class="plogo airtel">AIR</div>
+        <div class="plogo airtel"><img src="Airtel-logo-500x281-removebg-preview.png" alt="Airtel"></div>
         <div>
           <div class="pname">Airtel Money</div>
           <div class="psub">Fast USSD push · Airtel Zambia</div>
@@ -160,7 +160,7 @@
       </div>
 
       <div class="pprov" id="prov-Zamtel" onclick="selectProvider('Zamtel')" style="margin-top:10px;">
-        <div class="plogo zamtel">ZAM</div>
+        <div class="plogo zamtel"><img src="zamtel_logo-removebg-preview.png" alt="Zamtel"></div>
         <div>
           <div class="pname">Zamtel Money</div>
           <div class="psub">Secure USSD push · Zamtel network</div>

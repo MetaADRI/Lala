@@ -84,6 +84,7 @@
       display: inline-flex; align-items: center; gap: 3px;
       font-size: 9px; font-weight: 600; padding: 2px 6px; border-radius: 4px;
     }
+    .provider-badge img { height: 10px; width: auto; }
     .provider-MTN { background: #FFFDE7; color: #F57F17; }
     .provider-Airtel { background: #FFEBEE; color: #C62828; }
     .provider-Zamtel { background: #E8F5E9; color: #2E7D32; }
@@ -157,7 +158,9 @@
 
     function getProviderBadge(provider) {
       if (!provider) return '';
-      return `<span class="provider-badge provider-${provider}">${provider}</span>`;
+      const logos = { MTN: 'MTN-Logo.png', Airtel: 'Airtel-logo-500x281-removebg-preview.png', Zamtel: 'zamtel_logo-removebg-preview.png' };
+      const logo = logos[provider] ? `<img src="${logos[provider]}" alt=""> ` : '';
+      return `<span class="provider-badge provider-${provider}">${logo}${provider}</span>`;
     }
 
     function renderBookings() {
