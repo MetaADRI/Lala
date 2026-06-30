@@ -1,39 +1,74 @@
-/**
- * Service to handle Mobile Money payments via Aggregator (Paychangu/DPO/Paypulse)
- */
-const paymentService = {
-  /**
-   * Initiates a Mobile Money USSD Push (STK Push)
-   */
-  initiateMomoPush: async (booking, provider, phone) => {
-    console.log(`[Payment Service] Initiating MM Push for ${phone} via ${provider} for K${booking.totalAmount}`);
+const axios = require('axios');
+const crypto = require('crypto');
 
-    // Mock implementation for Phase 1
-    // In production, this would call the aggregator API (e.g., Paychangu)
-    
-    try {
-      // 1. Prepare payload
-      // 2. Call aggregator endpoint
-      // 3. Handle response (transaction reference)
-      
-      return {
-        success: true,
-        transactionRef: `LALA-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-        message: `USSD push sent to ${phone}. Please confirm on your phone.`
-      };
-    } catch (error) {
-      console.error('Payment Initiation Error:', error);
-      return { success: false, error: error.message };
-    }
+const LENCO_API_URL = process.env.LENCO_API_URL;
+const LENCO_API_KEY = process.env.LENCO_API_KEY;
+
+if (!LENCO_API_KEY) {
+  console.warn('[paymentService] LENCO_API_KEY is not set — payments will fail.');
+}
+
+const lenco = axios.create({
+  baseURL: LENCO_API_URL,
+  headers: {
+    Authorization: `Bearer ${LENCO_API_KEY}`,
+    'Content-Type': 'application/json',
   },
+  timeout: 30000,
+});
 
-  /**
-   * Verifies payment status (Webhook or Polling)
-   */
-  verifyPayment: async (transactionRef) => {
-    // Implementation to check if payment was successful
-    return { status: 'success' };
+async function initiateMomoPush({ amount, reference, phone, operator }) {
+  try {
+    const { data } = await lenco.post('/collections/mobile-money', {
+      amount,
+      currency: 'ZMW',
+      reference,
+      phone,
+      operator: String(operator).toLowerCase(),
+      country: 'zm',
+      bearer: 'merchant',
+    });
+    return data.data;
+  } catch (err) {
+    const apiError = err.response?.data || { message: err.message };
+    console.error('[paymentService.initiateMomoPush] error:', apiError);
+    throw new Error(apiError.message || 'Failed to initiate mobile money payment');
   }
-};
+}
 
-module.exports = paymentService;
+async function verifyCollectionStatus(reference) {
+  try {
+    const { data } = await lenco.get(`/collections/status/${encodeURIComponent(reference)}`);
+    return data.data;
+  } catch (err) {
+    const apiError = err.response?.data || { message: err.message };
+    console.error('[paymentService.verifyCollectionStatus] error:', apiError);
+    throw new Error(apiError.message || 'Failed to verify payment status');
+  }
+}
+
+function verifyWebhookSignature(rawBody, signature) {
+  if (!signature) return false;
+  const webhookHashKey = crypto
+    .createHash('sha256')
+    .update(LENCO_API_KEY)
+    .digest('hex');
+  const expected = crypto
+    .createHmac('sha512', webhookHashKey)
+    .update(rawBody)
+    .digest('hex');
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(expected),
+      Buffer.from(signature)
+    );
+  } catch {
+    return false;
+  }
+}
+
+module.exports = {
+  initiateMomoPush,
+  verifyCollectionStatus,
+  verifyWebhookSignature,
+};

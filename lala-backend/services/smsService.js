@@ -37,6 +37,11 @@ const smsService = {
   sendOTP: async (phone, otp) => {
     const msg = `Your Lala verification code is: ${otp}. Valid for 10 minutes. Do not share this code.`;
     return smsService.sendSMS(phone, msg);
+  },
+
+  sendBookingConfirmation: async (booking) => {
+    const msg = `Lala: Booking confirmed! Your stay from ${booking.checkIn} to ${booking.checkOut}. Ref: ${booking.transactionRef || booking.id.split('-')[0].toUpperCase()}. Enjoy your stay!`;
+    return smsService.sendSMS(booking.guestPhone, msg);
   }
 };
 

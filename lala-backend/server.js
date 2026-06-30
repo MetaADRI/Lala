@@ -1,8 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const sequelize = require('./config/database');
-require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
 const listingRoutes = require('./routes/listingRoutes');
@@ -24,6 +24,11 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
+
+// RAW body ONLY for the Lenco webhook (must come BEFORE express.json)
+app.use('/api/bookings/webhook', express.raw({ type: 'application/json' }));
+
+// JSON parser for everything else
 app.use(express.json());
 
 // Serve uploaded files

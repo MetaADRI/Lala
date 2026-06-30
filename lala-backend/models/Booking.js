@@ -42,7 +42,17 @@ const Booking = sequelize.define('Booking', {
   transactionRef: {
     type: DataTypes.STRING,
     allowNull: true
-  }
+  },
+  // --- Lenco payment fields ---
+  lencoReference: {
+    type: DataTypes.STRING,
+    allowNull: true, // Lenco's internal reference (lencoReference from the API)
+  },
+  paymentStatus: {
+    type: DataTypes.ENUM('pending', 'pay-offline', 'successful', 'failed'),
+    allowNull: false,
+    defaultValue: 'pending',
+  },
 });
 
 module.exports = Booking;

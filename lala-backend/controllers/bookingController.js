@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const Booking = require('../models/Booking');
 const Listing = require('../models/Listing');
 const User = require('../models/User');
@@ -6,111 +7,96 @@ const smsService = require('../services/smsService');
 
 /**
  * POST /api/bookings
- * Creates a booking and immediately initiates mobile money payment.
- * Body: { listingId, checkIn, checkOut, provider, phone }
+ * Create booking (awaiting_payment) then trigger Lenco USSD push.
  */
-exports.createBooking = async (req, res) => {
-  const { listingId, checkIn, checkOut, provider, phone } = req.body;
-
-  if (!listingId || !checkIn || !checkOut || !provider || !phone) {
-    return res.status(400).json({ error: 'listingId, checkIn, checkOut, provider, and phone are required' });
-  }
-
+async function createBooking(req, res) {
   try {
-    const listing = await Listing.findByPk(listingId);
-    if (!listing) return res.status(404).json({ error: 'Listing not found' });
+    const { listingId, checkIn, checkOut, provider, phone, totalAmount } = req.body;
+    const guestId = req.user?.id;
 
-    // Calculate total amount
-    const checkInDate = new Date(checkIn);
-    const checkOutDate = new Date(checkOut);
-    const nights = Math.max(1, Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24)));
-    const totalAmount = nights * listing.price;
+    const reference = `lala-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
 
-    // Create booking record
     const booking = await Booking.create({
       listingId,
-      guestId: req.user.id,
+      guestId,
       checkIn,
       checkOut,
+      status: 'awaiting_payment',
+      paymentStatus: 'pending',
       totalAmount,
       provider,
       guestPhone: phone,
-      status: 'awaiting_payment'
+      transactionRef: reference,
     });
 
-    // Initiate mobile money push
-    const paymentResult = await paymentService.initiateMomoPush(booking, provider, phone);
+    const lencoData = await paymentService.initiateMomoPush({
+      amount: totalAmount,
+      reference,
+      phone,
+      operator: provider,
+    });
 
-    if (paymentResult.success) {
-      booking.transactionRef = paymentResult.transactionRef;
-      booking.status = 'awaiting_payment';
-      await booking.save();
+    booking.lencoReference = lencoData.lencoReference;
+    booking.paymentStatus = lencoData.status;
+    await booking.save();
 
-      res.status(201).json({
-        message: paymentResult.message,
-        booking: {
-          id: booking.id,
-          listingId: booking.listingId,
-          listingName: listing.name,
-          listingCity: listing.city,
-          checkIn: booking.checkIn,
-          checkOut: booking.checkOut,
-          nights,
-          totalAmount: booking.totalAmount,
-          provider: booking.provider,
-          transactionRef: booking.transactionRef,
-          status: booking.status
-        }
-      });
-    } else {
-      // Payment initiation failed — mark booking as failed
-      booking.status = 'payment_failed';
-      await booking.save();
-      res.status(500).json({ error: 'Failed to initiate payment. Please try again.' });
-    }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(201).json({
+      bookingId: booking.id,
+      reference,
+      paymentStatus: booking.paymentStatus,
+      message: 'Approve the payment on your phone.',
+    });
+  } catch (err) {
+    console.error('[createBooking] error:', err.message);
+    return res.status(500).json({ error: err.message });
   }
-};
+}
 
 /**
- * POST /api/bookings/:id/confirm
- * Webhook / polling endpoint — marks booking as confirmed and sends SMS.
- * In production this is called by the payment aggregator webhook.
+ * GET /api/bookings/:id/status
+ * Frontend polls this from the USSD-waiting screen.
  */
-exports.confirmBooking = async (req, res) => {
+async function getBookingPaymentStatus(req, res) {
   try {
     const booking = await Booking.findByPk(req.params.id);
     if (!booking) return res.status(404).json({ error: 'Booking not found' });
 
-    const listing = await Listing.findByPk(booking.listingId);
-
-    booking.status = 'confirmed';
-    await booking.save();
-
-    // Send confirmation SMS to guest
-    if (booking.guestPhone) {
-      const msg = `Lala: Booking confirmed! ${listing ? listing.name : 'Your stay'} from ${booking.checkIn} to ${booking.checkOut}. Ref: ${booking.transactionRef || booking.id.split('-')[0].toUpperCase()}. Enjoy your stay!`;
-      await smsService.sendSMS(booking.guestPhone, msg);
+    if (['successful', 'failed'].includes(booking.paymentStatus)) {
+      return res.json({ paymentStatus: booking.paymentStatus, status: booking.status });
     }
 
-    res.json({
-      message: 'Booking confirmed',
-      booking: {
-        id: booking.id,
-        listingName: listing ? listing.name : 'Unknown',
-        checkIn: booking.checkIn,
-        checkOut: booking.checkOut,
-        totalAmount: booking.totalAmount,
-        provider: booking.provider,
-        transactionRef: booking.transactionRef,
-        status: booking.status
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    const lencoData = await paymentService.verifyCollectionStatus(booking.transactionRef);
+    booking.paymentStatus = lencoData.status;
+
+    if (lencoData.status === 'successful' && booking.status !== 'confirmed') {
+      await confirmBooking(booking);
+    } else {
+      await booking.save();
+    }
+
+    return res.json({ paymentStatus: booking.paymentStatus, status: booking.status });
+  } catch (err) {
+    console.error('[getBookingPaymentStatus] error:', err.message);
+    return res.status(500).json({ error: err.message });
   }
-};
+}
+
+/**
+ * Internal: confirm a booking and send SMS.
+ * Called ONLY after Lenco confirms 'successful' (via poll or webhook).
+ */
+async function confirmBooking(booking) {
+  booking.status = 'confirmed';
+  booking.paymentStatus = 'successful';
+  await booking.save();
+
+  try {
+    await smsService.sendBookingConfirmation(booking);
+  } catch (smsErr) {
+    console.error('[confirmBooking] SMS failed (booking still confirmed):', smsErr.message);
+  }
+  return booking;
+}
 
 /**
  * GET /api/bookings/:id
@@ -283,6 +269,19 @@ exports.getAllBookings = async (req, res) => {
 /**
  * @deprecated - kept for backward compatibility; use createBooking which auto-initiates payment
  */
-exports.initiatePayment = async (req, res) => {
+async function initiatePayment(req, res) {
   res.status(410).json({ error: 'Deprecated. Use POST /api/bookings with provider and phone fields.' });
+}
+
+module.exports = {
+  createBooking,
+  getBookingPaymentStatus,
+  confirmBooking,
+  getBookingDetails,
+  getGuestBookings,
+  getHostBookings,
+  cancelBooking,
+  hostCancelBooking,
+  getAllBookings,
+  initiatePayment,
 };
