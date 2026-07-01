@@ -623,6 +623,7 @@
     })();
 
     if ('serviceWorker' in navigator) {
+
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js')
           .then(reg => console.log('SW Registered', reg))
@@ -630,5 +631,6 @@
       });
     }
   </script>
+  <script src="session.js"></script>
 </body>
 </html>

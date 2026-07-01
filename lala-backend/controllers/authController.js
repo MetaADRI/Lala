@@ -11,7 +11,7 @@ function signToken(user) {
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role, name: user.name },
     process.env.JWT_SECRET || 'lala_secret_key_2026',
-    { expiresIn: '7d' }
+    { expiresIn: '24h' }
   );
   return { token, user: { id: user.id, email: user.email, role: user.role, name: user.name } };
 }
