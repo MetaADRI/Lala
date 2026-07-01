@@ -11,8 +11,18 @@ const smsService = require('../services/smsService');
  */
 async function createBooking(req, res) {
   try {
-    const { listingId, checkIn, checkOut, provider, phone, totalAmount } = req.body;
+    const { listingId, checkIn, checkOut, provider, phone } = req.body;
     const guestId = req.user?.id;
+
+    const listing = await Listing.findByPk(listingId);
+    if (!listing) return res.status(404).json({ error: 'Listing not found' });
+
+    const nights = Math.ceil(
+      (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)
+    );
+    if (nights <= 0) return res.status(400).json({ error: 'Invalid date range' });
+
+    const totalAmount = Number(listing.price) * nights;
 
     const reference = `lala-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
 
