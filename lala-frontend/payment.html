@@ -298,14 +298,14 @@
           throw new Error(result.error);
         }
 
-        createdBookingId = result.booking.id;
+        createdBookingId = result.bookingId;
 
         // Show USSD waiting screen
         document.getElementById('mainForm').style.display = 'none';
         document.getElementById('ussdScreen').classList.add('visible');
         document.getElementById('confirmPhone').textContent = `+${phone}`;
-        document.getElementById('transRef').textContent = result.booking.transactionRef
-          ? `Ref: ${result.booking.transactionRef}`
+        document.getElementById('transRef').textContent = result.reference
+          ? `Ref: ${result.reference}`
           : '';
 
         // In production: start polling the payment status
