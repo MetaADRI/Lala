@@ -53,6 +53,11 @@ const Booking = sequelize.define('Booking', {
     allowNull: false,
     defaultValue: 'pending',
   },
+  // --- Lenco split-settlement fields ---
+    lodgeStatus:       { type: DataTypes.ENUM('pending','paid','failed','skipped'), allowNull: false, defaultValue: 'pending' },
+    lodgeRef:          { type: DataTypes.STRING, allowNull: true },
+    lodgePayoutAmount: { type: DataTypes.FLOAT,  allowNull: true },
+    commissionAmount:  { type: DataTypes.FLOAT,  allowNull: true }, // reporting only; stays in Lenco account
 });
 
 module.exports = Booking;

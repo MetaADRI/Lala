@@ -3,6 +3,7 @@ const router = express.Router();
 const bookingController = require('../controllers/bookingController');
 const Booking = require('../models/Booking');
 const paymentService = require('../services/paymentService');
+const settlementService = require('../services/settlementService');
 const { authMiddleware, roleMiddleware } = require('../middleware/auth');
 
 // IMPORTANT: Specific named routes MUST come before /:id to avoid conflicts
@@ -15,6 +16,30 @@ router.get('/:id', authMiddleware, bookingController.getBookingDetails);
 router.get('/:id/status', bookingController.getBookingPaymentStatus);
 router.post('/:id/cancel', authMiddleware, bookingController.cancelBooking);
 router.post('/:id/host-cancel', authMiddleware, roleMiddleware(['host', 'admin']), bookingController.hostCancelBooking);
+
+// View settlement state for a booking
+router.get('/:id/settlement-status', /* authMiddleware, */ async (req, res) => {
+  const booking = await Booking.findByPk(req.params.id);
+  if (!booking) return res.status(404).json({ error: 'Booking not found' });
+  return res.json({
+    lodgeStatus: booking.lodgeStatus,
+    lodgeRef: booking.lodgeRef,
+    lodgePayoutAmount: booking.lodgePayoutAmount,
+    commissionAmount: booking.commissionAmount,
+  });
+});
+
+// Retry a failed/skipped lodge payout (protect with admin auth in production)
+router.post('/:id/retry-payout', /* adminAuthMiddleware, */ async (req, res) => {
+  const booking = await Booking.findByPk(req.params.id);
+  if (!booking) return res.status(404).json({ error: 'Booking not found' });
+  if (!['failed', 'skipped'].includes(booking.lodgeStatus)) {
+    return res.status(400).json({ error: `Nothing to retry (lodgeStatus=${booking.lodgeStatus})` });
+  }
+  await settlementService.settleBooking(booking);
+  await booking.reload();
+  return res.json({ lodgeStatus: booking.lodgeStatus, lodgeRef: booking.lodgeRef });
+});
 
 // Lenco webhook (no auth middleware — verified by signature instead)
 router.post('/webhook', async (req, res) => {

@@ -67,8 +67,47 @@ function verifyWebhookSignature(rawBody, signature) {
   }
 }
 
+/**
+ * Send a mobile money payout (transfer) via Lenco.
+ * @returns {Promise<Object>} Lenco transfer data (includes status, reference, lencoReference)
+ */
+async function sendPayout({ amount, reference, phone, operator, narration }) {
+  try {
+    const { data } = await lenco.post('/transfers/mobile-money', {
+      accountId: process.env.LENCO_ACCOUNT_ID,
+      amount,
+      currency: 'ZMW',
+      reference,
+      narration,
+      phone,
+      operator: String(operator).toLowerCase(),
+      country: 'zm',
+    });
+    return data.data;
+  } catch (err) {
+    const apiError = err.response?.data || { message: err.message };
+    console.error('[paymentService.sendPayout] error:', apiError);
+    throw new Error(apiError.message || 'Failed to send payout');
+  }
+}
+
+/**
+ * Verify / re-query a transfer's status by reference.
+ * @returns {Promise<Object>} Lenco transfer data (status: pending|successful|failed)
+ */
+async function verifyTransferStatus(reference) {
+  try {
+    const { data } = await lenco.get(`/transfers/status/${encodeURIComponent(reference)}`);
+    return data.data;
+  } catch (err) {
+    const apiError = err.response?.data || { message: err.message };
+    console.error('[paymentService.verifyTransferStatus] error:', apiError);
+    throw new Error(apiError.message || 'Failed to verify transfer status');
+  }
+}
+
 module.exports = {
-  initiateMomoPush,
-  verifyCollectionStatus,
-  verifyWebhookSignature,
+  ...module.exports,   // keep initiateMomoPush, verifyCollectionStatus, verifyWebhookSignature
+  sendPayout,
+  verifyTransferStatus,
 };

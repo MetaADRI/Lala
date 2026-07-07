@@ -100,11 +100,13 @@ async function confirmBooking(booking) {
   booking.paymentStatus = 'successful';
   await booking.save();
 
-  try {
-    await smsService.sendBookingConfirmation(booking);
-  } catch (smsErr) {
-    console.error('[confirmBooking] SMS failed (booking still confirmed):', smsErr.message);
-  }
+  // existing SMS
+  try { await smsService.sendBookingConfirmation(booking); }
+  catch (e) { console.error('[confirmBooking] SMS failed:', e.message); }
+
+  // NEW: settle lodge 90% (commission 10% stays in Lenco account). Crash-safe — won't throw.
+  await require('../services/settlementService').settleBooking(booking);
+
   return booking;
 }
 
