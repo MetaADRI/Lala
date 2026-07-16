@@ -313,9 +313,14 @@
         startPolling();
 
       } catch (err) {
+        const msg = err.message || '';
+        if (msg.includes('Invalid token') || msg.includes('Access denied')) {
+          window.location.href = `guest-login.html?redirect=${encodeURIComponent(window.location.href)}`;
+          return;
+        }
         btn.disabled = false;
         btn.innerHTML = `<i class="ti ti-send"></i> <span id="payBtnText">Pay via ${selectedProvider}</span>`;
-        alert('Payment failed: ' + (err.message || 'Please try again.'));
+        alert('Payment failed: ' + (msg || 'Please try again.'));
         console.error(err);
       }
     }
