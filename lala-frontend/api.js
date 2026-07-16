@@ -87,15 +87,10 @@ const api = {
   },
 
   /**
-   * Confirm a booking after payment succeeds (called by polling or webhook).
+   * Poll payment status. Backend re-queries Lenco and confirms + settles when successful.
    */
-  confirmBooking: async (id) => {
-    const token = localStorage.getItem('lala_token');
-    const res = await fetch(`${API_BASE}/bookings/${id}/confirm`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (res.status === 401) api.logout();
+  getBookingPaymentStatus: async (id) => {
+    const res = await fetch(`${API_BASE}/bookings/${id}/status`);
     return res.json();
   },
 

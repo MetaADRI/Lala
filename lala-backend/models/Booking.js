@@ -57,7 +57,9 @@ const Booking = sequelize.define('Booking', {
     lodgeStatus:       { type: DataTypes.ENUM('pending','paid','failed','skipped'), allowNull: false, defaultValue: 'pending' },
     lodgeRef:          { type: DataTypes.STRING, allowNull: true },
     lodgePayoutAmount: { type: DataTypes.FLOAT,  allowNull: true },
-    commissionAmount:  { type: DataTypes.FLOAT,  allowNull: true }, // reporting only; stays in Lenco account
+    commissionAmount:  { type: DataTypes.FLOAT,  allowNull: true }, // 10% commission amount
+    commissionStatus:  { type: DataTypes.ENUM('pending','paid','failed','skipped'), allowNull: false, defaultValue: 'pending' },
+    commissionRef:     { type: DataTypes.STRING, allowNull: true }, // Lenco ref for the commission payout
 });
 
 module.exports = Booking;

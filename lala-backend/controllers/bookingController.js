@@ -104,10 +104,29 @@ async function confirmBooking(booking) {
   try { await smsService.sendBookingConfirmation(booking); }
   catch (e) { console.error('[confirmBooking] SMS failed:', e.message); }
 
-  // NEW: settle lodge 90% (commission 10% stays in Lenco account). Crash-safe — won't throw.
+  // Settle: 90% to lodge hostPhone + 10% to operator commission number. Crash-safe — won't throw.
   await require('../services/settlementService').settleBooking(booking);
 
   return booking;
+}
+
+/** Strip settlement/commission fields so guests never see the 10% split. */
+function publicBookingFields(bookingJson, role) {
+  if (role === 'admin') return bookingJson;
+  const {
+    commissionAmount,
+    commissionStatus,
+    commissionRef,
+    lodgeStatus,
+    lodgeRef,
+    lodgePayoutAmount,
+    ...safe
+  } = bookingJson;
+  // Hosts may see their own lodge payout status, not Lala commission
+  if (role === 'host') {
+    return { ...safe, lodgeStatus, lodgeRef, lodgePayoutAmount };
+  }
+  return safe;
 }
 
 /**
@@ -126,12 +145,12 @@ async function getBookingDetails(req, res) {
 
     const listing = await Listing.findByPk(booking.listingId);
 
-    res.json({
+    res.json(publicBookingFields({
       ...booking.toJSON(),
       listingName: listing ? listing.name : 'Unknown',
       listingCity: listing ? listing.city : '',
       listingDistrict: listing ? listing.district : ''
-    });
+    }, req.user.role));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -148,14 +167,14 @@ async function getGuestBookings(req, res) {
       order: [['createdAt', 'DESC']]
     });
 
-    // Enrich with listing names
+    // Enrich with listing names (hide commission from guests)
     const enriched = await Promise.all(bookings.map(async (b) => {
       const listing = await Listing.findByPk(b.listingId);
-      return {
+      return publicBookingFields({
         ...b.toJSON(),
         listingName: listing ? listing.name : 'Unknown',
         listingCity: listing ? listing.city : ''
-      };
+      }, 'guest');
     }));
 
     res.json(enriched);
@@ -184,11 +203,11 @@ async function getHostBookings(req, res) {
     const guests = await User.findAll({ where: { id: guestIds }, attributes: ['id', 'name', 'phone'] });
     const guestMap = Object.fromEntries(guests.map(g => [g.id, { name: g.name, phone: g.phone }]));
 
-    const enriched = bookings.map(b => ({
+    const enriched = bookings.map(b => publicBookingFields({
       ...b.toJSON(),
       listingName: listingMap[b.listingId] || 'Unknown',
       guest: guestMap[b.guestId] || { name: 'Guest', phone: '' }
-    }));
+    }, 'host'));
 
     res.json(enriched);
   } catch (error) {

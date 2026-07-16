@@ -210,7 +210,7 @@
       </div>
       <div style="font-size:11px; color:var(--muted); margin-top:12px;">Waiting for confirmation...</div>
       <button class="btn-outline" style="margin-top:20px; width:100%;" onclick="simulateConfirm()">
-        <i class="ti ti-check"></i> Simulate Confirmation (Dev Mode)
+        <i class="ti ti-refresh"></i> I've paid — check status
       </button>
     </div>
 
@@ -320,46 +320,72 @@
       }
     }
 
-    // ── Polling (mock for Phase 1 dev) ───────────────────────────────────
+    // ── Poll payment status (triggers Lenco verify + 90/10 settlement on success) ──
     let pollInterval = null;
     let pollAttempts = 0;
 
+    function redirectConfirmed(transactionRef) {
+      const confirmParams = new URLSearchParams({
+        bookingId: createdBookingId,
+        listingName,
+        checkIn,
+        checkOut,
+        nights,
+        total,
+        provider: selectedProvider,
+        transactionRef: transactionRef || createdBookingId,
+        hostPhone
+      });
+      window.location.href = `booking-confirmed.html?${confirmParams.toString()}`;
+    }
+
     function startPolling() {
-      // In production: poll GET /api/bookings/:id every 3s for status change
-      // For Phase 1 (mock payments), we just let the simulate button handle it
+      pollAttempts = 0;
       pollInterval = setInterval(async () => {
         pollAttempts++;
-        // Auto-stop after 2 minutes (40 attempts × 3s)
         if (pollAttempts > 40) {
           clearInterval(pollInterval);
+          return;
         }
-        // Real implementation: check booking status from backend
+        try {
+          const result = await api.getBookingPaymentStatus(createdBookingId);
+          if (result.error) return;
+
+          if (result.paymentStatus === 'successful' || result.status === 'confirmed') {
+            clearInterval(pollInterval);
+            redirectConfirmed(createdBookingId);
+          } else if (result.paymentStatus === 'failed') {
+            clearInterval(pollInterval);
+            alert('Payment failed or was cancelled. Please try again.');
+            document.getElementById('ussdScreen').classList.remove('visible');
+            document.getElementById('mainForm').style.display = '';
+            const btn = document.getElementById('payBtn');
+            btn.disabled = false;
+            btn.innerHTML = `<i class="ti ti-send"></i> <span id="payBtnText">Pay via ${selectedProvider}</span>`;
+          }
+        } catch (err) {
+          console.error('[poll] status check failed:', err);
+        }
       }, 3000);
     }
 
-    // ── Dev mode: simulate payment confirmation ──────────────────────────
+    // ── Manual re-check (same path as auto-poll — uses real Lenco status) ──
     async function simulateConfirm() {
       if (!createdBookingId) return;
       try {
-        clearInterval(pollInterval);
-        const result = await api.confirmBooking(createdBookingId);
+        const result = await api.getBookingPaymentStatus(createdBookingId);
         if (result.error) throw new Error(result.error);
 
-        // Redirect to confirmation page
-        const confirmParams = new URLSearchParams({
-          bookingId: createdBookingId,
-          listingName,
-          checkIn,
-          checkOut,
-          nights,
-          total,
-          provider: selectedProvider,
-          transactionRef: result.booking.transactionRef || createdBookingId.split('-')[0].toUpperCase(),
-          hostPhone
-        });
-        window.location.href = `booking-confirmed.html?${confirmParams.toString()}`;
+        if (result.paymentStatus === 'successful' || result.status === 'confirmed') {
+          clearInterval(pollInterval);
+          redirectConfirmed(createdBookingId);
+        } else if (result.paymentStatus === 'failed') {
+          alert('Payment failed or was cancelled.');
+        } else {
+          alert('Payment not confirmed yet. Approve the USSD prompt on your phone, then try again.');
+        }
       } catch (err) {
-        alert('Error confirming booking: ' + err.message);
+        alert('Error checking payment: ' + err.message);
       }
     }
   </script>

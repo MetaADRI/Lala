@@ -28,10 +28,23 @@ In Render dashboard, go to **Environment** and add:
 
 | Variable | Value |
 |----------|-------|
-| `DATABASE_URL` | `postgresql://neondb_owner:npg_Uo10QHuMdmAi@ep-rapid-mountain-aq0it7q0-pooler.c-8.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require` |
-| `JWT_SECRET` | `lala_secret_key_2026_zambia` |
+| `DATABASE_URL` | Your Neon Postgres connection string |
+| `JWT_SECRET` | A long random secret (do not commit real secrets) |
 | `NODE_ENV` | `production` |
 | `PORT` | `5000` |
+| `LENCO_API_KEY` | From Lenco dashboard |
+| `LENCO_API_URL` | `https://api.lenco.co/access/v2` |
+| `LENCO_ACCOUNT_ID` | Lenco account UUID (required for 90/10 payouts) |
+| `LENCO_COMMISSION_RATE` | `0.10` |
+| `LENCO_MIN_TRANSFER` | `5` |
+| `LENCO_COMMISSION_MTN` | `0769723838` |
+| `LENCO_COMMISSION_ZAMTEL` | `0954702600` |
+| `LENCO_COMMISSION_AIRTEL` | `0572587206` |
+| `RESEND_API_KEY` | (optional) for email |
+
+**Commission flow:** guest pays 100% → Lenco collects → backend pays **90%** to lodge `hostPhone` and **10%** to the operator-matched commission number above. Customers never see the split.
+
+**DB columns:** `commissionStatus`, `commissionRef`, `lodgeStatus`, etc. are added automatically on restart via `sequelize.sync({ alter: true })`.
 
 ### **Step 4: Deploy**
 - Click **Deploy**
@@ -123,6 +136,10 @@ export const verifyOTP = async (phone, otp) => {
 - `DATABASE_URL` - Neon connection string
 - `JWT_SECRET` - Your JWT signing key
 - `NODE_ENV` - Set to `production`
+- `LENCO_API_KEY` / `LENCO_API_URL` / `LENCO_ACCOUNT_ID` - mobile money collections + payouts
+- `LENCO_COMMISSION_RATE` - default `0.10` (10%)
+- `LENCO_MIN_TRANSFER` - default `5` (Lenco K5 minimum)
+- `LENCO_COMMISSION_MTN` / `LENCO_COMMISSION_AIRTEL` / `LENCO_COMMISSION_ZAMTEL` - 10% wallets
 
 ### **Frontend (Vercel)**
 - `VITE_API_URL` - Your Render backend URL

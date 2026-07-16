@@ -7,6 +7,10 @@ const LENCO_API_KEY = process.env.LENCO_API_KEY;
 if (!LENCO_API_KEY) {
   console.warn('[paymentService] LENCO_API_KEY is not set — payments will fail.');
 }
+if (!process.env.LENCO_ACCOUNT_ID) {
+  console.warn('[paymentService] LENCO_ACCOUNT_ID is not set — lodge/commission payouts will fail.');
+}
+
 
 const lenco = axios.create({
   baseURL: LENCO_API_URL,
@@ -107,7 +111,9 @@ async function verifyTransferStatus(reference) {
 }
 
 module.exports = {
-  ...module.exports,   // keep initiateMomoPush, verifyCollectionStatus, verifyWebhookSignature
+  initiateMomoPush,
+  verifyCollectionStatus,
+  verifyWebhookSignature,
   sendPayout,
   verifyTransferStatus,
 };

@@ -17,8 +17,8 @@ router.get('/:id/status', bookingController.getBookingPaymentStatus);
 router.post('/:id/cancel', authMiddleware, bookingController.cancelBooking);
 router.post('/:id/host-cancel', authMiddleware, roleMiddleware(['host', 'admin']), bookingController.hostCancelBooking);
 
-// View settlement state for a booking
-router.get('/:id/settlement-status', /* authMiddleware, */ async (req, res) => {
+// View settlement state (admin/host only — includes commission for ops)
+router.get('/:id/settlement-status', authMiddleware, roleMiddleware(['admin', 'host']), async (req, res) => {
   const booking = await Booking.findByPk(req.params.id);
   if (!booking) return res.status(404).json({ error: 'Booking not found' });
   return res.json({
@@ -26,19 +26,44 @@ router.get('/:id/settlement-status', /* authMiddleware, */ async (req, res) => {
     lodgeRef: booking.lodgeRef,
     lodgePayoutAmount: booking.lodgePayoutAmount,
     commissionAmount: booking.commissionAmount,
+    commissionStatus: booking.commissionStatus,
+    commissionRef: booking.commissionRef,
   });
 });
 
-// Retry a failed/skipped lodge payout (protect with admin auth in production)
-router.post('/:id/retry-payout', /* adminAuthMiddleware, */ async (req, res) => {
+// Retry failed/skipped lodge and/or commission payouts (admin only)
+router.post('/:id/retry-payout', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
   const booking = await Booking.findByPk(req.params.id);
   if (!booking) return res.status(404).json({ error: 'Booking not found' });
-  if (!['failed', 'skipped'].includes(booking.lodgeStatus)) {
-    return res.status(400).json({ error: `Nothing to retry (lodgeStatus=${booking.lodgeStatus})` });
+
+  const lodgeNeedsRetry = ['failed', 'skipped', 'pending'].includes(booking.lodgeStatus);
+  const commissionNeedsRetry = ['failed', 'skipped', 'pending'].includes(booking.commissionStatus);
+
+  if (!lodgeNeedsRetry && !commissionNeedsRetry) {
+    return res.status(400).json({
+      error: `Nothing to retry (lodgeStatus=${booking.lodgeStatus}, commissionStatus=${booking.commissionStatus})`,
+    });
   }
+
+  // Allow re-attempt: reset skipped/failed so settleBooking will try again
+  if (lodgeNeedsRetry && booking.lodgeStatus !== 'pending') {
+    booking.lodgeStatus = 'pending';
+  }
+  if (commissionNeedsRetry && booking.commissionStatus !== 'pending') {
+    booking.commissionStatus = 'pending';
+  }
+  await booking.save();
+
   await settlementService.settleBooking(booking);
   await booking.reload();
-  return res.json({ lodgeStatus: booking.lodgeStatus, lodgeRef: booking.lodgeRef });
+  return res.json({
+    lodgeStatus: booking.lodgeStatus,
+    lodgeRef: booking.lodgeRef,
+    lodgePayoutAmount: booking.lodgePayoutAmount,
+    commissionStatus: booking.commissionStatus,
+    commissionRef: booking.commissionRef,
+    commissionAmount: booking.commissionAmount,
+  });
 });
 
 // Lenco webhook (no auth middleware — verified by signature instead)
