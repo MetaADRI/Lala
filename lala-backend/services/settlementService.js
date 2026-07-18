@@ -2,6 +2,7 @@
 const crypto = require('crypto');
 const paymentService = require('./paymentService');
 const Listing = require('../models/Listing');
+const User = require('../models/User');
 
 const VALID_OPERATORS = ['mtn', 'airtel', 'zamtel'];
 const round2 = (n) => Math.round(Number(n) * 100) / 100;
@@ -9,11 +10,18 @@ const round2 = (n) => Math.round(Number(n) * 100) / 100;
 // Commission destination numbers per operator. Overridable via env.
 // The 10% commission is transferred to the number that matches the
 // operator the guest paid with (kept hidden from the customer).
-const COMMISSION_NUMBERS = {
-  mtn:    process.env.LENCO_COMMISSION_MTN    || '0769723838',
-  zamtel: process.env.LENCO_COMMISSION_ZAMTEL || '0954702600',
-  airtel: process.env.LENCO_COMMISSION_AIRTEL || '0572587206',
-};
+// CONFIRMED destinations (defaults match production requirement):
+//   MTN    → 0769723838
+//   Zamtel → 0954702600
+//   Airtel → 0572587206
+function getCommissionNumbers() {
+  return {
+    mtn:    process.env.LENCO_COMMISSION_MTN    || '0769723838',
+    zamtel: process.env.LENCO_COMMISSION_ZAMTEL || '0954702600',
+    airtel: process.env.LENCO_COMMISSION_AIRTEL || '0572587206',
+  };
+}
+const COMMISSION_NUMBERS = getCommissionNumbers();
 
 /**
  * Detect Zambian mobile operator from phone prefix.
@@ -71,9 +79,22 @@ async function settleBooking(booking) {
       console.log(`[settle] Booking ${booking.id} lodge already paid — checking commission only.`);
     } else {
       const listing = await Listing.findByPk(booking.listingId);
-      const hostPhone = listing?.hostPhone;
+      // Prefer listing.hostPhone; fall back to host user's phone on the User record
+      let hostPhone = listing?.hostPhone || null;
+      if (!hostPhone && listing?.hostId) {
+        const host = await User.findByPk(listing.hostId);
+        hostPhone = host?.phone || null;
+        if (hostPhone) {
+          console.log(`[settle] Listing ${listing.id} missing hostPhone — using host user phone ${hostPhone}`);
+          // Persist so future settlements don't re-lookup
+          try {
+            listing.hostPhone = hostPhone;
+            await listing.save();
+          } catch (_) {}
+        }
+      }
       if (!hostPhone) {
-        console.error(`[settle] Listing ${booking.listingId} has no hostPhone (booking ${booking.id}) — flagging failed.`);
+        console.error(`[settle] Listing ${booking.listingId} has no hostPhone and host has no phone (booking ${booking.id}) — lodge failed; still attempting commission.`);
         booking.lodgeStatus = 'failed';
         await booking.save();
         // Still try commission so Lala still receives its cut when funds allow
@@ -141,7 +162,9 @@ async function payCommission(booking, operator, commissionAmount, min) {
       return;
     }
 
-    const dest = COMMISSION_NUMBERS[operator];
+    // Re-read env each time so Render env changes apply without code edits
+    const numbers = getCommissionNumbers();
+    const dest = numbers[operator];
     if (!dest) {
       console.error(`[settle] No commission number for operator "${operator}" (booking ${booking.id}) -- flagging commission failed.`);
       booking.commissionStatus = 'failed';
@@ -168,14 +191,23 @@ async function payCommission(booking, operator, commissionAmount, min) {
     });
 
     booking.commissionRef = reference;
-    booking.commissionStatus = (result.status === 'failed') ? 'failed' : 'paid';
+    // Only mark paid when Lenco reports success; pending stays pending for later verify/retry
+    if (result.status === 'failed') {
+      booking.commissionStatus = 'failed';
+    } else if (result.status === 'successful' || result.status === 'success') {
+      booking.commissionStatus = 'paid';
+    } else {
+      // pending / processing — keep pending so admin retry / status poll can re-check
+      booking.commissionStatus = 'pending';
+      console.warn(`[settle] Commission transfer still "${result.status}" for booking ${booking.id} — left as pending (ref ${reference}).`);
+    }
     await booking.save();
 
-    console.log(`[settle] Booking ${booking.id} commission payout status: ${result.status}.`);
+    console.log(`[settle] Booking ${booking.id} commission payout status: ${result.status} → commissionStatus=${booking.commissionStatus}.`);
   } catch (err) {
     console.error(`[settle] COMMISSION payout FAILED for booking ${booking.id}:`, err.response?.data || err.message);
     try { booking.commissionStatus = 'failed'; await booking.save(); } catch (_) {}
   }
 }
 
-module.exports = { settleBooking, detectOperatorFromPhone, COMMISSION_NUMBERS };
+module.exports = { settleBooking, detectOperatorFromPhone, getCommissionNumbers, COMMISSION_NUMBERS };
