@@ -131,6 +131,7 @@
       <div class="pay-amount" id="displayAmount">K—</div>
       <div class="pay-meta" id="displayMeta">Loading...</div>
       <div class="pay-dates" id="displayDates"></div>
+      <div class="pay-dates" id="displayFeeNote" style="margin-top:4px;"></div>
     </div>
   </div>
 
@@ -227,18 +228,30 @@
     const checkIn     = params.get('checkIn')  || '';
     const checkOut    = params.get('checkOut') || '';
     const nights      = parseInt(params.get('nights') || '1');
-    const total       = parseFloat(params.get('total') || '0');
+    const subtotal    = parseFloat(params.get('subtotal') || '0');
+    const serviceFee  = parseFloat(params.get('serviceFee') || '0');
+    // Prefer explicit total (stay + 10% fee). Fall back to subtotal+fee if needed.
+    let total = parseFloat(params.get('total') || '0');
+    if (!total && subtotal) {
+      total = subtotal + (serviceFee || Math.round(subtotal * 0.10));
+    }
     const hostPhone   = params.get('hostPhone') || '';
 
     let selectedProvider = 'MTN';
     let createdBookingId = null;
 
-    // ── Populate header summary ──────────────────────────────────────────
-    document.getElementById('displayAmount').textContent = total ? `K${parseFloat(total).toLocaleString()}` : 'K—';
+    // ── Populate header summary (must show stay + 10% fee, e.g. K99 not K90) ──
+    document.getElementById('displayAmount').textContent = total ? `K${Number(total).toLocaleString()}` : 'K—';
     document.getElementById('displayMeta').textContent = `${nights} night${nights !== 1 ? 's' : ''} · ${listingName}`;
     if (checkIn && checkOut) {
       const fmt = d => new Date(d).toLocaleDateString('en-ZM', { weekday:'short', day:'numeric', month:'short' });
       document.getElementById('displayDates').textContent = `${fmt(checkIn)} → ${fmt(checkOut)}`;
+    }
+    const feeNote = document.getElementById('displayFeeNote');
+    if (feeNote && (subtotal || serviceFee)) {
+      const fee = serviceFee || Math.round(subtotal * 0.10);
+      const stay = subtotal || (total - fee);
+      feeNote.textContent = `Stay K${Number(stay).toLocaleString()} + 10% service fee K${Number(fee).toLocaleString()}`;
     }
 
     // Back button goes to listing detail

@@ -28,7 +28,8 @@ function fakeBooking(overrides = {}) {
   const data = {
     id: 'test-uuid',
     listingId: 'listing-uuid',
-    totalAmount: 100,
+    // Guest total = stay + 10% fee (e.g. K100 stay + K10 = K110)
+    totalAmount: 110,
     provider: 'mtn',
     lodgeStatus: 'pending',
     lodgeRef: null,
@@ -59,29 +60,46 @@ const commCall  = (calls) => calls.find(c => /commission/i.test(c.narration || '
 async function run() {
   console.log('\n── settleBooking tests ──\n');
 
-  // ── 1. Happy path (MTN): K100 → K90 lodge + K10 commission to MTN number ──
+  // ── 1. Happy path (MTN): guest pays K110 (K100 stay + K10 fee) → K100 lodge + K10 commission ──
   {
     Listing.findByPk = async () => ({ hostPhone: '+260970000000' });
     const calls = mockPayouts();
 
-    const b = fakeBooking();
+    // totalAmount is what guest paid (stay + 10% service fee)
+    const b = fakeBooking({ totalAmount: 110 });
     await settleBooking(b);
 
     assert(b.lodgeStatus === 'paid', 'happy path → lodgeStatus=paid');
     assert(b.commissionStatus === 'paid', 'happy path → commissionStatus=paid');
     assert(b.commissionAmount === 10, `happy path → commission=K10 (got K${b.commissionAmount})`);
-    assert(b.lodgePayoutAmount === 90, `happy path → lodgePayout=K90 (got K${b.lodgePayoutAmount})`);
+    assert(b.lodgePayoutAmount === 100, `happy path → lodgePayout=K100 (got K${b.lodgePayoutAmount})`);
     assert(b.lodgeRef && b.lodgeRef.startsWith('lala-lodge-'), `happy path → lodgeRef set (${b.lodgeRef})`);
     assert(b.commissionRef && b.commissionRef.startsWith('lala-comm-'), `happy path → commissionRef set (${b.commissionRef})`);
 
     const lodge = lodgeCall(calls);
     const comm  = commCall(calls);
     assert(calls.length === 2, `happy path → TWO payouts sent (got ${calls.length})`);
-    assert(lodge && lodge.amount === 90, `happy path → lodge payout amount=90 (got ${lodge && lodge.amount})`);
+    assert(lodge && lodge.amount === 100, `happy path → lodge payout amount=100 (got ${lodge && lodge.amount})`);
     assert(lodge && lodge.phone === '260970000000', `happy path → lodge pays hostPhone (${lodge && lodge.phone})`);
     assert(comm && comm.amount === 10, `happy path → commission payout amount=10 (got ${comm && comm.amount})`);
     assert(comm && comm.phone === COMM.mtn, `happy path → commission goes to MTN number ${COMM.mtn} (got ${comm && comm.phone})`);
     assert(comm && comm.operator === 'mtn', `happy path → commission operator=mtn (${comm && comm.operator})`);
+  }
+
+  // ── 1a. Lusaka Central Hostel style: K90 stay + 10% = K99 → lodge K90, fee K9 ──
+  {
+    Listing.findByPk = async () => ({ hostPhone: '+260970000000' });
+    const calls = mockPayouts();
+
+    const b = fakeBooking({ totalAmount: 99 });
+    await settleBooking(b);
+
+    assert(b.lodgePayoutAmount === 90, `K99 total → lodge=K90 (got K${b.lodgePayoutAmount})`);
+    assert(b.commissionAmount === 9, `K99 total → commission=K9 (got K${b.commissionAmount})`);
+    const lodge = lodgeCall(calls);
+    const comm  = commCall(calls);
+    assert(lodge && lodge.amount === 90, `K99 → lodge payout 90 (got ${lodge && lodge.amount})`);
+    assert(comm && comm.amount === 9, `K99 → commission payout 9 (got ${comm && comm.amount})`);
   }
 
   // ── 1b. Airtel routing: commission → Airtel number ──
@@ -199,21 +217,21 @@ async function run() {
     assert(b.lodgeStatus === 'failed', 'sendPayout throws → lodgeStatus=failed');
   }
 
-  // ── 8. Commission IS paid out (K250 → K25 commission to operator number) ──
+  // ── 8. Commission IS paid out (K250 stay + K25 fee = K275 total) ──
   {
     Listing.findByPk = async () => ({ hostPhone: '+260970000000' });
     const calls = mockPayouts();
 
-    const b = fakeBooking({ totalAmount: 250, provider: 'airtel' });
+    const b = fakeBooking({ totalAmount: 275, provider: 'airtel' });
     await settleBooking(b);
 
     const lodge = lodgeCall(calls);
     const comm  = commCall(calls);
-    assert(lodge && lodge.amount === 225, `lodge paid K225 (got K${lodge && lodge.amount})`);
+    assert(lodge && lodge.amount === 250, `lodge paid K250 (got K${lodge && lodge.amount})`);
     assert(comm && comm.amount === 25, `commission paid out K25 (got K${comm && comm.amount})`);
     assert(comm && comm.phone === COMM.airtel, `commission K25 goes to Airtel number (got ${comm && comm.phone})`);
     assert(b.commissionAmount === 25, `commission recorded as K25 (got K${b.commissionAmount})`);
-    assert(b.lodgePayoutAmount === 225, `lodge amount recorded K225 (got K${b.lodgePayoutAmount})`);
+    assert(b.lodgePayoutAmount === 250, `lodge amount recorded K250 (got K${b.lodgePayoutAmount})`);
   }
 
   // ── 9. Lodge payout goes to hostPhone, not guestPhone ──

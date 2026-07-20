@@ -22,7 +22,11 @@ async function createBooking(req, res) {
     );
     if (nights <= 0) return res.status(400).json({ error: 'Invalid date range' });
 
-    const totalAmount = Number(listing.price) * nights;
+    // Guest pays stay + 10% service fee (e.g. K90 + K9 = K99). Must match listing-detail UI.
+    const serviceFeeRate = Number(process.env.LENCO_COMMISSION_RATE || 0.10);
+    const subtotal = Number(listing.price) * nights;
+    const serviceFee = Math.round(subtotal * serviceFeeRate);
+    const totalAmount = subtotal + serviceFee;
 
     const reference = `lala-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
 

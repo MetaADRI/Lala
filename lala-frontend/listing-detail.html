@@ -285,7 +285,7 @@
       </div>
       <div class="price-summary" id="priceSummary">
         <div class="ps-row"><span class="ps-label" id="nightsLabel">— nights</span><span class="ps-value" id="subtotalPrice">K—</span></div>
-        <div class="ps-row"><span class="ps-label">Service fee (5%)</span><span class="ps-value" id="serviceFeePrice">K—</span></div>
+        <div class="ps-row"><span class="ps-label">Service fee (10%)</span><span class="ps-value" id="serviceFeePrice">K—</span></div>
         <div class="ps-total-row"><span class="ps-total-label">Total</span><span class="ps-total" id="totalPrice">K—</span></div>
       </div>
     </div>
@@ -430,7 +430,8 @@
       }
       const nights = Math.max(1, Math.ceil((new Date(checkOutEl.value) - ciDate) / (1000 * 60 * 60 * 24)));
       const subtotal = nights * pricePerNight;
-      const serviceFee = Math.round(subtotal * 0.05);
+      // Platform service fee = 10% of stay (e.g. K90 → K9 fee → K99 total)
+      const serviceFee = Math.round(subtotal * 0.10);
       const total = subtotal + serviceFee;
       document.getElementById('nightsLabel').textContent = `${nights} night${nights > 1 ? 's' : ''} × K${pricePerNight}`;
       document.getElementById('subtotalPrice').textContent = `K${subtotal.toLocaleString()}`;
@@ -525,8 +526,20 @@
         return;
       }
       const nights = Math.max(1, Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)));
-      const total = nights * pricePerNight;
-      const params = new URLSearchParams({ id: listing.id, name: listing.name, checkIn, checkOut, nights, total, hostPhone: listing.hostPhone || '' });
+      const subtotal = nights * pricePerNight;
+      const serviceFee = Math.round(subtotal * 0.10);
+      const total = subtotal + serviceFee; // must match listing total (e.g. K90 + K9 = K99)
+      const params = new URLSearchParams({
+        id: listing.id,
+        name: listing.name,
+        checkIn,
+        checkOut,
+        nights,
+        subtotal,
+        serviceFee,
+        total,
+        hostPhone: listing.hostPhone || ''
+      });
       window.location.href = `payment.html?${params.toString()}`;
     }
 

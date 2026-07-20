@@ -45,9 +45,11 @@ function normalizePhone(phone) {
 }
 
 /**
- * Settle a confirmed booking:
- *   - 90% -> lodge owner's hostPhone (payout #1), using host's network operator
- *   - 10% commission -> operator-specific commission number (payout #2)
+ * Settle a confirmed booking.
+ * Guest was charged: stay (subtotal) + 10% service fee.
+ *   e.g. K90 stay + K9 fee = K99 total
+ *   - lodge gets full stay (subtotal) → hostPhone
+ *   - 10% service fee → operator commission number
  *        mtn -> 0769723838, zamtel -> 0954702600, airtel -> 0572587206
  * CRASH-SAFE: never throws. Failures are logged + flagged; booking stays confirmed.
  * Idempotent: lodge already paid still retries commission if commission is not paid.
@@ -58,8 +60,10 @@ async function settleBooking(booking) {
     const min  = Number(process.env.LENCO_MIN_TRANSFER || 5);
     const total = Number(booking.totalAmount);
 
-    const commissionAmount = round2(total * rate);
-    const lodgeAmount = round2(total - commissionAmount);
+    // total = subtotal * (1 + rate)  →  lodge = subtotal, commission = fee
+    // e.g. total 99, rate 0.10 → lodge 90, commission 9
+    const lodgeAmount = round2(total / (1 + rate));
+    const commissionAmount = round2(total - lodgeAmount);
 
     booking.commissionAmount = commissionAmount;
     booking.lodgePayoutAmount = lodgeAmount;
