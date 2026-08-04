@@ -7,21 +7,27 @@ const User = require('../models/User');
 const VALID_OPERATORS = ['mtn', 'airtel', 'zamtel'];
 const round2 = (n) => Math.round(Number(n) * 100) / 100;
 
-// Commission destination numbers per operator. Overridable via env.
-// The 10% commission is transferred to the number that matches the
-// operator the guest paid with (kept hidden from the customer).
-// CONFIRMED destinations (defaults match production requirement):
-//   MTN    → 0769723838
-//   Zamtel → 0954702600
-//   Airtel → 0572587206
+// Commission destination numbers per operator.
+// MUST come ONLY from environment variables (MTN_WALLET / ZAMTEL_WALLET / AIRTEL_WALLET).
+// A settlement service must never guess a wallet number — if one is missing we throw
+// instead of silently routing money to a hardcoded destination.
+// Presence is validated at startup (config/envValidation.js); this is the runtime safety net.
 function getCommissionNumbers() {
-  return {
-    mtn:    process.env.LENCO_COMMISSION_MTN    || '0769723838',
-    zamtel: process.env.LENCO_COMMISSION_ZAMTEL || '0954702600',
-    airtel: process.env.LENCO_COMMISSION_AIRTEL || '0572587206',
+  const numbers = {
+    mtn:    process.env.MTN_WALLET,
+    zamtel: process.env.ZAMTEL_WALLET,
+    airtel: process.env.AIRTEL_WALLET,
   };
+  const missing = Object.keys(numbers).filter((op) => !numbers[op]);
+  if (missing.length > 0) {
+    throw new Error(
+      '[settlementService] Missing commission wallet env var(s): ' +
+        missing.map((op) => `${op.toUpperCase()}_WALLET`).join(', ') +
+        '. Refusing to guess a payout destination — configure the wallet numbers in the environment.'
+    );
+  }
+  return numbers;
 }
-const COMMISSION_NUMBERS = getCommissionNumbers();
 
 /**
  * Detect Zambian mobile operator from phone prefix.
@@ -49,8 +55,7 @@ function normalizePhone(phone) {
  * Guest was charged: stay (subtotal) + 10% service fee.
  *   e.g. K90 stay + K9 fee = K99 total
  *   - lodge gets full stay (subtotal) → hostPhone
- *   - 10% service fee → operator commission number
- *        mtn -> 0769723838, zamtel -> 0954702600, airtel -> 0572587206
+ *   - 10% service fee → operator commission wallet (MTN_WALLET / ZAMTEL_WALLET / AIRTEL_WALLET)
  * CRASH-SAFE: never throws. Failures are logged + flagged; booking stays confirmed.
  * Idempotent: lodge already paid still retries commission if commission is not paid.
  */
@@ -214,4 +219,4 @@ async function payCommission(booking, operator, commissionAmount, min) {
   }
 }
 
-module.exports = { settleBooking, detectOperatorFromPhone, getCommissionNumbers, COMMISSION_NUMBERS };
+module.exports = { settleBooking, detectOperatorFromPhone, getCommissionNumbers };

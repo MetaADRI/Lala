@@ -30,8 +30,8 @@ Region: (your choice)
 
 **Environment Variables on Render:**
 ```
-DATABASE_URL=postgresql://neondb_owner:npg_Uo10QHuMdmAi@ep-rapid-mountain-aq0it7q0-pooler.c-8.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
-JWT_SECRET=lala_secret_key_2026_zambia
+DATABASE_URL=<your Neon postgresql:// connection string>
+JWT_SECRET=<long random string>
 NODE_ENV=production
 ```
 

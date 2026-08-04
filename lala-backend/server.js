@@ -1,4 +1,9 @@
 require('dotenv').config();
+
+// Fail fast: abort before anything else if required env vars are missing.
+const { validateEnv } = require('./config/envValidation');
+validateEnv();
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -18,6 +23,7 @@ require('./models/Listing');
 require('./models/SavedListing');
 require('./models/Car');
 require('./models/CarBooking');
+require('./models/PasswordResetToken');
 
 const app = express();
 const PORT = process.env.PORT || 5000;

@@ -1,16 +1,27 @@
 // test/settle.test.js — run with: node test/settle.test.js
 // Tests settleBooking() with zero real money. Mocks all external calls.
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+// Unit test — never connects to a database. The Sequelize config is now strictly
+// env-driven (no hardcoded fallback), so supply a placeholder URL when .env has none.
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/lala_test';
+}
 const { settleBooking } = require('../services/settlementService');
 const Listing = require('../models/Listing');
 const paymentService = require('../services/paymentService');
 
-// Commission destination numbers (defaults in settlementService; override here for determinism)
-const COMM = {
-  mtn:    process.env.LENCO_COMMISSION_MTN    || '0769723838',
-  zamtel: process.env.LENCO_COMMISSION_ZAMTEL || '0954702600',
-  airtel: process.env.LENCO_COMMISSION_AIRTEL || '0572587206',
+// Commission destination numbers are read from env only (never hardcoded in the app).
+// Set them here as deterministic test fixtures so the service has valid wallets to use.
+const TEST_WALLETS = {
+  mtn: '0769723838',
+  zamtel: '0954702600',
+  airtel: '0572587206',
 };
+process.env.MTN_WALLET = TEST_WALLETS.mtn;
+process.env.ZAMTEL_WALLET = TEST_WALLETS.zamtel;
+process.env.AIRTEL_WALLET = TEST_WALLETS.airtel;
+
+const COMM = { ...TEST_WALLETS };
 
 let passed = 0;
 let failed = 0;

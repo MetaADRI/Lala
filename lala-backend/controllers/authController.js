@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const PasswordResetToken = require('../models/PasswordResetToken');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
@@ -6,13 +7,23 @@ const crypto = require('crypto');
 
 const emailService = require('../services/email');
 
-// In-memory store for reset tokens (use Redis/DB in production)
-const resetTokens = {};
+const RESET_TOKEN_TTL_MS = 30 * 60 * 1000; // 30 minutes (kept from previous behavior)
+
+// Only ever store/compare the hash of a reset code, never the plaintext.
+function hashResetCode(code) {
+  return crypto.createHash('sha256').update(String(code)).digest('hex');
+}
+
+function codeMatches(storedHash, code) {
+  const a = Buffer.from(hashResetCode(code), 'utf8');
+  const b = Buffer.from(String(storedHash || ''), 'utf8');
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
 
 function signToken(user) {
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role, name: user.name },
-    process.env.JWT_SECRET || 'lala_secret_key_2026',
+    process.env.JWT_SECRET,
     { expiresIn: '24h' }
   );
   return { token, user: { id: user.id, email: user.email, role: user.role, name: user.name } };
@@ -102,9 +113,14 @@ exports.forgotPassword = async (req, res) => {
     if (!user) return res.status(404).json({ error: 'No account found with this email' });
 
     const resetCode = crypto.randomInt(100000, 999999).toString();
-    const expiresAt = Date.now() + 30 * 60 * 1000;
 
-    resetTokens[email] = { code: resetCode, expiresAt };
+    // Invalidate any previous outstanding tokens for this email, then persist the new one.
+    await PasswordResetToken.destroy({ where: { email } });
+    await PasswordResetToken.create({
+      email,
+      codeHash: hashResetCode(resetCode),
+      expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS),
+    });
 
     await emailService.sendPasswordResetCode(email, resetCode);
 
@@ -121,13 +137,18 @@ exports.resetPassword = async (req, res) => {
   }
 
   try {
-    const stored = resetTokens[email];
+    const stored = await PasswordResetToken.findOne({
+      where: { email, used: false },
+      order: [['createdAt', 'DESC']],
+    });
     if (!stored) return res.status(400).json({ error: 'No reset code requested for this email' });
-    if (Date.now() > stored.expiresAt) {
-      delete resetTokens[email];
+    if (Date.now() > new Date(stored.expiresAt).getTime()) {
+      await stored.destroy();
       return res.status(400).json({ error: 'Reset code has expired' });
     }
-    if (stored.code !== code) return res.status(400).json({ error: 'Invalid reset code' });
+    if (!codeMatches(stored.codeHash, code)) {
+      return res.status(400).json({ error: 'Invalid reset code' });
+    }
 
     const user = await User.findOne({ where: { email } });
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -135,7 +156,8 @@ exports.resetPassword = async (req, res) => {
     user.password = await bcrypt.hash(password, 10);
     await user.save();
 
-    delete resetTokens[email];
+    // One-time use: consume the token after a successful reset.
+    await stored.destroy();
 
     res.json({ message: 'Password reset successful. You can now log in with your new password.' });
   } catch (error) {
