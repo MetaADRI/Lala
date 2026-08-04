@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lala — Host Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="common.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
@@ -48,7 +49,6 @@
     }
 
     .topbar-logo span {
-      font-family: 'Sora', sans-serif;
       font-weight: 700;
       font-size: 16px;
       color: #fff;
@@ -90,7 +90,6 @@
       color: #fff;
       font-size: 13px;
       font-weight: 700;
-      font-family: 'Sora', sans-serif;
       overflow: hidden;
       transition: border-color 0.2s;
       padding: 0;
@@ -111,7 +110,6 @@
     }
 
     .topbar-name {
-      font-family: 'Sora', sans-serif;
       font-weight: 700;
       font-size: 20px;
       color: #fff;
@@ -162,7 +160,6 @@
     .stat-icon.gld { background: var(--gold-lt); color: #7B4F00; }
 
     .stat-value {
-      font-family: 'Sora', sans-serif;
       font-weight: 800;
       font-size: 22px;
       color: var(--text);
@@ -190,7 +187,6 @@
     }
 
     .section-title {
-      font-family: 'Sora', sans-serif;
       font-weight: 700;
       font-size: 16px;
       color: var(--text);
@@ -206,7 +202,6 @@
       gap: 4px;
       background: none;
       border: none;
-      font-family: 'DM Sans', sans-serif;
     }
 
     .section-action:hover { text-decoration: underline; }
@@ -226,7 +221,6 @@
       border: none;
       border-radius: 10px;
       background: transparent;
-      font-family: 'Sora', sans-serif;
       font-weight: 600;
       font-size: 12px;
       color: var(--muted);
@@ -276,7 +270,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Sora', sans-serif;
       font-weight: 700;
       font-size: 14px;
       flex-shrink: 0;
@@ -285,7 +278,6 @@
     .li-info { flex: 1; }
 
     .li-title {
-      font-family: 'Sora', sans-serif;
       font-weight: 600;
       font-size: 13px;
       color: var(--text);
@@ -302,7 +294,6 @@
       font-weight: 700;
       padding: 4px 10px;
       border-radius: 99px;
-      font-family: 'Sora', sans-serif;
       flex-shrink: 0;
     }
 
@@ -351,7 +342,6 @@
       text-decoration: none;
       color: var(--muted);
       font-size: 10px;
-      font-family: 'Sora', sans-serif;
       font-weight: 500;
       transition: color 0.2s;
       background: none;
@@ -423,7 +413,6 @@
       color: #fff;
       border: none;
       border-radius: 8px;
-      font-family: 'Sora', sans-serif;
       font-weight: 600;
       font-size: 11px;
       cursor: pointer;
@@ -490,7 +479,6 @@
     }
 
     .modal-header h2 {
-      font-family: 'Sora', sans-serif;
       font-size: 18px;
     }
 
@@ -521,7 +509,6 @@
       font-weight: 600;
       color: var(--muted);
       margin-bottom: 6px;
-      font-family: 'Sora', sans-serif;
     }
 
     .form-group input,
@@ -531,7 +518,6 @@
       border: 1.5px solid var(--border);
       border-radius: 10px;
       font-size: 14px;
-      font-family: 'DM Sans', sans-serif;
       outline: none;
       transition: border-color 0.2s;
       background: #fff;
@@ -556,7 +542,6 @@
       color: #fff;
       border: none;
       border-radius: 12px;
-      font-family: 'Sora', sans-serif;
       font-weight: 700;
       font-size: 14px;
       cursor: pointer;
@@ -575,7 +560,6 @@
       color: var(--g-dark);
       border: 1.5px solid var(--border);
       border-radius: 12px;
-      font-family: 'Sora', sans-serif;
       font-weight: 600;
       font-size: 14px;
       cursor: pointer;
@@ -584,18 +568,6 @@
     }
 
     .btn-secondary:hover { border-color: var(--g-mid); background: var(--g-light); }
-
-    /* ── Animations ─────────────────────────────────────────────────── */
-    .fade-up {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-    }
-
-    .fade-up.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
 
     /* ── Responsive ─────────────────────────────────────────────────── */
     @media (min-width: 600px) {
@@ -699,7 +671,7 @@
       <div onclick="location.href='admin-portal.html'" style="display:flex; align-items:center; gap:12px; background:#fff; border-radius:14px; padding:14px; border:1px solid var(--border); cursor:pointer;">
         <div style="width:40px;height:40px;border-radius:12px;background:#E3F2FD;color:#1565C0;display:flex;align-items:center;justify-content:center;font-size:20px;"><i class="ti ti-shield-check"></i></div>
         <div style="flex:1;">
-          <div style="font-family:'Sora',sans-serif;font-weight:600;font-size:13px;">Admin Portal</div>
+          <div style="font-weight:600;font-size:13px;">Admin Portal</div>
           <div style="font-size:11px;color:var(--muted);">Manage listings, users & approvals</div>
         </div>
         <i class="ti ti-chevron-right" style="color:var(--muted);"></i>
@@ -785,7 +757,7 @@
         </div>
         <div class="form-group">
           <label>Description</label>
-          <textarea name="description" placeholder="Describe your property..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;min-height:60px;resize:vertical;"></textarea>
+          <textarea name="description" placeholder="Describe your property..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;outline:none;min-height:60px;resize:vertical;"></textarea>
         </div>
         <button type="submit" class="btn-primary">Submit for Review</button>
         <button type="button" class="btn-secondary" onclick="closeModal('listingModal')">Cancel</button>
@@ -836,7 +808,7 @@
         </div>
         <div class="form-group">
           <label>Description</label>
-          <textarea name="description" id="editDescription" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;min-height:60px;resize:vertical;"></textarea>
+          <textarea name="description" id="editDescription" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;outline:none;min-height:60px;resize:vertical;"></textarea>
         </div>
         <button type="submit" class="btn-primary">Save Changes</button>
         <button type="button" class="btn-secondary" onclick="closeModal('editListingModal')">Cancel</button>
@@ -894,7 +866,7 @@
         </div>
         <div class="form-group">
           <label>Description</label>
-          <textarea name="description" placeholder="Anything to note about the vehicle..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;min-height:60px;resize:vertical;"></textarea>
+          <textarea name="description" placeholder="Anything to note about the vehicle..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;outline:none;min-height:60px;resize:vertical;"></textarea>
         </div>
         <button type="submit" class="btn-primary">Register Vehicle</button>
         <button type="button" class="btn-secondary" onclick="closeModal('carModal')">Cancel</button>
@@ -927,6 +899,22 @@
       }
     }
     updateProfileBtn();
+
+    // ── Toast (replaces raw alert on async results) ────────────────────
+    let toastTimer;
+    window.toast = function (msg, type) {
+      let t = document.getElementById('toastBox');
+      if (!t) {
+        t = document.createElement('div');
+        t.id = 'toastBox';
+        t.className = 'toast';
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      t.className = 'toast ' + (type || 'ok') + ' show';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+    };
 
     // ── Tab Switching ──────────────────────────────────────────────────
     let currentTab = 'bookings';
@@ -1013,7 +1001,7 @@
         }).join('');
       } catch (err) {
         console.error(err);
-        document.getElementById('bookingsList').innerHTML = '<div class="empty-state"><i class="ti ti-alert-circle"></i><p style="color:red;">Error loading data</p></div>';
+        document.getElementById('bookingsList').innerHTML = '<div class="empty-state"><i class="ti ti-alert-circle"></i><p>Couldn\'t load bookings.</p><button class="btn-outline" style="margin-top:12px;" onclick="loadDashboard()">Retry</button></div>';
       }
     }
 
@@ -1073,7 +1061,7 @@
         }).join('');
       } catch (err) {
         console.error(err);
-        listEl.innerHTML = '<div class="empty-state"><i class="ti ti-alert-circle"></i><p style="color:red;">Error loading reviews</p></div>';
+        listEl.innerHTML = '<div class="empty-state"><i class="ti ti-alert-circle"></i><p>Couldn\'t load reviews.</p><button class="btn-outline" style="margin-top:12px;" onclick="loadReviews()">Retry</button></div>';
       }
     }
 
@@ -1084,13 +1072,13 @@
 
     window.submitResponse = async (reviewId) => {
       const text = document.getElementById(`respText-${reviewId}`).value.trim();
-      if (!text) { alert('Please write a response.'); return; }
+      if (!text) { toast('Please write a response.', 'err'); return; }
       try {
         await api.hostRespond(reviewId, text);
-        alert('Response submitted!');
+        toast('Response submitted!');
         loadReviews();
       } catch (err) {
-        alert('Failed to submit response.');
+        toast('Failed to submit response.', 'err');
       }
     };
 
@@ -1118,7 +1106,7 @@
         `).join('');
       } catch (err) {
         console.error(err);
-        listEl.innerHTML = '<div class="empty-state"><i class="ti ti-alert-circle"></i><p style="color:red;">Error loading listings</p></div>';
+        listEl.innerHTML = '<div class="empty-state"><i class="ti ti-alert-circle"></i><p>Couldn\'t load listings.</p><button class="btn-outline" style="margin-top:12px;" onclick="loadListings()">Retry</button></div>';
       }
     }
 
@@ -1136,12 +1124,12 @@
       };
       try {
         await api.createListing(data);
-        alert('Listing submitted for review! We\'ll notify you once approved.');
+        toast('Listing submitted for review! We\'ll notify you once approved.');
         closeModal('listingModal');
         e.target.reset();
         loadListings();
       } catch (err) {
-        alert('Failed to submit listing. Please try again.');
+        toast('Failed to submit listing. Please try again.', 'err');
       }
     });
 
@@ -1160,7 +1148,7 @@
         document.getElementById('editDescription').value = listing.description || '';
         openModal('editListingModal');
       } catch (err) {
-        alert('Failed to load listing details.');
+        toast('Failed to load listing details.', 'err');
       }
     }
 
@@ -1179,11 +1167,11 @@
       try {
         const result = await api.updateListing(id, data);
         if (result.error) throw new Error(result.error);
-        alert('Listing updated!');
+        toast('Listing updated!');
         closeModal('editListingModal');
         loadListings();
       } catch (err) {
-        alert('Failed to update listing.');
+        toast('Failed to update listing.', 'err');
       }
     });
 
@@ -1194,17 +1182,18 @@
       e.preventDefault();
       const name = e.target.name.value.trim();
       const avatar = e.target.avatar.value.trim() || null;
-      if (!name) { alert('Name is required.'); return; }
+      if (!name) { toast('Name is required.', 'err'); return; }
       try {
         const result = await api.updateProfile({ name, avatar });
-        if (result.error) { alert(result.error); return; }
+        if (result.error) { toast(result.error, 'err'); return; }
         Object.assign(user, result.user);
         localStorage.setItem('lala_user', JSON.stringify(user));
         document.getElementById('hostName').innerText = user.name || 'Host';
         updateProfileBtn();
         closeModal('profileModal');
+        toast('Profile updated!');
       } catch (err) {
-        alert('Failed to update profile.');
+        toast('Failed to update profile.', 'err');
       }
     });
 
@@ -1245,8 +1234,9 @@
       try {
         await api.confirmBooking(id);
         loadDashboard();
+        toast('Booking confirmed.');
       } catch (err) {
-        alert('Failed to confirm booking');
+        toast('Failed to confirm booking', 'err');
       }
     }
 
@@ -1255,8 +1245,9 @@
       try {
         await api.hostCancelBooking(id);
         loadDashboard();
+        toast('Booking declined.');
       } catch (err) {
-        alert('Failed to cancel booking');
+        toast('Failed to cancel booking', 'err');
       }
     }
 
@@ -1276,7 +1267,7 @@
           <div style="background:var(--card);border-radius:var(--rsm);border:1px solid var(--border);padding:12px 14px;margin-bottom:10px;">
             <div style="display:flex;justify-content:space-between;align-items:start;">
               <div>
-                <strong style="font-family:'Sora',sans-serif;font-size:14px;">${c.model}</strong>
+                <strong style="font-size:14px;">${c.model}</strong>
                 <div style="font-size:12px;color:var(--muted);">👤 ${c.driverName} · ${c.plateNumber} · ${c.seats} seats · ${c.city}</div>
                 <div style="display:flex;gap:8px;margin-top:6px;">
                   ${c.airportPrice ? `<span style="font-size:11px;background:#E8F5E9;padding:2px 8px;border-radius:99px;">Airport K${c.airportPrice}</span>` : ''}
@@ -1288,7 +1279,7 @@
           </div>
         `).join('');
       } catch (err) {
-        container.innerHTML = '<div class="empty-state"><p style="color:red;">Failed to load vehicles</p></div>';
+        container.innerHTML = '<div class="empty-state"><i class="ti ti-alert-circle"></i><p>Failed to load vehicles.</p><button class="btn-outline" style="margin-top:12px;" onclick="loadTransfers()">Retry</button></div>';
       }
     }
 
@@ -1297,8 +1288,9 @@
       try {
         await api.deleteCar(id);
         loadTransfers();
+        toast('Vehicle removed.');
       } catch (err) {
-        alert('Failed to remove vehicle');
+        toast('Failed to remove vehicle', 'err');
       }
     }
 
@@ -1314,7 +1306,7 @@
           <div style="background:var(--card);border-radius:var(--rsm);border:1px solid var(--border);padding:12px 14px;margin-bottom:10px;">
             <div style="display:flex;justify-content:space-between;align-items:start;">
               <div>
-                <strong style="font-family:'Sora',sans-serif;font-size:13px;">${b.tripType === 'airport' ? '✈️ Airport' : '📍 City'} — ${b.car ? b.car.model : 'Car'}</strong>
+                <strong style="font-size:13px;">${b.tripType === 'airport' ? '✈️ Airport' : '📍 City'} — ${b.car ? b.car.model : 'Car'}</strong>
                 <div style="font-size:12px;color:var(--muted);margin:2px 0;">
                   ${b.pickupLocation} → ${b.dropoffLocation} · ${b.pickupDate} ${b.pickupTime}
                 </div>
@@ -1324,24 +1316,24 @@
             </div>
             ${b.status === 'pending' ? `
             <div style="display:flex;gap:8px;margin-top:8px;">
-              <button onclick="driverAccept('${b.id}')" style="flex:1;padding:8px;background:#1B5E20;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;">Accept</button>
-              <button onclick="driverDecline('${b.id}')" style="flex:1;padding:8px;background:#f5f5f5;color:#666;border:1px solid #ddd;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;">Decline</button>
+              <button onclick="driverAccept('${b.id}')" style="flex:1;padding:8px;background:#1B5E20;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Accept</button>
+              <button onclick="driverDecline('${b.id}')" style="flex:1;padding:8px;background:#f5f5f5;color:#666;border:1px solid #ddd;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Decline</button>
             </div>` : ''}
           </div>
         `).join('');
       } catch (err) {
-        container.innerHTML = '<div class="empty-state"><p style="color:red;">Failed to load ride requests</p></div>';
+        container.innerHTML = '<div class="empty-state"><i class="ti ti-alert-circle"></i><p>Failed to load ride requests.</p><button class="btn-outline" style="margin-top:12px;" onclick="loadDriverBookings()">Retry</button></div>';
       }
     }
 
     async function driverAccept(id) {
-      try { await api.updateCarBookingStatus(id, 'confirmed'); loadDriverBookings(); }
-      catch (err) { alert('Failed to accept'); }
+      try { await api.updateCarBookingStatus(id, 'confirmed'); loadDriverBookings(); toast('Ride accepted.'); }
+      catch (err) { toast('Failed to accept', 'err'); }
     }
 
     async function driverDecline(id) {
-      try { await api.updateCarBookingStatus(id, 'cancelled'); loadDriverBookings(); }
-      catch (err) { alert('Failed to decline'); }
+      try { await api.updateCarBookingStatus(id, 'cancelled'); loadDriverBookings(); toast('Ride declined.'); }
+      catch (err) { toast('Failed to decline', 'err'); }
     }
 
     window.deleteCar = deleteCar;
@@ -1358,12 +1350,12 @@
       try {
         const result = await api.createCar(data);
         if (result.error) throw new Error(result.error);
-        alert('Vehicle registered!');
+        toast('Vehicle registered!');
         closeModal('carModal');
         e.target.reset();
         loadTransfers();
       } catch (err) {
-        alert('Failed to register vehicle');
+        toast('Failed to register vehicle', 'err');
       }
     });
 

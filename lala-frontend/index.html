@@ -12,42 +12,11 @@
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <link rel="manifest" href="manifest.json">
   <style>
-    :root {
-      --accent: #2E7D32;
-      --accent-hover: #1B5E20;
-      --accent-light: #E8F5E9;
-      --accent-disabled: #C8E6C9;
-      --ink: #222222;
-      --body: #3f3f3f;
-      --muted: #6a6a6a;
-      --muted-soft: #929292;
-      --canvas: #ffffff;
-      --surface-soft: #f7f7f7;
-      --surface-strong: #f2f2f2;
-      --hairline: #dddddd;
-      --hairline-soft: #ebebeb;
-      --border-strong: #c1c1c1;
-      --star-color: #222222;
-      --shadow-card: 0 0 0 1px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.04), 0 4px 8px rgba(0,0,0,0.1);
-      --section-gap: 40px;
-      --card-pad: 20px;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; }
+    :root { --section-gap: 40px; --card-pad: 20px; }
 
     body {
-      font-family: 'Inter', -apple-system, system-ui, 'Helvetica Neue', sans-serif;
       background: var(--canvas);
-      color: var(--ink);
-      line-height: 1.5;
-      margin: 0;
-      -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
-    }
-
-    h1, h2, h3, h4, h5, h6 {
-      font-family: 'Inter', -apple-system, system-ui, 'Helvetica Neue', sans-serif;
-      letter-spacing: -0.02em;
     }
 
     h1 { font-size: 48px; font-weight: 700; line-height: 1.1; letter-spacing: -0.04em; }
@@ -471,8 +440,6 @@
     @media (max-width: 768px) { .bottom-nav { display: block; } body { padding-bottom: 72px; } }
 
     /* ---- ANIMATIONS ---- */
-    .fade-up { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
-    .fade-up.visible { opacity: 1; transform: translateY(0); }
     .fade-up-d1 { transition-delay: 0.1s; }
     .fade-up-d2 { transition-delay: 0.2s; }
     .fade-up-d3 { transition-delay: 0.3s; }

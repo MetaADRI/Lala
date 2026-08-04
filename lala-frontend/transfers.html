@@ -11,40 +11,6 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: 'Inter', -apple-system, system-ui, 'Helvetica Neue', sans-serif;
-      background: var(--surface-soft);
-      color: var(--ink);
-      line-height: 1.5;
-      margin: 0;
-      -webkit-font-smoothing: antialiased;
-    }
-    h1, h2, h3, h4 { font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
-
-    nav {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 0 40px; height: 72px;
-      background: var(--canvas);
-      border-bottom: 1px solid var(--hairline);
-    }
-    .logo-img { height: 32px; display: block; }
-    .nav-links { display: flex; gap: 8px; align-items: center; }
-    .nav-links a {
-      font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px;
-      color: var(--ink); text-decoration: none; padding: 8px 14px;
-      border-radius: 9999px; transition: all 0.2s;
-    }
-    .nav-links a:hover, .nav-links a.active { background: var(--surface-strong); }
-    .nav-cta {
-      background: var(--accent) !important; color: #fff !important; font-weight: 600 !important;
-    }
-    .nav-cta:hover { background: var(--accent-hover) !important; }
-    @media (max-width: 768px) {
-      nav { padding: 0 16px; }
-      .nav-links a:not(.nav-cta):not([href="index.html"]) { display: none; }
-    }
-
     /* ---- HERO ---- */
     .hero-pick {
       background: linear-gradient(135deg, var(--accent-hover), var(--accent));
@@ -58,7 +24,7 @@
       padding: 8px 20px; border-radius: 9999px;
       border: 1.5px solid rgba(255,255,255,0.3);
       background: rgba(255,255,255,0.1); color: #fff;
-      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+      font-family: var(--font); font-size: 13px; font-weight: 500;
       cursor: pointer; transition: all 0.2s;
     }
     .type-btn.on { background: #fff; color: var(--accent-hover); border-color: #fff; font-weight: 600; }
@@ -71,7 +37,7 @@
     .city-wrap i { color: rgba(255,255,255,0.7); font-size: 18px; }
     .city-wrap input {
       background: transparent; border: none; color: #fff; font-size: 14px;
-      width: 100%; outline: none; font-family: 'Inter', sans-serif;
+      width: 100%; outline: none; font-family: var(--font);
     }
     .city-wrap input::placeholder { color: rgba(255,255,255,0.5); }
 
@@ -81,17 +47,6 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 20px;
-    }
-
-    .ccard {
-      background: var(--canvas); border-radius: 14px;
-      border: 1px solid var(--hairline); overflow: hidden;
-      transition: all 0.25s;
-      box-shadow: var(--shadow-card);
-    }
-    .ccard:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.02), 0 6px 16px rgba(0,0,0,0.08);
     }
 
     .cimg {
@@ -106,10 +61,6 @@
     .cdriver { font-size: 13px; color: var(--muted); margin: 2px 0 8px; }
 
     .cbadges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-    .cbadge {
-      background: var(--accent-light); color: var(--accent-hover);
-      padding: 3px 10px; border-radius: 9999px; font-size: 10px; font-weight: 600;
-    }
 
     .cprices { display: flex; gap: 16px; font-size: 13px; color: var(--muted); }
     .cprices strong { color: var(--ink); font-size: 15px; }
@@ -117,13 +68,10 @@
     .cbook {
       display: block; margin-top: 12px; text-align: center; padding: 10px;
       background: var(--accent); color: #fff; border-radius: 10px;
-      text-decoration: none; font-family: 'Inter', sans-serif;
+      text-decoration: none; font-family: var(--font);
       font-size: 13px; font-weight: 600; transition: background 0.2s;
     }
     .cbook:hover { background: var(--accent-hover); }
-
-    .empty { text-align: center; padding: 60px 20px; color: var(--muted-soft); }
-    .empty i { font-size: 48px; margin-bottom: 16px; }
 
     @media (max-width: 768px) {
       .results { padding: 16px; }
@@ -132,7 +80,7 @@
   </style>
 </head>
 <body>
-  <nav>
+  <nav class="nav">
     <a href="index.html" class="logo">
       <img src="logo-removebg-preview.png" alt="Lala Logo" class="logo-img">
     </a>
@@ -162,7 +110,10 @@
 
   <div class="results">
     <div class="results-grid" id="resultsGrid">
-      <div class="empty" style="grid-column:1/-1;"><i class="ti ti-car"></i><p>Loading drivers...</p></div>
+      <div class="state loading-state" style="grid-column:1/-1;">
+        <div class="spinner"></div>
+        <p>Loading drivers...</p>
+      </div>
     </div>
   </div>
 
@@ -185,13 +136,15 @@
       const filters = {};
       if (city) filters.city = city;
 
+      grid.innerHTML = '<div class="state loading-state" style="grid-column:1/-1;"><div class="spinner"></div><p>Loading drivers...</p></div>';
+
       try {
         let cars = await api.getCars(filters);
         if (activeType === 'airport') cars = cars.filter(c => c.airportPrice);
         else if (activeType === 'city') cars = cars.filter(c => c.pricePerKm);
 
         if (!cars.length) {
-          grid.innerHTML = '<div class="empty" style="grid-column:1/-1;"><i class="ti ti-car-off"></i><p>No drivers found in this area</p></div>';
+          grid.innerHTML = '<div class="state empty-state" style="grid-column:1/-1;"><i class="ti ti-car-off"></i><p>No drivers found in this area</p></div>';
           return;
         }
 
@@ -216,7 +169,7 @@
         `).join('');
       } catch (err) {
         console.error('loadCars error:', err);
-        grid.innerHTML = '<div class="empty" style="grid-column:1/-1;color:var(--red);"><p>Failed to load</p></div>';
+        grid.innerHTML = '<div class="state error-state" style="grid-column:1/-1;"><i class="ti ti-cloud-off"></i><p>Failed to load drivers. Check your connection and try again.</p><button class="btn btn-outline btn-sm" onclick="loadCars()">Retry</button></div>';
       }
     }
 

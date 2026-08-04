@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala — WhatsApp Booking</title>
+  <title>Lala — WhatsApp Booking (Coming soon)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="common.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
@@ -28,7 +29,7 @@
       width: 38px; height: 38px; border-radius: 50%; background: #25D366; 
       display: flex; align-items: center; justify-content: center; font-size: 18px;
     }
-    .wa-nm { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 15px; }
+    .wa-nm { font-weight: 600; font-size: 15px; }
     .wa-ol { font-size: 11px; color: rgba(255,255,255,0.7); }
 
     .wa-body { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
@@ -46,7 +47,7 @@
       padding: 12px; align-self: flex-start; max-width: 85%;
       box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
-    .wa-bk-title { font-weight: 700; font-size: 13px; color: #075E54; font-family: 'Sora', sans-serif; margin-bottom: 6px; }
+    .wa-bk-title { font-weight: 700; font-size: 13px; color: #075E54; margin-bottom: 6px; }
     .wa-bk-detail { font-size: 12px; color: #555; line-height: 1.6; }
     
     .wa-inp {
@@ -63,10 +64,27 @@
       border: none;
     }
     .wa-send-btn i { color: #fff; font-size: 20px; }
+
+    /* Coming soon banner */
+    .wa-soon {
+      background: linear-gradient(135deg, #1B5E20, #2E7D32);
+      color: #fff; text-align: center; padding: 12px 16px; font-size: 13px;
+      font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .wa-soon .tag {
+      background: var(--gold); color: #3E2700; font-size: 10px; font-weight: 800;
+      padding: 3px 10px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.04em;
+    }
   </style>
 </head>
 <body>
   <div class="wa-container">
+    <!-- Coming soon banner -->
+    <div class="wa-soon">
+      <span class="tag">Coming soon</span>
+      <span>WhatsApp booking is a preview — live chat isn't available yet. Book directly on a listing for instant confirmation.</span>
+    </div>
+
     <!-- HEADER -->
     <div class="wa-hdr">
       <a href="listing-detail.html" class="wa-back"><i class="ti ti-arrow-left"></i></a>
@@ -93,7 +111,7 @@
           <strong>Check-out:</strong> Wed, 28 May 2026<br>
           <strong>Guests:</strong> 1 Guest · 2 nights
         </div>
-        <div style="margin-top: 8px; font-size: 13px; font-weight: 700; color: #075E54; font-family: 'Sora', sans-serif;">
+        <div style="margin-top: 8px; font-size: 13px; font-weight: 700; color: #075E54;">
           Total: K360
         </div>
       </div>

@@ -10,383 +10,35 @@
   <link rel="stylesheet" href="common.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #0F2B10 0%, #1B5E20 30%, #2E7D32 60%, #43A047 100%);
-      padding: 20px;
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle at 70% 30%, rgba(249,168,37,0.08) 0%, transparent 50%),
-                  radial-gradient(circle at 20% 70%, rgba(255,255,255,0.05) 0%, transparent 40%);
-      animation: bgShift 20s ease-in-out infinite alternate;
-      pointer-events: none;
-    }
-
-    @keyframes bgShift {
-      0% { transform: translate(0, 0) rotate(0deg); }
-      100% { transform: translate(5%, -5%) rotate(-3deg); }
-    }
-
-    .floating-shapes {
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .shape {
-      position: absolute;
-      border-radius: 50%;
-      opacity: 0.06;
-      animation: floatShape 25s ease-in-out infinite;
-    }
-
-    .shape:nth-child(1) {
-      width: 250px; height: 250px;
-      background: var(--gold);
-      top: 15%; right: 10%;
-      animation-delay: 0s;
-      animation-duration: 28s;
-    }
-    .shape:nth-child(2) {
-      width: 180px; height: 180px;
-      background: #fff;
-      bottom: 20%; left: 8%;
-      animation-delay: -8s;
-      animation-duration: 22s;
-    }
-    .shape:nth-child(3) {
-      width: 120px; height: 120px;
-      background: var(--gold);
-      top: 50%; left: 50%;
-      animation-delay: -15s;
-      animation-duration: 18s;
-    }
-
-    @keyframes floatShape {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(-30px, -30px) scale(1.1); }
-      66% { transform: translate(20px, 30px) scale(0.9); }
-    }
-
-    .login-card {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 400px;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(20px);
-      border-radius: 28px;
-      box-shadow: 0 25px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1);
-      overflow: hidden;
-      animation: cardEnter 0.8s ease-out;
-    }
-
-    @keyframes cardEnter {
-      from { opacity: 0; transform: translateY(40px) scale(0.96); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .card-header {
-      background: linear-gradient(160deg, #1B5E20, #2E7D32, #388E3C);
-      padding: 24px 28px 32px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card-header::after {
-      content: '';
-      position: absolute;
-      top: -30px; right: -30px;
-      width: 140px; height: 140px;
-      background: rgba(249,168,37,0.1);
-      border-radius: 50%;
-    }
-
-    .logo-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      margin-bottom: 20px;
-      position: relative;
-      z-index: 1;
-      transition: opacity 0.2s;
-    }
-
-    .logo-link:hover { opacity: 0.85; }
-
-    .logo-link img {
-      height: 34px;
-      filter: brightness(0) invert(1);
-    }
-
-    .header-title {
-      font-family: 'Inter', sans-serif;
-      font-weight: 700;
-      font-size: 22px;
-      color: #fff;
-      position: relative;
-      z-index: 1;
-      line-height: 1.2;
-    }
-
-    .header-sub {
-      font-size: 13px;
-      color: rgba(255,255,255,0.75);
-      margin-top: 6px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .card-body {
-      padding: 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .input-group label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      font-family: 'Inter', sans-serif;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .input-wrap {
-      display: flex;
-      align-items: center;
-      background: #F5F7F4;
-      border: 2px solid transparent;
-      border-radius: 12px;
-      padding: 0 14px;
-      transition: all 0.25s;
-    }
-
-    .input-wrap:focus-within {
-      border-color: var(--g-dark);
-      background: #fff;
-      box-shadow: 0 0 0 4px rgba(27,94,32,0.08);
-    }
-
-    .input-wrap i {
-      color: var(--muted);
-      font-size: 18px;
-      margin-right: 10px;
-      transition: color 0.25s;
-    }
-
-    .input-wrap:focus-within i {
-      color: var(--g-dark);
-    }
-
-    .input-wrap input {
-      flex: 1;
-      border: none;
-      background: transparent;
-      padding: 14px 0;
-      font-size: 14px;
-      font-family: 'Inter', sans-serif;
-      color: var(--text);
-      outline: none;
-    }
-
-    .input-wrap input::placeholder {
-      color: #aaa;
-    }
-
-    .toggle-pw {
-      cursor: pointer;
-      color: var(--muted);
-      font-size: 18px;
-      transition: color 0.2s;
-    }
-
-    .toggle-pw:hover { color: var(--text); }
-
-    .btn-login {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, #1B5E20, #2E7D32);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      font-family: 'Inter', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all 0.3s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-login::before {
-      content: '';
-      position: absolute;
-      top: 0; left: -100%;
-      width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-      transition: left 0.5s;
-    }
-
-    .btn-login:hover::before { left: 100%; }
-
-    .btn-login:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(27,94,32,0.3);
-    }
-
-    .btn-login:active { transform: translateY(0); }
-    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .divider::before,
-    .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    .signup-link {
-      text-align: center;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .signup-link a {
-      color: var(--g-dark);
-      font-weight: 700;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .signup-link a:hover {
-      color: #0f3b12;
-      text-decoration: underline;
-    }
-
-    .host-link {
-      text-align: center;
-      font-size: 12px;
-      color: var(--muted);
-      padding: 12px;
-      background: var(--g-light);
-      border-radius: 12px;
-      margin-top: 4px;
-    }
-
-    .host-link a {
-      color: var(--g-dark);
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .host-link a:hover { text-decoration: underline; }
-
-    .error-msg {
-      background: #FEF2F2;
-      border: 1px solid #FECACA;
-      color: #DC2626;
-      font-size: 13px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      display: none;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .error-msg.visible { display: flex; }
-
-    .spinner {
-      width: 18px;
-      height: 18px;
-      border: 2.5px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: inline-block;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    @media (max-width: 480px) {
-      .login-card { border-radius: 20px; }
-      .card-header { padding: 20px 20px 28px; }
-      .card-body { padding: 22px; }
-    }
-  </style>
 </head>
-<body>
-  <div class="floating-shapes">
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-  </div>
-
-  <div class="login-card" id="loginCard">
-    <div class="card-header">
-      <a href="index.html" class="logo-link">
+<body class="auth-shell">
+  <div class="auth-card" id="loginCard">
+    <div class="auth-head">
+      <a href="index.html" class="auth-logo">
         <img src="logo-removebg-preview.png" alt="Lala">
-        <span style="font-family:'Inter',sans-serif; font-weight:700; font-size:18px; color:#fff;">lala</span>
+        <span>lala</span>
       </a>
-      <div class="header-title">Welcome back</div>
-      <div class="header-sub">Sign in to manage bookings and more</div>
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to manage bookings and more</div>
     </div>
 
-    <div class="card-body">
-      <div class="error-msg" id="errorMsg">
+    <div class="auth-body">
+      <div class="auth-err" id="errorMsg">
         <i class="ti ti-alert-circle"></i>
         <span id="errorText">Something went wrong</span>
       </div>
 
-      <div class="input-group">
+      <div class="fg">
         <label>Email address</label>
-        <div class="input-wrap">
+        <div class="icon-field">
           <i class="ti ti-mail"></i>
           <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email">
         </div>
       </div>
 
-      <div class="input-group">
+      <div class="fg">
         <label>Password</label>
-        <div class="input-wrap">
+        <div class="icon-field">
           <i class="ti ti-lock"></i>
           <input type="password" id="passwordInput" placeholder="Enter your password" autocomplete="current-password">
           <i class="ti ti-eye toggle-pw" id="togglePw" onclick="togglePassword()"></i>
@@ -403,11 +55,11 @@
 
       <div class="divider">or</div>
 
-      <div class="signup-link">
+      <div class="auth-link">
         Don't have an account? <a href="signup.html">Create one</a>
       </div>
 
-      <div class="host-link">
+      <div class="auth-host">
         <i class="ti ti-building-estate"></i>
         Are you a host? <a href="signup.html">List your property</a>
       </div>
@@ -449,16 +101,15 @@
       if (!password) return showError('Please enter your password');
 
       const btn = document.getElementById('loginBtn');
-      const btnText = document.getElementById('loginBtnText');
       btn.disabled = true;
-      btnText.textContent = 'Signing in...';
+      btn.innerHTML = '<span class="btn-spinner"></span> Signing in...';
 
       try {
         const data = await api.login(email, password);
         if (data.error) {
           showError(data.error);
           btn.disabled = false;
-          btnText.textContent = 'Sign In';
+          btn.innerHTML = '<i class="ti ti-login"></i> Sign In';
           return;
         }
 
@@ -479,7 +130,7 @@
         showError('Failed to connect. Is the backend running?');
         console.error(err);
         btn.disabled = false;
-        btnText.textContent = 'Sign In';
+        btn.innerHTML = '<i class="ti ti-login"></i> Sign In';
       }
     }
 

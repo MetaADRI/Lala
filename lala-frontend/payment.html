@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lala — Mobile Money Payment</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="common.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
@@ -19,21 +20,21 @@
     }
     .back-btn { font-size: 20px; color: #3E2700; text-decoration: none; }
     .gold-hdr-title {
-      font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px;
+      font-weight: 700; font-size: 16px;
       color: #3E2700; margin-left: 12px;
     }
     .pay-summary {
       background: rgba(255,255,255,0.28); border-radius: 14px;
       padding: 16px; margin-top: 16px; backdrop-filter: blur(4px);
     }
-    .pay-amount { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 36px; color: #3E2700; }
+    .pay-amount { font-weight: 800; font-size: 36px; color: #3E2700; }
     .pay-meta { font-size: 12px; color: rgba(62,39,0,0.65); margin-top: 4px; }
     .pay-dates { font-size: 11px; color: rgba(62,39,0,0.55); margin-top: 2px; }
 
     /* ── BODY ─────────────────────────────────────────────────────────── */
     .payment-body { padding: 20px 18px; display: flex; flex-direction: column; gap: 16px; }
 
-    .section-title { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; color: var(--text); }
+    .section-title { font-weight: 600; font-size: 14px; color: var(--text); }
 
     /* ── PROVIDER CARDS ───────────────────────────────────────────────── */
     .pprov {
@@ -51,7 +52,7 @@
     .mtn  { background: #FFCC00; padding: 6px; }
     .airtel { background: #fff; padding: 8px; }
     .zamtel { background: #fff; padding: 8px; }
-    .pname { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; color: var(--text); }
+    .pname { font-weight: 600; font-size: 14px; color: var(--text); }
     .psub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
     .pchk  { color: var(--g-dark); font-size: 22px; margin-left: auto; display: none; }
     .pprov.on .pchk { display: block; }
@@ -65,12 +66,12 @@
     .phone-box:focus-within { border-color: var(--g-dark); }
     .phone-prefix {
       background: var(--g-light); padding: 14px 14px; border-right: 1px solid var(--border);
-      font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700;
+      font-size: 14px; font-weight: 700;
       color: var(--g-dark); flex-shrink: 0;
     }
     .phone-input {
       flex: 1; padding: 14px 14px; border: none; outline: none;
-      font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 500;
+      font-size: 15px; font-weight: 500;
       color: var(--text); background: transparent; letter-spacing: 0.04em;
     }
     .phone-input::placeholder { color: var(--muted); font-weight: 400; letter-spacing: 0; }
@@ -91,12 +92,6 @@
     #payBtn:disabled {
       opacity: 0.6; cursor: not-allowed; transform: none !important;
     }
-    .spinner {
-      width: 18px; height: 18px; border: 2.5px solid rgba(62,39,0,0.3);
-      border-top-color: #3E2700; border-radius: 50%;
-      animation: spin 0.8s linear infinite; display: inline-block;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ── USSD WAITING SCREEN ─────────────────────────────────────────── */
     .ussd-screen {
@@ -106,9 +101,9 @@
     }
     .ussd-screen.visible { display: block; }
     .ussd-icon { font-size: 48px; color: var(--g-dark); margin-bottom: 12px; }
-    .ussd-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 8px; }
+    .ussd-title { font-weight: 700; font-size: 17px; margin-bottom: 8px; }
     .ussd-msg { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 280px; margin: 0 auto; }
-    .ussd-ref { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 13px; color: var(--g-dark); margin-top: 12px; }
+    .ussd-ref { font-weight: 700; font-size: 13px; color: var(--g-dark); margin-top: 12px; }
     .poll-dots { display: flex; justify-content: center; gap: 6px; margin-top: 16px; }
     .poll-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--g-mid); animation: pulse 1.4s ease-in-out infinite; }
     .poll-dot:nth-child(2) { animation-delay: 0.2s; }
@@ -190,6 +185,7 @@
       </div>
 
       <!-- Pay button -->
+      <div class="msg err" id="payError" role="alert" style="display:none;"></div>
       <button id="payBtn" class="btn-gold" style="width:100%; margin-top:8px;" onclick="handlePayment()">
         <i class="ti ti-send"></i> <span id="payBtnText">Pay via MTN</span>
       </button>
@@ -210,6 +206,7 @@
         <div class="poll-dot"></div>
       </div>
       <div style="font-size:11px; color:var(--muted); margin-top:12px;">Waiting for confirmation...</div>
+      <div class="msg err" id="pollError" role="alert" style="display:none;"></div>
       <button class="btn-outline" style="margin-top:20px; width:100%;" onclick="simulateConfirm()">
         <i class="ti ti-refresh"></i> I've paid — check status
       </button>
@@ -278,14 +275,40 @@
     selectProvider('MTN');
 
     // ── Initiate payment ─────────────────────────────────────────────────
+    const payError = document.getElementById('payError');
+    const pollError = document.getElementById('pollError');
+
+    function showPayError(msg) {
+      payError.textContent = msg;
+      payError.style.display = 'block';
+    }
+    function clearPayError() {
+      payError.textContent = '';
+      payError.style.display = 'none';
+    }
+    function showPollError(msg) {
+      pollError.textContent = msg;
+      pollError.style.display = 'block';
+    }
+    function clearPollError() {
+      pollError.textContent = '';
+      pollError.style.display = 'none';
+    }
+    function resetPayBtn() {
+      const btn = document.getElementById('payBtn');
+      btn.disabled = false;
+      btn.innerHTML = `<i class="ti ti-send"></i> <span id="payBtnText">Pay via ${selectedProvider}</span>`;
+    }
+
     async function handlePayment() {
+      clearPayError();
       const rawPhone = document.getElementById('phoneInput').value.trim();
       if (!rawPhone || rawPhone.length < 9) {
-        alert('Please enter a valid 9-digit mobile money number.');
+        showPayError('Please enter a valid 9-digit mobile money number.');
         return;
       }
       if (!listingId) {
-        alert('Booking information is missing. Please go back and try again.');
+        showPayError('Booking information is missing. Please go back and try again.');
         return;
       }
       if (!api.isLoggedIn()) {
@@ -296,7 +319,7 @@
       const phone = `260${rawPhone}`;
       const btn = document.getElementById('payBtn');
       btn.disabled = true;
-      btn.innerHTML = `<span class="spinner"></span> Sending USSD prompt...`;
+      btn.innerHTML = `<span class="btn-spinner"></span> Sending USSD prompt...`;
 
       try {
         const result = await api.createBooking({
@@ -331,9 +354,8 @@
           window.location.href = `guest-login.html?redirect=${encodeURIComponent(window.location.href)}`;
           return;
         }
-        btn.disabled = false;
-        btn.innerHTML = `<i class="ti ti-send"></i> <span id="payBtnText">Pay via ${selectedProvider}</span>`;
-        alert('Payment failed: ' + (msg || 'Please try again.'));
+        resetPayBtn();
+        showPayError(msg ? `Payment failed: ${msg}` : 'Payment failed. Please try again.');
         console.error(err);
       }
     }
@@ -358,11 +380,16 @@
     }
 
     function startPolling() {
+      clearPollError();
       pollAttempts = 0;
       pollInterval = setInterval(async () => {
         pollAttempts++;
         if (pollAttempts > 40) {
           clearInterval(pollInterval);
+          showPollError(
+            "We haven't confirmed your payment yet. If you completed the USSD prompt on your phone, " +
+            "tap \"I've paid — check status\" below. Your booking is still reserved."
+          );
           return;
         }
         try {
@@ -374,15 +401,14 @@
             redirectConfirmed(createdBookingId);
           } else if (result.paymentStatus === 'failed') {
             clearInterval(pollInterval);
-            alert('Payment failed or was cancelled. Please try again.');
             document.getElementById('ussdScreen').classList.remove('visible');
             document.getElementById('mainForm').style.display = '';
-            const btn = document.getElementById('payBtn');
-            btn.disabled = false;
-            btn.innerHTML = `<i class="ti ti-send"></i> <span id="payBtnText">Pay via ${selectedProvider}</span>`;
+            resetPayBtn();
+            showPayError('Payment failed or was cancelled. Please try again.');
           }
         } catch (err) {
           console.error('[poll] status check failed:', err);
+          showPollError('Could not reach the payment service. Tap "I\'ve paid — check status" to retry.');
         }
       }, 3000);
     }
@@ -390,6 +416,7 @@
     // ── Manual re-check (same path as auto-poll — uses real Lenco status) ──
     async function simulateConfirm() {
       if (!createdBookingId) return;
+      clearPollError();
       try {
         const result = await api.getBookingPaymentStatus(createdBookingId);
         if (result.error) throw new Error(result.error);
@@ -398,12 +425,15 @@
           clearInterval(pollInterval);
           redirectConfirmed(createdBookingId);
         } else if (result.paymentStatus === 'failed') {
-          alert('Payment failed or was cancelled.');
+          showPollError('Payment failed or was cancelled. Please try paying again.');
+          document.getElementById('ussdScreen').classList.remove('visible');
+          document.getElementById('mainForm').style.display = '';
+          resetPayBtn();
         } else {
-          alert('Payment not confirmed yet. Approve the USSD prompt on your phone, then try again.');
+          showPollError('Payment not confirmed yet. Approve the USSD prompt on your phone, then tap check again.');
         }
       } catch (err) {
-        alert('Error checking payment: ' + err.message);
+        showPollError('Error checking payment: ' + err.message);
       }
     }
   </script>

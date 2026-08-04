@@ -11,45 +11,11 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: 'Inter', -apple-system, system-ui, 'Helvetica Neue', sans-serif;
-      background: var(--canvas);
-      color: var(--ink);
-      line-height: 1.5;
-      margin: 0;
-      -webkit-font-smoothing: antialiased;
-      padding-bottom: 100px;
-    }
-    h1, h2, h3, h4 { font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
+    body { padding-bottom: 100px; }
 
-    /* ---- NAV ---- */
-    nav {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 0 40px; height: 72px;
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: var(--canvas);
-      border-bottom: 1px solid var(--hairline);
-    }
-    .logo-img { height: 32px; display: block; }
-    .nav-links { display: flex; gap: 8px; align-items: center; }
-    .nav-links a {
-      font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px;
-      color: var(--ink); text-decoration: none; padding: 8px 14px;
-      border-radius: 9999px; transition: all 0.2s;
-    }
-    .nav-links a:hover, .nav-links a.active { background: var(--surface-strong); }
-    .nav-cta {
-      background: var(--accent) !important;
-      color: #fff !important;
-      font-weight: 600 !important;
-    }
-    .nav-cta:hover { background: var(--accent-hover) !important; }
-
-    @media (max-width: 768px) {
-      nav { padding: 0 16px; }
-      .nav-links a:not(.nav-cta):not([href="index.html"]) { display: none; }
-    }
+    /* ---- NAV (fixed) ---- */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
+    @media (max-width: 768px) { nav { padding: 0 16px; } }
 
     /* ---- PHOTO GALLERY ---- */
     .gallery-wrap {
@@ -133,11 +99,7 @@
     .price-main { font-weight: 700; font-size: 26px; color: var(--accent-hover); }
     .price-sub { font-size: 12px; color: var(--muted); }
 
-    .section-card {
-      background: var(--canvas); border-radius: 14px;
-      border: 1px solid var(--hairline);
-      padding: 20px; margin-bottom: 16px;
-    }
+    .section-card { margin-bottom: 16px; }
     .section-title {
       font-weight: 600; font-size: 15px; margin-bottom: 12px; color: var(--ink);
     }
@@ -152,7 +114,7 @@
     .date-field:focus-within { border-color: var(--accent); }
     .date-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; font-weight: 500; }
     .date-field input[type="date"] {
-      border: none; background: transparent; font-family: 'Inter', sans-serif;
+      border: none; background: transparent; font-family: var(--font);
       font-weight: 600; font-size: 13px; color: var(--ink); outline: none; width: 100%; cursor: pointer;
     }
 
@@ -184,10 +146,7 @@
     .am-row { display: flex; gap: 8px; flex-wrap: wrap; }
 
     /* ---- REVIEWS ---- */
-    .rcard {
-      background: var(--surface-soft); border-radius: 12px;
-      padding: 16px; margin-top: 10px;
-    }
+    .rcard { margin-top: 10px; }
     .rav {
       width: 34px; height: 34px; border-radius: 50%; background: var(--accent-light);
       color: var(--accent-hover); display: flex; align-items: center; justify-content: center;
@@ -204,17 +163,14 @@
       display: flex; gap: 10px; z-index: 50;
       max-width: 900px; margin: 0 auto;
     }
-    .action-bar .btn-primary { flex: 1; text-align: center; justify-content: center; }
-    .action-bar .btn-secondary { flex: 1; text-align: center; justify-content: center; border-color: var(--gold); color: var(--gold); }
+    .action-bar .btn { flex: 1; text-align: center; }
+    .action-bar .btn-secondary { border-color: var(--gold); color: var(--gold); }
     .action-bar .btn-secondary:hover { background: rgba(249,168,37,0.1); }
 
     .star-rating span { transition: transform 0.15s, color 0.15s; }
     .star-rating span:hover { transform: scale(1.2); }
 
     input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
-
-    .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
-    .fade-up.visible { opacity: 1; transform: translateY(0); }
 
     @media (max-width: 768px) {
       .detail-wrap { padding: 0 16px; }
@@ -224,7 +180,7 @@
 </head>
 <body>
   <!-- NAV -->
-  <nav>
+  <nav class="nav">
     <a href="index.html" class="logo">
       <img src="logo-removebg-preview.png" alt="Lala Logo" class="logo-img">
     </a>
@@ -259,6 +215,18 @@
 
   <!-- CONTENT -->
   <div class="detail-wrap">
+    <div class="state loading-state" id="listingLoading">
+      <div class="spinner"></div>
+      <p>Loading listing details...</p>
+    </div>
+
+    <div class="state error-state" id="listingError" style="display:none;">
+      <i class="ti ti-cloud-off"></i>
+      <h3>Couldn't load this listing</h3>
+      <p>Check your connection and try again.</p>
+      <button class="btn-primary" onclick="loadListingDetail()"><i class="ti ti-refresh"></i> Retry</button>
+    </div>
+
     <div class="name-row fade-up" id="nameRow" style="display:none;">
       <div>
         <div class="listing-title" id="listingName">Loading...</div>
@@ -377,6 +345,7 @@
             <textarea id="reviewComment" class="input-field" placeholder="Share your experience staying here..." style="min-height: 80px; font-family: inherit; resize: vertical;" required></textarea>
           </div>
           <button type="submit" class="btn-primary" id="submitReviewBtn" style="width:100%; justify-content:center;">Submit Review</button>
+          <div class="msg msg-error" id="reviewError" style="display:none; margin-top:10px;"></div>
         </form>
       </div>
     </div>
@@ -401,6 +370,21 @@
     let isSaved = false;
     let currentPhotoIndex = 0;
     let photos = [];
+
+    let toastTimer;
+    window.toast = function (msg, type) {
+      let t = document.getElementById('toastBox');
+      if (!t) {
+        t = document.createElement('div');
+        t.id = 'toastBox';
+        t.className = 'toast';
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      t.className = 'toast ' + (type || 'ok') + ' show';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+    };
 
     function initDates() {
       const today = new Date();
@@ -546,13 +530,22 @@
     async function loadListingDetail() {
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id');
+      const loadingEl = document.getElementById('listingLoading');
+      const errorEl = document.getElementById('listingError');
       if (!id) {
-        document.body.innerHTML = '<div style="padding:40px;text-align:center;">No listing ID provided.</div>';
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (errorEl) {
+          errorEl.style.display = 'flex';
+          errorEl.querySelector('h3').textContent = 'No listing selected';
+          errorEl.querySelector('p').textContent = 'Open a stay from the search results to see its details.';
+        }
         return;
       }
       try {
-        listing = await api.getListing(id);
-        if (listing.error) throw new Error(listing.error);
+        const detail = await api.getListing(id);
+        if (detail.error) throw new Error(detail.error);
+        listing = detail;
+        if (loadingEl) loadingEl.style.display = 'none';
         pricePerNight = listing.price;
         document.title = `Lala — ${listing.name}`;
         const saved = new Set(JSON.parse(localStorage.getItem('lala_saved') || '[]'));
@@ -606,12 +599,8 @@
           setTimeout(() => el.classList.add('visible'), 50);
         });
       } catch (err) {
-        document.querySelector('.detail-wrap').innerHTML = `
-          <div style="text-align:center; padding:60px 20px; color:var(--muted);">
-            <i class="ti ti-alert-circle" style="font-size:40px;"></i>
-            <div style="margin-top:12px; font-weight:600;">Failed to load listing details.</div>
-            <a href="search.html" class="btn-primary" style="margin-top:16px; display:inline-flex;">Back to Search</a>
-          </div>`;
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (errorEl) errorEl.style.display = 'flex';
         console.error(err);
       }
     }
@@ -716,7 +705,9 @@
       e.preventDefault();
       const ratingVal = document.getElementById('reviewRating').value;
       const commentVal = document.getElementById('reviewComment').value.trim();
-      if (!ratingVal) { alert('Please select a star rating.'); return; }
+      const errorMsg = document.getElementById('reviewError');
+      errorMsg.style.display = 'none';
+      if (!ratingVal) { errorMsg.textContent = 'Please select a star rating.'; errorMsg.style.display = 'block'; return; }
       const btn = document.getElementById('submitReviewBtn');
       btn.disabled = true; btn.innerText = 'Submitting...';
       try {
@@ -730,11 +721,12 @@
           comment: commentVal
         });
         if (result.error) throw new Error(result.error);
-        alert('Thank you! Your review has been submitted.');
+        toast('Thank you! Your review has been submitted.');
         document.getElementById('reviewFormCard').style.display = 'none';
         await loadListingDetail();
       } catch (err) {
-        alert(err.message || 'Failed to submit review.');
+        errorMsg.textContent = err.message || 'Failed to submit review. Please try again.';
+        errorMsg.style.display = 'block';
         btn.disabled = false; btn.innerText = 'Submit Review';
       }
     }

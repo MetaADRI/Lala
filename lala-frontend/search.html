@@ -11,48 +11,13 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: 'Inter', -apple-system, system-ui, 'Helvetica Neue', sans-serif;
-      background: var(--canvas);
-      color: var(--ink);
-      line-height: 1.5;
-      margin: 0;
-      -webkit-font-smoothing: antialiased;
-    }
-    h1, h2, h3, h4 { font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
-
-    /* ---- NAV ---- */
+    /* ---- NAV (fixed, hides on scroll) ---- */
     nav {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 0 40px; height: 72px;
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: var(--canvas);
-      border-bottom: 1px solid var(--hairline);
       transition: transform 0.3s ease;
     }
-    nav.hidden {
-      transform: translateY(-100%);
-    }
-    .logo-img { height: 32px; display: block; }
-    .nav-links { display: flex; gap: 8px; align-items: center; }
-    .nav-links a {
-      font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px;
-      color: var(--ink); text-decoration: none; padding: 8px 14px;
-      border-radius: 9999px; transition: all 0.2s;
-    }
-    .nav-links a:hover, .nav-links a.active { background: var(--surface-strong); }
-    .nav-cta {
-      background: var(--accent) !important;
-      color: #fff !important;
-      font-weight: 600 !important;
-    }
-    .nav-cta:hover { background: var(--accent-hover) !important; }
-
-    @media (max-width: 768px) {
-      nav { padding: 0 16px; }
-      .nav-links a:not(.nav-cta):not([href="index.html"]) { display: none; }
-    }
+    nav.hidden { transform: translateY(-100%); }
+    @media (max-width: 768px) { nav { padding: 0 16px; } }
 
     /* ---- SEARCH HEADER ---- */
     .search-header {
@@ -178,24 +143,6 @@
       font-size: 15px; font-weight: 600; color: var(--ink);
     }
 
-    .listings-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 20px;
-    }
-
-    .lcard {
-      background: var(--canvas); border-radius: 14px;
-      border: 1px solid var(--hairline);
-      overflow: hidden; display: block; text-decoration: none; color: inherit;
-      transition: all 0.25s;
-      box-shadow: var(--shadow-card);
-    }
-    .lcard:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.02), 0 6px 16px rgba(0,0,0,0.08);
-    }
-
     .limg {
       height: 180px; display: flex; align-items: center; justify-content: center;
       font-size: 40px; position: relative; overflow: hidden;
@@ -213,14 +160,6 @@
     }
     .save-btn:hover { transform: scale(1.1); }
     .save-btn.saved { color: var(--red); }
-
-    .pbadge {
-      position: absolute; bottom: 10px; left: 10px;
-      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-      color: #fff; font-size: 11px; font-weight: 600;
-      padding: 3px 10px; border-radius: 9999px;
-      font-family: 'Inter', sans-serif;
-    }
 
     .lbody { padding: 16px; }
     .lname { font-weight: 600; font-size: 16px; color: var(--ink); }
@@ -246,12 +185,6 @@
       transition: all 0.2s;
     }
     .load-more-btn:hover { border-color: var(--ink); }
-
-    /* ---- FADE UP ---- */
-    .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
-    .fade-up.visible { opacity: 1; transform: translateY(0); }
-    .fade-up-d1 { transition-delay: 0.1s; }
-    .fade-up-d2 { transition-delay: 0.2s; }
 
     @media (max-width: 768px) {
       .search-header { padding: 16px; }
@@ -332,9 +265,9 @@
       <div class="results-count" id="resultsCount">Loading stays...</div>
     </div>
     <div class="listings-grid" id="listingsGrid">
-      <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted-soft);font-size:14px;">
-        <i class="ti ti-loader" style="font-size:32px;display:block;margin-bottom:12px;"></i>
-        Loading...
+      <div class="state loading-state" style="grid-column:1/-1;">
+        <div class="spinner"></div>
+        <p>Loading stays...</p>
       </div>
     </div>
   </div>
@@ -391,7 +324,7 @@
             <button class="save-btn ${isSaved ? 'saved' : ''}" onclick="toggleSaveCard(event, '${listing.id}')">
               <i class="ti ${isSaved ? 'ti-heart-filled' : 'ti-heart'}"></i>
             </button>
-            <span class="pbadge">${listing.type}</span>
+            <span class="img-badge">${listing.type}</span>
           </div>
           <div class="lbody">
             <div class="lname">${listing.name}</div>
@@ -416,6 +349,8 @@
     async function loadListings() {
       const grid = document.getElementById('listingsGrid');
       const countEl = document.getElementById('resultsCount');
+      grid.innerHTML = '<div class="state loading-state" style="grid-column:1/-1;"><div class="spinner"></div><p>Loading stays...</p></div>';
+      countEl.innerText = 'Searching...';
       try {
         currentFilters.limit = 10;
         currentFilters.offset = 0;
@@ -424,7 +359,7 @@
         countEl.innerText = `${allListings.length} stay${allListings.length !== 1 ? 's' : ''} found`;
         grid.innerHTML = '';
         if (allListings.length === 0) {
-          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted-soft);font-size:14px;">No stays found. Try a different search.</div>';
+          grid.innerHTML = '<div class="state empty-state" style="grid-column:1/-1;"><i class="ti ti-search-off"></i><p>No stays found. Try a different search.</p><button class="btn btn-outline btn-sm" onclick="clearSearch()">Clear search</button></div>';
           return;
         }
         allListings.forEach(l => grid.insertAdjacentHTML('beforeend', renderListingCard(l)));
@@ -432,9 +367,18 @@
           grid.insertAdjacentHTML('afterend', '<div class="load-more-wrap"><button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()"><i class="ti ti-plus"></i> Load More</button></div>');
         }
       } catch (err) {
-        countEl.innerText = 'Failed to load stays';
+        countEl.innerText = 'Couldn\'t load stays';
+        grid.innerHTML = '<div class="state error-state" style="grid-column:1/-1;"><i class="ti ti-cloud-off"></i><p>Something went wrong while loading stays. Check your connection and try again.</p><button class="btn btn-outline btn-sm" onclick="loadListings()">Retry</button></div>';
         console.error(err);
       }
+    }
+
+    function clearSearch() {
+      document.getElementById('citySearch').value = '';
+      currentFilters.city = '';
+      currentFilters.type = '';
+      document.querySelectorAll('.fchip').forEach(c => c.classList.toggle('on', !c.dataset.type));
+      loadListings();
     }
 
     async function loadMore() {
@@ -456,7 +400,10 @@
           });
           grid.insertAdjacentHTML('afterend', '<div class="load-more-wrap"><button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()"><i class="ti ti-plus"></i> Load More</button></div>');
         }
-      } catch (err) { console.error(err); }
+      } catch (err) {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-plus"></i> Load More'; }
+        console.error(err);
+      }
       isLoadingMore = false;
     }
 

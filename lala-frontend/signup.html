@@ -11,280 +11,26 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #0F2B10 0%, #1B5E20 30%, #2E7D32 60%, #43A047 100%);
-      padding: 20px;
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle at 30% 40%, rgba(249,168,37,0.08) 0%, transparent 50%),
-                  radial-gradient(circle at 70% 60%, rgba(255,255,255,0.05) 0%, transparent 40%);
-      animation: bgShift 20s ease-in-out infinite alternate;
-      pointer-events: none;
-    }
-
-    @keyframes bgShift {
-      0% { transform: translate(0, 0) rotate(0deg); }
-      100% { transform: translate(-5%, 5%) rotate(3deg); }
-    }
-
-    .floating-shapes {
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .shape {
-      position: absolute;
-      border-radius: 50%;
-      opacity: 0.06;
-      animation: floatShape 25s ease-in-out infinite;
-    }
-
-    .shape:nth-child(1) {
-      width: 300px; height: 300px;
-      background: var(--gold);
-      top: 10%; left: 5%;
-      animation-delay: 0s;
-      animation-duration: 30s;
-    }
-    .shape:nth-child(2) {
-      width: 200px; height: 200px;
-      background: #fff;
-      top: 60%; right: 10%;
-      animation-delay: -5s;
-      animation-duration: 25s;
-    }
-    .shape:nth-child(3) {
-      width: 150px; height: 150px;
-      background: var(--gold);
-      bottom: 15%; left: 30%;
-      animation-delay: -12s;
-      animation-duration: 20s;
-    }
-
-    @keyframes floatShape {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(30px, -40px) scale(1.1); }
-      66% { transform: translate(-20px, 20px) scale(0.9); }
-    }
-
-    .signup-card {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 420px;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(20px);
-      border-radius: 28px;
-      box-shadow: 0 25px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1);
-      overflow: hidden;
-      animation: cardEnter 0.8s ease-out;
-    }
-
-    @keyframes cardEnter {
-      from { opacity: 0; transform: translateY(40px) scale(0.96); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .card-header {
-      background: linear-gradient(160deg, #1B5E20, #2E7D32, #388E3C);
-      padding: 24px 28px 32px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card-header::after {
-      content: '';
-      position: absolute;
-      top: -40px; right: -40px;
-      width: 160px; height: 160px;
-      background: rgba(249,168,37,0.12);
-      border-radius: 50%;
-    }
-
-    .card-header::before {
-      content: '';
-      position: absolute;
-      bottom: -30px; left: -20px;
-      width: 100px; height: 100px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 50%;
-    }
-
-    .logo-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      margin-bottom: 20px;
-      position: relative;
-      z-index: 1;
-      transition: opacity 0.2s;
-    }
-
-    .logo-link:hover { opacity: 0.85; }
-
-    .logo-link img {
-      height: 34px;
-      filter: brightness(0) invert(1);
-    }
-
-    .header-title {
-      font-family: 'Inter', sans-serif;
-      font-weight: 700;
-      font-size: 22px;
-      color: #fff;
-      position: relative;
-      z-index: 1;
-      line-height: 1.2;
-    }
-
-    .header-sub {
-      font-size: 13px;
-      color: rgba(255,255,255,0.75);
-      margin-top: 6px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .card-body {
-      padding: 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .input-group label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      font-family: 'Inter', sans-serif;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .input-wrap {
-      display: flex;
-      align-items: center;
-      background: #F5F7F4;
-      border: 2px solid transparent;
-      border-radius: 12px;
-      padding: 0 14px;
-      transition: all 0.25s;
-    }
-
-    .input-wrap:focus-within {
-      border-color: var(--g-dark);
-      background: #fff;
-      box-shadow: 0 0 0 4px rgba(27,94,32,0.08);
-    }
-
-    .input-wrap i {
-      color: var(--muted);
-      font-size: 18px;
-      margin-right: 10px;
-      transition: color 0.25s;
-    }
-
-    .input-wrap:focus-within i {
-      color: var(--g-dark);
-    }
-
-    .input-wrap input {
-      flex: 1;
-      border: none;
-      background: transparent;
-      padding: 14px 0;
-      font-size: 14px;
-      font-family: 'Inter', sans-serif;
-      color: var(--text);
-      outline: none;
-    }
-
-    .input-wrap input::placeholder {
-      color: #aaa;
-    }
-
-    .toggle-pw {
-      cursor: pointer;
-      color: var(--muted);
-      font-size: 18px;
-      transition: color 0.2s;
-    }
-
-    .toggle-pw:hover { color: var(--text); }
-
-    .btn-signup {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, #1B5E20, #2E7D32);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      font-family: 'Inter', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    /* ── Page-specific: signup only ─────────────────────────────── */
+    .features-mini {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
-      transition: all 0.3s;
-      position: relative;
-      overflow: hidden;
+      margin-top: 4px;
     }
-
-    .btn-signup::before {
-      content: '';
-      position: absolute;
-      top: 0; left: -100%;
-      width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-      transition: left 0.5s;
+    .feat-mini {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 8px 10px;
+      background: var(--g-light);
+      border-radius: 8px;
     }
+    .feat-mini i { color: var(--g-dark); font-size: 14px; }
 
-    .btn-signup:hover::before { left: 100%; }
-
-    .btn-signup:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(27,94,32,0.3);
-    }
-
-    .btn-signup:active {
-      transform: translateY(0);
-    }
-
-    .btn-signup:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-
-    /* ── Success Overlay ───────────────────────────────────────────── */
+    /* ── Success Overlay ───────────────────────────────────────── */
     .success-overlay {
       position: fixed; inset: 0; z-index: 9999;
       display: none; align-items: center; justify-content: center;
@@ -293,11 +39,7 @@
       animation: overlayIn 0.5s ease-out;
     }
     .success-overlay.show { display: flex; }
-
-    @keyframes overlayIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+    @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
 
     .success-card {
       text-align: center;
@@ -306,10 +48,7 @@
       transform: scale(0.8);
       opacity: 0;
     }
-
-    @keyframes cardPop {
-      to { transform: scale(1); opacity: 1; }
-    }
+    @keyframes cardPop { to { transform: scale(1); opacity: 1; } }
 
     .success-check {
       width: 80px; height: 80px;
@@ -321,38 +60,19 @@
       box-shadow: 0 0 0 rgba(67,160,71,0.4);
       animation: pulseRing 2s ease-in-out infinite;
     }
-
     @keyframes pulseRing {
       0%, 100% { box-shadow: 0 0 0 0 rgba(67,160,71,0.4); }
       50% { box-shadow: 0 0 0 20px rgba(67,160,71,0); }
     }
-
     .success-check i { animation: checkDraw 0.6s 0.2s ease-out both; }
-
     @keyframes checkDraw {
       from { transform: scale(0); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
 
-    .success-title {
-      font-family: 'Inter', sans-serif;
-      font-weight: 800;
-      font-size: 26px;
-      margin-bottom: 8px;
-    }
-
-    .success-sub {
-      font-size: 15px;
-      color: rgba(255,255,255,0.7);
-      margin-bottom: 6px;
-    }
-
-    .success-email {
-      font-size: 13px;
-      color: var(--gold);
-      font-weight: 500;
-      margin-bottom: 28px;
-    }
+    .success-title { font-weight: 800; font-size: 26px; margin-bottom: 8px; }
+    .success-sub { font-size: 15px; color: rgba(255,255,255,0.7); margin-bottom: 6px; }
+    .success-email { font-size: 13px; color: var(--gold); font-weight: 500; margin-bottom: 28px; }
 
     .success-loader {
       width: 120px; height: 3px;
@@ -361,208 +81,89 @@
       margin: 0 auto;
       overflow: hidden;
     }
-
     .success-loader-bar {
-      height: 100%;
-      width: 0%;
+      height: 100%; width: 0%;
       background: linear-gradient(90deg, var(--gold), #66BB6A);
       border-radius: 99px;
       animation: loadBar 2.8s ease-in-out forwards;
     }
+    @keyframes loadBar { to { width: 100%; } }
 
-    @keyframes loadBar {
-      to { width: 100%; }
-    }
-
-    .confetti-container {
-      position: fixed; inset: 0; pointer-events: none; z-index: 10000;
-      overflow: hidden;
-    }
-
+    .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 10000; overflow: hidden; }
     .confetti-piece {
       position: absolute;
-      width: 8px; height: 8px;
-      top: -10px;
+      width: 8px; height: 8px; top: -10px;
       border-radius: 2px;
       animation: confettiFall linear forwards;
     }
-
     @keyframes confettiFall {
       0% { transform: translateY(0) rotate(0deg); opacity: 1; }
       100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
     }
 
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .divider::before,
-    .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    .login-link {
-      text-align: center;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .login-link a {
-      color: var(--g-dark);
-      font-weight: 700;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .login-link a:hover {
-      color: #0f3b12;
-      text-decoration: underline;
-    }
-
-    .features-mini {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    .feat-mini {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: var(--muted);
-      padding: 8px 10px;
-      background: var(--g-light);
-      border-radius: 8px;
-    }
-
-    .feat-mini i {
-      color: var(--g-dark);
-      font-size: 14px;
-    }
-
-    .error-msg {
-      background: #FEF2F2;
-      border: 1px solid #FECACA;
-      color: #DC2626;
-      font-size: 13px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      display: none;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .error-msg.visible { display: flex; }
-
-    .spinner {
-      width: 18px;
-      height: 18px;
-      border: 2.5px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: inline-block;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .success-check {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: var(--g-light);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto;
-    }
-
-    .success-check i {
-      font-size: 24px;
-      color: var(--g-dark);
-    }
-
     @media (max-width: 480px) {
-      .signup-card { border-radius: 20px; }
-      .card-header { padding: 20px 20px 28px; }
-      .card-body { padding: 22px; }
       .features-mini { grid-template-columns: 1fr; }
     }
   </style>
 </head>
-<body>
-  <div class="floating-shapes">
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-  </div>
-
-  <div class="signup-card" id="signupCard">
-    <div class="card-header">
-      <a href="index.html" class="logo-link">
+<body class="auth-shell">
+  <div class="auth-card" id="signupCard">
+    <div class="auth-head">
+      <a href="index.html" class="auth-logo">
         <img src="logo-removebg-preview.png" alt="Lala">
-        <span style="font-family:'Inter',sans-serif; font-weight:700; font-size:18px; color:#fff;">lala</span>
+        <span>lala</span>
       </a>
-      <div class="header-title">Create your account</div>
-      <div class="header-sub">Join Lala and start booking stays across Zambia</div>
+      <div class="auth-title">Create your account</div>
+      <div class="auth-sub">Join Lala and start booking stays across Zambia</div>
     </div>
 
-    <div class="card-body">
-      <div class="error-msg" id="errorMsg">
+    <div class="auth-body">
+      <div class="auth-err" id="errorMsg">
         <i class="ti ti-alert-circle"></i>
         <span id="errorText">Something went wrong</span>
       </div>
 
-      <div class="input-group">
+      <div class="fg">
         <label>Full name</label>
-        <div class="input-wrap">
+        <div class="icon-field">
           <i class="ti ti-user"></i>
           <input type="text" id="nameInput" placeholder="e.g. John Banda" autocomplete="name">
         </div>
       </div>
 
-      <div class="input-group">
+      <div class="fg">
         <label>Email address</label>
-        <div class="input-wrap">
+        <div class="icon-field">
           <i class="ti ti-mail"></i>
           <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email">
         </div>
       </div>
 
-      <div class="input-group">
+      <div class="fg">
         <label>Phone (optional)</label>
-        <div class="input-wrap">
+        <div class="icon-field">
           <i class="ti ti-phone"></i>
           <input type="tel" id="phoneInput" placeholder="+260 97 000 0000" autocomplete="tel">
         </div>
       </div>
 
-      <div class="input-group">
+      <div class="fg">
         <label>Password</label>
-        <div class="input-wrap">
+        <div class="icon-field">
           <i class="ti ti-lock"></i>
           <input type="password" id="passwordInput" placeholder="Create a strong password" autocomplete="new-password">
           <i class="ti ti-eye toggle-pw" id="togglePw" onclick="togglePassword()"></i>
         </div>
       </div>
 
-      <button class="btn-signup" id="signupBtn" onclick="handleSignup()">
+      <button class="btn-login" id="signupBtn" onclick="handleSignup()">
         <i class="ti ti-user-plus"></i>
         <span id="signupBtnText">Create Account</span>
       </button>
 
       <div class="divider">or</div>
 
-      <div class="login-link">
+      <div class="auth-link">
         Already have an account? <a href="guest-login.html">Sign in</a>
       </div>
 
@@ -653,16 +254,15 @@
       if (!password || password.length < 6) return showError('Password must be at least 6 characters');
 
       const btn = document.getElementById('signupBtn');
-      const btnText = document.getElementById('signupBtnText');
       btn.disabled = true;
-      btnText.textContent = 'Creating account...';
+      btn.innerHTML = '<span class="btn-spinner"></span> Creating account...';
 
       try {
         const data = await api.register(email, password, name, phone || undefined);
         if (data.error) {
           showError(data.error);
           btn.disabled = false;
-          btnText.textContent = 'Create Account';
+          btn.innerHTML = '<i class="ti ti-user-plus"></i> Create Account';
           return;
         }
 
@@ -671,7 +271,7 @@
         showError('Failed to connect. Is the backend running?');
         console.error(err);
         btn.disabled = false;
-        btnText.textContent = 'Create Account';
+        btn.innerHTML = '<i class="ti ti-user-plus"></i> Create Account';
       }
     }
 
