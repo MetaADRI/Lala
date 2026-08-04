@@ -11,11 +11,11 @@ const Listing = require('../models/Listing');
 const paymentService = require('../services/paymentService');
 
 // Commission destination numbers are read from env only (never hardcoded in the app).
-// Set them here as deterministic test fixtures so the service has valid wallets to use.
+// Set them here as clearly-fake test fixtures (000… suffix) so tests never touch real wallets.
 const TEST_WALLETS = {
-  mtn: '0769723838',
-  zamtel: '0954702600',
-  airtel: '0572587206',
+  mtn: '0769000000',
+  zamtel: '0959000000',
+  airtel: '0579000000',
 };
 process.env.MTN_WALLET = TEST_WALLETS.mtn;
 process.env.ZAMTEL_WALLET = TEST_WALLETS.zamtel;

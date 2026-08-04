@@ -37,12 +37,12 @@ In Render dashboard, go to **Environment** and add:
 | `LENCO_ACCOUNT_ID` | Lenco account UUID (required for 90/10 payouts) |
 | `LENCO_COMMISSION_RATE` | `0.10` |
 | `LENCO_MIN_TRANSFER` | `5` |
-| `LENCO_COMMISSION_MTN` | `0769723838` |
-| `LENCO_COMMISSION_ZAMTEL` | `0954702600` |
-| `LENCO_COMMISSION_AIRTEL` | `0572587206` |
+| `MTN_WALLET` | Your MTN commission wallet number (no default — set in Render) |
+| `ZAMTEL_WALLET` | Your Zamtel commission wallet number (no default — set in Render) |
+| `AIRTEL_WALLET` | Your Airtel commission wallet number (no default — set in Render) |
 | `RESEND_API_KEY` | (optional) for email |
 
-**Commission flow:** guest pays 100% → Lenco collects → backend pays **90%** to lodge `hostPhone` and **10%** to the operator-matched commission number above. Customers never see the split.
+**Commission flow:** guest pays 100% → Lenco collects → backend pays **90%** to lodge `hostPhone` and **10%** to the operator-matched commission wallet (`MTN_WALLET` / `ZAMTEL_WALLET` / `AIRTEL_WALLET`). Customers never see the split.
 
 **DB columns:** `commissionStatus`, `commissionRef`, `lodgeStatus`, etc. are added automatically on restart via `sequelize.sync({ alter: true })`.
 
