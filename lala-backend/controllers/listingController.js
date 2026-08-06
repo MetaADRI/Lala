@@ -3,8 +3,19 @@ const User = require('../models/User');
 const Review = require('../models/Review');
 const sequelize = require('../config/database');
 const { Op } = require('sequelize');
+const { asyncHandler, badRequest, notFound, forbidden } = require('../middleware/errorHandler');
 
-exports.getAllListings = async (req, res) => {
+/** Fields a client may set when creating/updating a listing. Prevents mass-assignment. */
+const ALLOWED_LISTING_FIELDS = [
+  'name', 'type', 'city', 'district', 'price', 'description', 'amenities', 'photos', 'cancellationPolicy',
+];
+
+const intOrDefault = (raw, def) => {
+  const n = parseInt(raw, 10);
+  return Number.isNaN(n) ? def : n;
+};
+
+exports.getAllListings = asyncHandler(async (req, res) => {
   const { city, type, minPrice, maxPrice, sort, limit, offset } = req.query;
   const where = { isApproved: true };
 
@@ -22,154 +33,140 @@ exports.getAllListings = async (req, res) => {
     'newest': [['createdAt', 'DESC']]
   };
   const order = sortOptions[sort] || [['createdAt', 'DESC']];
-  const queryLimit = limit ? parseInt(limit, 10) : 50;
-  const queryOffset = offset ? parseInt(offset, 10) : 0;
+  const queryLimit = limit ? intOrDefault(limit, 50) : 50;
+  const queryOffset = offset ? intOrDefault(offset, 0) : 0;
 
-  try {
-    const listings = await Listing.findAll({ where, order, limit: queryLimit, offset: queryOffset });
-    
-    // Fetch average ratings and counts in a group query
-    const reviews = await Review.findAll({
-      attributes: [
-        'listingId',
-        [sequelize.fn('AVG', sequelize.col('rating')), 'ratingAverage'],
-        [sequelize.fn('COUNT', sequelize.col('id')), 'reviewCount']
-      ],
-      group: ['listingId']
-    });
+  const listings = await Listing.findAll({ where, order, limit: queryLimit, offset: queryOffset });
 
-    const reviewsMap = reviews.reduce((map, r) => {
-      map[r.listingId] = {
-        ratingAverage: parseFloat(parseFloat(r.getDataValue('ratingAverage') || 0).toFixed(1)),
-        reviewCount: parseInt(r.getDataValue('reviewCount') || 0, 10)
-      };
-      return map;
-    }, {});
+  // Fetch average ratings and counts in a group query
+  const reviews = await Review.findAll({
+    attributes: [
+      'listingId',
+      [sequelize.fn('AVG', sequelize.col('rating')), 'ratingAverage'],
+      [sequelize.fn('COUNT', sequelize.col('id')), 'reviewCount']
+    ],
+    group: ['listingId']
+  });
 
-    const results = listings.map(listing => {
-      const rev = reviewsMap[listing.id] || { ratingAverage: 0, reviewCount: 0 };
-      return {
-        ...listing.toJSON(),
-        ratingAverage: rev.ratingAverage,
-        reviewCount: rev.reviewCount
-      };
-    });
+  const reviewsMap = reviews.reduce((map, r) => {
+    map[r.listingId] = {
+      ratingAverage: parseFloat(parseFloat(r.getDataValue('ratingAverage') || 0).toFixed(1)),
+      reviewCount: parseInt(r.getDataValue('reviewCount') || 0, 10)
+    };
+    return map;
+  }, {});
 
-    res.json(results);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-exports.getListingById = async (req, res) => {
-  try {
-    const listing = await Listing.findByPk(req.params.id);
-    if (!listing) return res.status(404).json({ error: 'Listing not found' });
-    
-    const reviews = await Review.findAll({ where: { listingId: req.params.id } });
-    const reviewCount = reviews.length;
-    const ratingAverage = reviewCount > 0 
-      ? parseFloat((reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount).toFixed(1))
-      : 0;
-
-    res.json({
+  const results = listings.map(listing => {
+    const rev = reviewsMap[listing.id] || { ratingAverage: 0, reviewCount: 0 };
+    return {
       ...listing.toJSON(),
-      ratingAverage,
-      reviewCount
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+      ratingAverage: rev.ratingAverage,
+      reviewCount: rev.reviewCount
+    };
+  });
+
+  res.json(results);
+});
+
+exports.getListingById = asyncHandler(async (req, res) => {
+  const listing = await Listing.findByPk(req.params.id);
+  if (!listing) throw notFound('Listing not found');
+
+  const reviews = await Review.findAll({ where: { listingId: req.params.id } });
+  const reviewCount = reviews.length;
+  const ratingAverage = reviewCount > 0
+    ? parseFloat((reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount).toFixed(1))
+    : 0;
+
+  res.json({
+    ...listing.toJSON(),
+    ratingAverage,
+    reviewCount
+  });
+});
+
+exports.getMyListings = asyncHandler(async (req, res) => {
+  const listings = await Listing.findAll({
+    where: { hostId: req.user.id },
+    order: [['createdAt', 'DESC']]
+  });
+  res.json(listings);
+});
+
+exports.getPendingListings = asyncHandler(async (req, res) => {
+  const listings = await Listing.findAll({ where: { isApproved: false }, order: [['createdAt', 'DESC']] });
+  res.json(listings);
+});
+
+exports.createListing = asyncHandler(async (req, res) => {
+  const { name, type, city, district, price } = req.body;
+  if (!name || !type || !city || !district || price == null) {
+    throw badRequest('name, type, city, district and price are required');
   }
-};
-
-exports.getMyListings = async (req, res) => {
-  try {
-    const listings = await Listing.findAll({
-      where: { hostId: req.user.id },
-      order: [['createdAt', 'DESC']]
-    });
-    res.json(listings);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  const numericPrice = Number(price);
+  if (!Number.isFinite(numericPrice) || numericPrice < 0) {
+    throw badRequest('price must be a non-negative number');
   }
-};
 
-exports.getPendingListings = async (req, res) => {
-  try {
-    const listings = await Listing.findAll({ where: { isApproved: false }, order: [['createdAt', 'DESC']] });
-    res.json(listings);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  // Whitelist body fields — never trust the client with id/hostId/isApproved.
+  const data = {};
+  for (const field of ALLOWED_LISTING_FIELDS) {
+    if (req.body[field] !== undefined) data[field] = req.body[field];
   }
-};
+  data.price = numericPrice;
 
-exports.createListing = async (req, res) => {
-  try {
-    // Fetch host's phone number so WhatsApp links use the real number
-    const host = await User.findByPk(req.user.id);
+  // Fetch host's phone number so WhatsApp links use the real number
+  const host = await User.findByPk(req.user.id);
 
-    const listing = await Listing.create({
-      ...req.body,
-      hostId: req.user.id,
-      hostPhone: host ? host.phone : null,
-      isApproved: false // Requires admin approval
-    });
-    res.status(201).json({ message: 'Listing created and pending approval', listing });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  const listing = await Listing.create({
+    ...data,
+    hostId: req.user.id,
+    hostPhone: host ? host.phone : null,
+    isApproved: false // Requires admin approval
+  });
+  res.status(201).json({ message: 'Listing created and pending approval', listing });
+});
+
+exports.approveListing = asyncHandler(async (req, res) => {
+  const listing = await Listing.findByPk(req.params.id);
+  if (!listing) throw notFound('Listing not found');
+
+  listing.isApproved = true;
+  await listing.save();
+  res.json({ message: 'Listing approved', listing });
+});
+
+exports.rejectListing = asyncHandler(async (req, res) => {
+  const listing = await Listing.findByPk(req.params.id);
+  if (!listing) throw notFound('Listing not found');
+
+  await listing.destroy();
+  res.json({ message: 'Listing rejected and removed' });
+});
+
+exports.updateListing = asyncHandler(async (req, res) => {
+  const listing = await Listing.findByPk(req.params.id);
+  if (!listing) throw notFound('Listing not found');
+
+  // Only the host who owns it or an admin can update
+  if (req.user.role !== 'admin' && listing.hostId !== req.user.id) {
+    throw forbidden('Access denied');
   }
-};
 
-exports.approveListing = async (req, res) => {
-  try {
-    const listing = await Listing.findByPk(req.params.id);
-    if (!listing) return res.status(404).json({ error: 'Listing not found' });
-
-    listing.isApproved = true;
-    await listing.save();
-    res.json({ message: 'Listing approved', listing });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-exports.rejectListing = async (req, res) => {
-  try {
-    const listing = await Listing.findByPk(req.params.id);
-    if (!listing) return res.status(404).json({ error: 'Listing not found' });
-
-    await listing.destroy();
-    res.json({ message: 'Listing rejected and removed' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-exports.updateListing = async (req, res) => {
-  try {
-    const listing = await Listing.findByPk(req.params.id);
-    if (!listing) return res.status(404).json({ error: 'Listing not found' });
-
-    // Only the host who owns it or an admin can update
-    if (req.user.role !== 'admin' && listing.hostId !== req.user.id) {
-      return res.status(403).json({ error: 'Access denied' });
+  ALLOWED_LISTING_FIELDS.forEach(field => {
+    if (req.body[field] !== undefined) {
+      listing[field] = req.body[field];
     }
-
-    const allowedFields = ['name', 'type', 'city', 'district', 'price', 'description', 'amenities', 'cancellationPolicy', 'photos'];
-    allowedFields.forEach(field => {
-      if (req.body[field] !== undefined) {
-        listing[field] = req.body[field];
-      }
-    });
-
-    // If admin updates, they can also change approval status
-    if (req.user.role === 'admin' && req.body.isApproved !== undefined) {
-      listing.isApproved = req.body.isApproved;
-    }
-
-    await listing.save();
-    res.json({ message: 'Listing updated', listing });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  });
+  if (req.body.price !== undefined && !Number.isFinite(Number(req.body.price))) {
+    throw badRequest('price must be a number');
   }
-};
+
+  // If admin updates, they can also change approval status
+  if (req.user.role === 'admin' && req.body.isApproved !== undefined) {
+    listing.isApproved = req.body.isApproved;
+  }
+
+  await listing.save();
+  res.json({ message: 'Listing updated', listing });
+});

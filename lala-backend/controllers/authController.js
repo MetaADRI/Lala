@@ -3,9 +3,11 @@ const PasswordResetToken = require('../models/PasswordResetToken');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-
+const { Sequelize } = require('sequelize');
 
 const emailService = require('../services/email');
+const logger = require('../utils/logger');
+const { asyncHandler, AppError, badRequest, notFound, conflict } = require('../middleware/errorHandler');
 
 const RESET_TOKEN_TTL_MS = 30 * 60 * 1000; // 30 minutes (kept from previous behavior)
 
@@ -29,138 +31,131 @@ function signToken(user) {
   return { token, user: { id: user.id, email: user.email, role: user.role, name: user.name } };
 }
 
-exports.register = async (req, res) => {
+exports.register = asyncHandler(async (req, res) => {
   const { email, password, name, phone, role } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
+  if (!email || !password) throw badRequest('Email and password are required');
 
   const safeRole = role === 'host' ? 'host' : 'guest';
 
+  const existing = await User.findOne({ where: { email } });
+  if (existing) throw badRequest('An account with this email already exists');
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  let user;
   try {
-    const existing = await User.findOne({ where: { email } });
-    if (existing) return res.status(400).json({ error: 'An account with this email already exists' });
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ email, password: hashedPassword, name, phone, role: safeRole });
-
-    const { token, user: userData } = signToken(user);
-    res.status(201).json({ message: 'Account created successfully', token, user: userData });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    user = await User.create({ email, password: hashedPassword, name, phone, role: safeRole });
+  } catch (err) {
+    // Unique-constraint race between findOne and create → same friendly message
+    if (err instanceof Sequelize.UniqueConstraintError) {
+      throw conflict('An account with this email already exists');
+    }
+    throw err;
   }
-};
 
-exports.login = async (req, res) => {
+  const { token, user: userData } = signToken(user);
+  res.status(201).json({ message: 'Account created successfully', token, user: userData });
+});
+
+exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
+  if (!email || !password) throw badRequest('Email and password are required');
 
-  try {
-    const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(400).json({ error: 'Invalid email or password' });
+  const user = await User.findOne({ where: { email } });
+  if (!user) throw badRequest('Invalid email or password');
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ error: 'Invalid email or password' });
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) throw badRequest('Invalid email or password');
 
-    const { token, user: userData } = signToken(user);
-    res.json({ message: 'Login successful', token, user: userData });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+  const { token, user: userData } = signToken(user);
+  res.json({ message: 'Login successful', token, user: userData });
+});
 
-exports.updateProfile = async (req, res) => {
+exports.updateProfile = asyncHandler(async (req, res) => {
   const { name, avatar } = req.body;
 
-  try {
-    const user = await User.findByPk(req.user.id);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+  const user = await User.findByPk(req.user.id);
+  if (!user) throw notFound('User not found');
 
-    if (name !== undefined) user.name = name;
-    if (avatar !== undefined) user.avatar = avatar;
-    await user.save();
+  if (name !== undefined) user.name = name;
+  if (avatar !== undefined) user.avatar = avatar;
+  await user.save();
 
-    const { token, user: userData } = signToken(user);
-    res.json({ message: 'Profile updated', token, user: userData });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+  const { token, user: userData } = signToken(user);
+  res.json({ message: 'Profile updated', token, user: userData });
+});
 
-exports.setupHost = async (req, res) => {
+exports.setupHost = asyncHandler(async (req, res) => {
   const { name } = req.body;
-  if (!name) return res.status(400).json({ error: 'Name is required' });
+  if (!name) throw badRequest('Name is required');
 
-  try {
-    const user = await User.findByPk(req.user.id);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+  const user = await User.findByPk(req.user.id);
+  if (!user) throw notFound('User not found');
 
-    user.name = name;
-    user.role = 'host';
-    await user.save();
+  user.name = name;
+  user.role = 'host';
+  await user.save();
 
-    const { token, user: userData } = signToken(user);
-    res.json({ message: 'Host profile created', token, user: userData });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+  const { token, user: userData } = signToken(user);
+  res.json({ message: 'Host profile created', token, user: userData });
+});
 
-exports.forgotPassword = async (req, res) => {
+exports.forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
-  if (!email) return res.status(400).json({ error: 'Email is required' });
+  if (!email) throw badRequest('Email is required');
 
+  const user = await User.findOne({ where: { email } });
+  if (!user) throw notFound('No account found with this email');
+
+  const resetCode = crypto.randomInt(100000, 999999).toString();
+
+  // Invalidate any previous outstanding tokens for this email, then persist the new one.
+  await PasswordResetToken.destroy({ where: { email } });
+  await PasswordResetToken.create({
+    email,
+    codeHash: hashResetCode(resetCode),
+    expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS),
+  });
+
+  // FLAG: if the email send fails below, the created token remains in the DB.
+  // It is still valid for 30 min, so a retry via the SAME email destroys and
+  // re-creates it — no orphan accumulation beyond one outstanding token.
   try {
-    const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(404).json({ error: 'No account found with this email' });
-
-    const resetCode = crypto.randomInt(100000, 999999).toString();
-
-    // Invalidate any previous outstanding tokens for this email, then persist the new one.
-    await PasswordResetToken.destroy({ where: { email } });
-    await PasswordResetToken.create({
-      email,
-      codeHash: hashResetCode(resetCode),
-      expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS),
-    });
-
     await emailService.sendPasswordResetCode(email, resetCode);
-
-    res.json({ message: 'Reset code sent to your email', expiresIn: '30 minutes' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    logger.error('auth.reset-email.failed', { email, err: err.message });
+    throw new AppError(502, 'Failed to send reset code. Please try again.');
   }
-};
 
-exports.resetPassword = async (req, res) => {
+  res.json({ message: 'Reset code sent to your email', expiresIn: '30 minutes' });
+});
+
+exports.resetPassword = asyncHandler(async (req, res) => {
   const { email, code, password } = req.body;
   if (!email || !code || !password) {
-    return res.status(400).json({ error: 'Email, code, and new password are required' });
+    throw badRequest('Email, code, and new password are required');
   }
 
-  try {
-    const stored = await PasswordResetToken.findOne({
-      where: { email, used: false },
-      order: [['createdAt', 'DESC']],
-    });
-    if (!stored) return res.status(400).json({ error: 'No reset code requested for this email' });
-    if (Date.now() > new Date(stored.expiresAt).getTime()) {
-      await stored.destroy();
-      return res.status(400).json({ error: 'Reset code has expired' });
-    }
-    if (!codeMatches(stored.codeHash, code)) {
-      return res.status(400).json({ error: 'Invalid reset code' });
-    }
-
-    const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(404).json({ error: 'User not found' });
-
-    user.password = await bcrypt.hash(password, 10);
-    await user.save();
-
-    // One-time use: consume the token after a successful reset.
+  const stored = await PasswordResetToken.findOne({
+    where: { email, used: false },
+    order: [['createdAt', 'DESC']],
+  });
+  if (!stored) throw badRequest('No reset code requested for this email');
+  if (Date.now() > new Date(stored.expiresAt).getTime()) {
     await stored.destroy();
-
-    res.json({ message: 'Password reset successful. You can now log in with your new password.' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    throw badRequest('Reset code has expired');
   }
-};
+  if (!codeMatches(stored.codeHash, code)) {
+    throw badRequest('Invalid reset code');
+  }
+
+  const user = await User.findOne({ where: { email } });
+  if (!user) throw notFound('User not found');
+
+  user.password = await bcrypt.hash(password, 10);
+  await user.save();
+
+  // One-time use: consume the token after a successful reset.
+  await stored.destroy();
+
+  res.json({ message: 'Password reset successful. You can now log in with your new password.' });
+});

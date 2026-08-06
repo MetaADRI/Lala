@@ -4,7 +4,9 @@ const bookingController = require('../controllers/bookingController');
 const Booking = require('../models/Booking');
 const paymentService = require('../services/paymentService');
 const settlementService = require('../services/settlementService');
+const logger = require('../utils/logger');
 const { authMiddleware, roleMiddleware } = require('../middleware/auth');
+const { asyncHandler, notFound } = require('../middleware/errorHandler');
 
 // IMPORTANT: Specific named routes MUST come before /:id to avoid conflicts
 router.get('/guest/all', authMiddleware, bookingController.getGuestBookings);
@@ -18,9 +20,9 @@ router.post('/:id/cancel', authMiddleware, bookingController.cancelBooking);
 router.post('/:id/host-cancel', authMiddleware, roleMiddleware(['host', 'admin']), bookingController.hostCancelBooking);
 
 // View settlement state (admin/host only — includes commission for ops)
-router.get('/:id/settlement-status', authMiddleware, roleMiddleware(['admin', 'host']), async (req, res) => {
+router.get('/:id/settlement-status', authMiddleware, roleMiddleware(['admin', 'host']), asyncHandler(async (req, res) => {
   const booking = await Booking.findByPk(req.params.id);
-  if (!booking) return res.status(404).json({ error: 'Booking not found' });
+  if (!booking) throw notFound('Booking not found');
   return res.json({
     lodgeStatus: booking.lodgeStatus,
     lodgeRef: booking.lodgeRef,
@@ -29,12 +31,12 @@ router.get('/:id/settlement-status', authMiddleware, roleMiddleware(['admin', 'h
     commissionStatus: booking.commissionStatus,
     commissionRef: booking.commissionRef,
   });
-});
+}));
 
 // Retry failed/skipped lodge and/or commission payouts (admin only)
-router.post('/:id/retry-payout', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
+router.post('/:id/retry-payout', authMiddleware, roleMiddleware(['admin']), asyncHandler(async (req, res) => {
   const booking = await Booking.findByPk(req.params.id);
-  if (!booking) return res.status(404).json({ error: 'Booking not found' });
+  if (!booking) throw notFound('Booking not found');
 
   const lodgeNeedsRetry = ['failed', 'skipped', 'pending'].includes(booking.lodgeStatus);
   const commissionNeedsRetry = ['failed', 'skipped', 'pending'].includes(booking.commissionStatus);
@@ -54,8 +56,17 @@ router.post('/:id/retry-payout', authMiddleware, roleMiddleware(['admin']), asyn
   }
   await booking.save();
 
+  logger.info('settle.retry.started', { bookingId: booking.id, by: req.user?.id });
+
   await settlementService.settleBooking(booking);
   await booking.reload();
+
+  logger.info('settle.retry.done', {
+    bookingId: booking.id,
+    lodgeStatus: booking.lodgeStatus,
+    commissionStatus: booking.commissionStatus,
+  });
+
   return res.json({
     lodgeStatus: booking.lodgeStatus,
     lodgeRef: booking.lodgeRef,
@@ -64,22 +75,33 @@ router.post('/:id/retry-payout', authMiddleware, roleMiddleware(['admin']), asyn
     commissionRef: booking.commissionRef,
     commissionAmount: booking.commissionAmount,
   });
-});
+}));
 
 // Lenco webhook (no auth middleware — verified by signature instead)
 router.post('/webhook', async (req, res) => {
+  const signature = req.header('x-lenco-signature');
+  const isValid = paymentService.verifyWebhookSignature(req.body, signature);
+  if (!isValid) {
+    logger.warn('lenco.webhook.rejected', { reason: 'invalid signature' });
+    return res.status(401).send('Invalid signature');
+  }
+
+  let eventType = null;
+  let reference = null;
+
+  // Unparsable body: acknowledge (Lenco should not retry garbage) but trace it.
   try {
-    const signature = req.header('x-lenco-signature');
-    const isValid = paymentService.verifyWebhookSignature(req.body, signature);
-    if (!isValid) {
-      console.warn('[webhook] invalid signature — rejected');
-      return res.status(401).send('Invalid signature');
-    }
-
     const event = JSON.parse(req.body.toString('utf8'));
-    const { event: eventType, data } = event;
-    const reference = data?.reference;
+    eventType = event?.event;
+    reference = event?.data?.reference;
+  } catch (err) {
+    logger.error('lenco.webhook.unparsable', { err: err.message });
+    return res.sendStatus(200);
+  }
 
+  logger.info('lenco.webhook.received', { eventType, reference });
+
+  try {
     if (reference) {
       const booking = await Booking.findOne({ where: { transactionRef: reference } });
       if (booking) {
@@ -87,16 +109,32 @@ router.post('/webhook', async (req, res) => {
           if (booking.status !== 'confirmed') {
             await bookingController.confirmBooking(booking);
           }
+          logger.info('lenco.webhook.confirmed', { bookingId: booking.id, reference });
         } else if (eventType === 'collection.failed') {
           booking.paymentStatus = 'failed';
           await booking.save();
+          logger.info('lenco.webhook.failed', { bookingId: booking.id, reference });
+        } else {
+          logger.info('lenco.webhook.ignored', { eventType, reference });
         }
+      } else {
+        logger.warn('lenco.webhook.no-booking', { reference });
       }
+    } else {
+      logger.warn('lenco.webhook.no-reference', { eventType });
     }
 
     return res.sendStatus(200);
   } catch (err) {
-    console.error('[webhook] error:', err.message);
+    // FLAG (Phase 3): returning 200 here means Lenco will NOT retry the event.
+    // Deliberately unchanged this pass — the status poll reconciles success,
+    // and admin retry-payout covers settlement. The failure is fully logged.
+    logger.error('lenco.webhook.process-failed', {
+      eventType,
+      reference,
+      err: err.message,
+      stack: err.stack,
+    });
     return res.sendStatus(200);
   }
 });

@@ -1,14 +1,15 @@
 const axios = require('axios');
 const crypto = require('crypto');
+const logger = require('../utils/logger');
 
 const LENCO_API_URL = process.env.LENCO_API_URL;
 const LENCO_API_KEY = process.env.LENCO_API_KEY;
 
 if (!LENCO_API_KEY) {
-  console.warn('[paymentService] LENCO_API_KEY is not set — payments will fail.');
+  logger.warn('payment.env.missing', { var: 'LENCO_API_KEY', detail: 'payments will fail' });
 }
 if (!process.env.LENCO_ACCOUNT_ID) {
-  console.warn('[paymentService] LENCO_ACCOUNT_ID is not set — lodge/commission payouts will fail.');
+  logger.warn('payment.env.missing', { var: 'LENCO_ACCOUNT_ID', detail: 'lodge/commission payouts will fail' });
 }
 
 
@@ -22,6 +23,12 @@ const lenco = axios.create({
 });
 
 async function initiateMomoPush({ amount, reference, phone, operator }) {
+  logger.info('lenco.collection.start', {
+    reference,
+    amount,
+    operator: String(operator).toLowerCase(),
+    phone: logger.maskPhone(phone),
+  });
   try {
     const { data } = await lenco.post('/collections/mobile-money', {
       amount,
@@ -32,21 +39,35 @@ async function initiateMomoPush({ amount, reference, phone, operator }) {
       country: 'zm',
       bearer: 'merchant',
     });
+    logger.info('lenco.collection.done', {
+      reference,
+      lencoReference: data?.data?.lencoReference,
+      status: data?.data?.status,
+    });
     return data.data;
   } catch (err) {
     const apiError = err.response?.data || { message: err.message };
-    console.error('[paymentService.initiateMomoPush] error:', apiError);
+    logger.error('lenco.collection.error', {
+      reference,
+      amount,
+      operator: String(operator).toLowerCase(),
+      phone: logger.maskPhone(phone),
+      apiError: JSON.stringify(apiError),
+      err: err.message,
+    });
     throw new Error(apiError.message || 'Failed to initiate mobile money payment');
   }
 }
 
 async function verifyCollectionStatus(reference) {
+  logger.info('lenco.status.start', { reference });
   try {
     const { data } = await lenco.get(`/collections/status/${encodeURIComponent(reference)}`);
+    logger.info('lenco.status.done', { reference, status: data?.data?.status });
     return data.data;
   } catch (err) {
     const apiError = err.response?.data || { message: err.message };
-    console.error('[paymentService.verifyCollectionStatus] error:', apiError);
+    logger.error('lenco.status.error', { reference, apiError: JSON.stringify(apiError), err: err.message });
     throw new Error(apiError.message || 'Failed to verify payment status');
   }
 }
@@ -76,6 +97,13 @@ function verifyWebhookSignature(rawBody, signature) {
  * @returns {Promise<Object>} Lenco transfer data (includes status, reference, lencoReference)
  */
 async function sendPayout({ amount, reference, phone, operator, narration }) {
+  logger.info('lenco.transfer.start', {
+    reference,
+    amount,
+    operator: String(operator).toLowerCase(),
+    narration,
+    phone: logger.maskPhone(phone),
+  });
   try {
     const { data } = await lenco.post('/transfers/mobile-money', {
       accountId: process.env.LENCO_ACCOUNT_ID,
@@ -87,10 +115,23 @@ async function sendPayout({ amount, reference, phone, operator, narration }) {
       operator: String(operator).toLowerCase(),
       country: 'zm',
     });
+    logger.info('lenco.transfer.done', {
+      reference,
+      lencoReference: data?.data?.lencoReference,
+      status: data?.data?.status,
+    });
     return data.data;
   } catch (err) {
     const apiError = err.response?.data || { message: err.message };
-    console.error('[paymentService.sendPayout] error:', apiError);
+    logger.error('lenco.transfer.error', {
+      reference,
+      amount,
+      operator: String(operator).toLowerCase(),
+      narration,
+      phone: logger.maskPhone(phone),
+      apiError: JSON.stringify(apiError),
+      err: err.message,
+    });
     throw new Error(apiError.message || 'Failed to send payout');
   }
 }
@@ -100,12 +141,14 @@ async function sendPayout({ amount, reference, phone, operator, narration }) {
  * @returns {Promise<Object>} Lenco transfer data (status: pending|successful|failed)
  */
 async function verifyTransferStatus(reference) {
+  logger.info('lenco.transfer-status.start', { reference });
   try {
     const { data } = await lenco.get(`/transfers/status/${encodeURIComponent(reference)}`);
+    logger.info('lenco.transfer-status.done', { reference, status: data?.data?.status });
     return data.data;
   } catch (err) {
     const apiError = err.response?.data || { message: err.message };
-    console.error('[paymentService.verifyTransferStatus] error:', apiError);
+    logger.error('lenco.transfer-status.error', { reference, apiError: JSON.stringify(apiError), err: err.message });
     throw new Error(apiError.message || 'Failed to verify transfer status');
   }
 }

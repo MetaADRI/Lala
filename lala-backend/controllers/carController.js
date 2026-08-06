@@ -1,85 +1,67 @@
 const Car = require('../models/Car');
+const { Op } = require('sequelize');
+const { asyncHandler, notFound, forbidden } = require('../middleware/errorHandler');
 
-exports.getAllCars = async (req, res) => {
+const CAR_FIELDS = [
+  'driverName', 'driverPhone', 'model', 'plateNumber', 'seats', 'pricePerKm',
+  'airportPrice', 'city', 'description', 'photos', 'isActive',
+];
+
+exports.getAllCars = asyncHandler(async (req, res) => {
   const { city, sort } = req.query;
   const where = { isActive: true };
 
-  if (city) where.city = { [require('sequelize').Op.iLike]: `%${city}%` };
+  if (city) where.city = { [Op.iLike]: `%${city}%` };
 
   const order = sort === 'price_asc' ? [['pricePerKm', 'ASC']] : [['createdAt', 'DESC']];
 
-  try {
-    const cars = await Car.findAll({ where, order });
-    res.json(cars);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  const cars = await Car.findAll({ where, order });
+  res.json(cars);
+});
+
+exports.getCarById = asyncHandler(async (req, res) => {
+  const car = await Car.findByPk(req.params.id);
+  if (!car) throw notFound('Car not found');
+  res.json(car);
+});
+
+exports.getMyCars = asyncHandler(async (req, res) => {
+  const cars = await Car.findAll({
+    where: { hostId: req.user.id },
+    order: [['createdAt', 'DESC']]
+  });
+  res.json(cars);
+});
+
+exports.createCar = asyncHandler(async (req, res) => {
+  // Whitelist body fields — never trust the client with id/hostId.
+  const data = {};
+  for (const field of CAR_FIELDS) {
+    if (req.body[field] !== undefined) data[field] = req.body[field];
   }
-};
 
-exports.getCarById = async (req, res) => {
-  try {
-    const car = await Car.findByPk(req.params.id);
-    if (!car) return res.status(404).json({ error: 'Car not found' });
-    res.json(car);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+  const car = await Car.create({ ...data, hostId: req.user.id });
+  res.status(201).json({ message: 'Car registered', car });
+});
 
-exports.getMyCars = async (req, res) => {
-  try {
-    const cars = await Car.findAll({
-      where: { hostId: req.user.id },
-      order: [['createdAt', 'DESC']]
-    });
-    res.json(cars);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+exports.updateCar = asyncHandler(async (req, res) => {
+  const car = await Car.findByPk(req.params.id);
+  if (!car) throw notFound('Car not found');
+  if (car.hostId !== req.user.id && req.user.role !== 'admin') throw forbidden('Access denied');
 
-exports.createCar = async (req, res) => {
-  try {
-    const car = await Car.create({
-      ...req.body,
-      hostId: req.user.id
-    });
-    res.status(201).json({ message: 'Car registered', car });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+  CAR_FIELDS.forEach(f => {
+    if (req.body[f] !== undefined) car[f] = req.body[f];
+  });
 
-exports.updateCar = async (req, res) => {
-  try {
-    const car = await Car.findByPk(req.params.id);
-    if (!car) return res.status(404).json({ error: 'Car not found' });
-    if (car.hostId !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'Access denied' });
-    }
+  await car.save();
+  res.json({ message: 'Car updated', car });
+});
 
-    const allowed = ['driverName', 'driverPhone', 'model', 'plateNumber', 'seats', 'pricePerKm', 'airportPrice', 'city', 'description', 'photos', 'isActive'];
-    allowed.forEach(f => {
-      if (req.body[f] !== undefined) car[f] = req.body[f];
-    });
+exports.deleteCar = asyncHandler(async (req, res) => {
+  const car = await Car.findByPk(req.params.id);
+  if (!car) throw notFound('Car not found');
+  if (car.hostId !== req.user.id && req.user.role !== 'admin') throw forbidden('Access denied');
 
-    await car.save();
-    res.json({ message: 'Car updated', car });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-exports.deleteCar = async (req, res) => {
-  try {
-    const car = await Car.findByPk(req.params.id);
-    if (!car) return res.status(404).json({ error: 'Car not found' });
-    if (car.hostId !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'Access denied' });
-    }
-    await car.destroy();
-    res.json({ message: 'Car removed' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+  await car.destroy();
+  res.json({ message: 'Car removed' });
+});

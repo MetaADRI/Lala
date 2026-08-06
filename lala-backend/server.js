@@ -8,6 +8,9 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const sequelize = require('./config/database');
+const logger = require('./utils/logger');
+const { notFoundHandler, errorHandler } = require('./middleware/errorHandler');
+const { ensureBookingOverlapConstraint } = require('./config/schemaGuard');
 
 const authRoutes = require('./routes/authRoutes');
 const listingRoutes = require('./routes/listingRoutes');
@@ -55,14 +58,28 @@ app.get('/', (req, res) => {
   res.send('Lala Backend API is running...');
 });
 
-// Database Sync & Start Server
-sequelize.sync({ alter: true })
-  .then(() => {
-    console.log('✓ Database synced successfully');
-    app.listen(PORT, () => {
-      console.log(`✓ Server is running on port ${PORT}`);
-    });
-  })
-  .catch(err => {
-    console.error('✗ Unable to sync database:', err.message);
+// 404 + centralized error handler (registered last, after all routes)
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+async function start() {
+  // Plain sync() ONLY: creates missing tables on a fresh database, and never
+  // alters or drops existing columns/constraints against production.
+  // Schema changes MUST go through migrations (`npm run migrate`) —
+  // see migrations/README.md. sync({ alter: true }) / sync({ force: true })
+  // are deliberately NOT used here.
+  await sequelize.sync();
+  logger.info('db.synced', { mode: 'sync (create-if-missing only)' });
+
+  // Additive, idempotent DB-level guard against double-booking (see migration).
+  await ensureBookingOverlapConstraint();
+
+  app.listen(PORT, () => {
+    logger.info('server.start', { port: PORT });
   });
+}
+
+start().catch((err) => {
+  logger.error('server.start.failed', { err: err.message, stack: err.stack });
+  process.exit(1);
+});

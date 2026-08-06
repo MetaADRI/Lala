@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const paymentService = require('./paymentService');
 const Listing = require('../models/Listing');
 const User = require('../models/User');
+const logger = require('../utils/logger');
 
 const VALID_OPERATORS = ['mtn', 'airtel', 'zamtel'];
 const round2 = (n) => Math.round(Number(n) * 100) / 100;
@@ -60,6 +61,7 @@ function normalizePhone(phone) {
  * Idempotent: lodge already paid still retries commission if commission is not paid.
  */
 async function settleBooking(booking) {
+  const bookingId = booking.id;
   try {
     const rate = Number(process.env.LENCO_COMMISSION_RATE || 0.10);
     const min  = Number(process.env.LENCO_MIN_TRANSFER || 5);
@@ -76,7 +78,11 @@ async function settleBooking(booking) {
     // Guest payment operator (drives which commission wallet receives 10%)
     const guestOperator = String(booking.provider || '').toLowerCase();
     if (!VALID_OPERATORS.includes(guestOperator)) {
-      console.error(`[settle] Invalid operator "${guestOperator}" (booking ${booking.id}) — flagging failed.`);
+      logger.error('settle.invalid-operator', {
+        bookingId,
+        operator: guestOperator,
+        reason: 'flagging failed',
+      });
       if (booking.lodgeStatus !== 'paid') booking.lodgeStatus = 'failed';
       if (booking.commissionStatus !== 'paid') booking.commissionStatus = 'failed';
       await booking.save();
@@ -85,7 +91,7 @@ async function settleBooking(booking) {
 
     // -- Payout #1: lodge 90% (skip if already paid) --
     if (booking.lodgeStatus === 'paid') {
-      console.log(`[settle] Booking ${booking.id} lodge already paid — checking commission only.`);
+      logger.info('settle.lodge.skipped', { bookingId, reason: 'already paid — checking commission only' });
     } else {
       const listing = await Listing.findByPk(booking.listingId);
       // Prefer listing.hostPhone; fall back to host user's phone on the User record
@@ -94,7 +100,11 @@ async function settleBooking(booking) {
         const host = await User.findByPk(listing.hostId);
         hostPhone = host?.phone || null;
         if (hostPhone) {
-          console.log(`[settle] Listing ${listing.id} missing hostPhone — using host user phone ${hostPhone}`);
+          logger.info('settle.listing.hostphone-missing', {
+            bookingId,
+            listingId: listing.id,
+            detail: 'using host user phone',
+          });
           // Persist so future settlements don't re-lookup
           try {
             listing.hostPhone = hostPhone;
@@ -103,7 +113,11 @@ async function settleBooking(booking) {
         }
       }
       if (!hostPhone) {
-        console.error(`[settle] Listing ${booking.listingId} has no hostPhone and host has no phone (booking ${booking.id}) — lodge failed; still attempting commission.`);
+        logger.error('settle.lodge.no-hostphone', {
+          bookingId,
+          listingId: booking.listingId,
+          detail: 'lodge failed; still attempting commission',
+        });
         booking.lodgeStatus = 'failed';
         await booking.save();
         // Still try commission so Lala still receives its cut when funds allow
@@ -114,11 +128,21 @@ async function settleBooking(booking) {
       // Host may be on a different network than the guest who paid
       const hostOperator = detectOperatorFromPhone(hostPhone) || guestOperator;
       if (hostOperator !== guestOperator) {
-        console.log(`[settle] Host operator (${hostOperator}) differs from guest payment operator (${guestOperator}) — using host network for lodge payout.`);
+        logger.info('settle.host-operator-differs', {
+          bookingId,
+          hostOperator,
+          guestOperator,
+          detail: 'using host network for lodge payout',
+        });
       }
 
       if (lodgeAmount < min) {
-        console.warn(`[settle] Lodge amount K${lodgeAmount} < K${min} minimum (booking ${booking.id}) — flagging 'skipped' for manual settlement.`);
+        logger.warn('settle.lodge.below-min', {
+          bookingId,
+          amount: lodgeAmount,
+          min,
+          detail: "flagging 'skipped' for manual settlement",
+        });
         booking.lodgeStatus = 'skipped';
         await booking.save();
         await payCommission(booking, guestOperator, commissionAmount, min);
@@ -126,7 +150,13 @@ async function settleBooking(booking) {
       }
 
       const reference = `lala-lodge-${booking.id}-${crypto.randomBytes(3).toString('hex')}`;
-      console.log(`[settle] Paying lodge K${lodgeAmount} -> ${hostOperator} ${hostPhone} (booking ${booking.id}, ref ${reference})`);
+      logger.info('settle.lodge.start', {
+        bookingId,
+        amount: lodgeAmount,
+        operator: hostOperator,
+        phone: logger.maskPhone(hostPhone),
+        reference,
+      });
 
       try {
         const result = await paymentService.sendPayout({
@@ -140,9 +170,13 @@ async function settleBooking(booking) {
         booking.lodgeRef = reference;
         booking.lodgeStatus = (result.status === 'failed') ? 'failed' : 'paid';
         await booking.save();
-        console.log(`[settle] Booking ${booking.id} lodge payout status: ${result.status}.`);
+        logger.info('settle.lodge.done', { bookingId, status: result.status, lodgeStatus: booking.lodgeStatus });
       } catch (err) {
-        console.error(`[settle] Lodge payout FAILED for booking ${booking.id}:`, err.response?.data || err.message);
+        logger.error('settle.lodge.error', {
+          bookingId,
+          err: err.response?.data ? JSON.stringify(err.response.data) : err.message,
+          reference,
+        });
         booking.lodgeStatus = 'failed';
         await booking.save();
       }
@@ -152,7 +186,10 @@ async function settleBooking(booking) {
     await payCommission(booking, guestOperator, commissionAmount, min);
   } catch (err) {
     // NEVER let settlement crash the booking flow
-    console.error(`[settle] FAILED for booking ${booking.id}:`, err.response?.data || err.message);
+    logger.error('settle.failed', {
+      bookingId,
+      err: err.response?.data ? JSON.stringify(err.response.data) : err.message,
+    });
     try {
       if (booking.lodgeStatus !== 'paid') booking.lodgeStatus = 'failed';
       await booking.save();
@@ -165,9 +202,10 @@ async function settleBooking(booking) {
  * Crash-safe: logs + flags but never throws. Hidden from the customer.
  */
 async function payCommission(booking, operator, commissionAmount, min) {
+  const bookingId = booking.id;
   try {
     if (booking.commissionStatus === 'paid') {
-      console.log(`[settle] Booking ${booking.id} commission already paid -- skipping.`);
+      logger.info('settle.commission.skipped', { bookingId, reason: 'already paid' });
       return;
     }
 
@@ -175,21 +213,36 @@ async function payCommission(booking, operator, commissionAmount, min) {
     const numbers = getCommissionNumbers();
     const dest = numbers[operator];
     if (!dest) {
-      console.error(`[settle] No commission number for operator "${operator}" (booking ${booking.id}) -- flagging commission failed.`);
+      logger.error('settle.commission.no-number', {
+        bookingId,
+        operator,
+        detail: 'flagging commission failed',
+      });
       booking.commissionStatus = 'failed';
       await booking.save();
       return;
     }
 
     if (commissionAmount < min) {
-      console.warn(`[settle] Commission K${commissionAmount} < K${min} minimum (booking ${booking.id}) -- flagging commission 'skipped'.`);
+      logger.warn('settle.commission.below-min', {
+        bookingId,
+        amount: commissionAmount,
+        min,
+        detail: "flagging commission 'skipped'",
+      });
       booking.commissionStatus = 'skipped';
       await booking.save();
       return;
     }
 
     const reference = `lala-comm-${booking.id}-${crypto.randomBytes(3).toString('hex')}`;
-    console.log(`[settle] Paying commission K${commissionAmount} -> ${operator} ${dest} (booking ${booking.id}, ref ${reference})`);
+    logger.info('settle.commission.start', {
+      bookingId,
+      amount: commissionAmount,
+      operator,
+      phone: logger.maskPhone(dest),
+      reference,
+    });
 
     const result = await paymentService.sendPayout({
       amount: commissionAmount,
@@ -208,13 +261,25 @@ async function payCommission(booking, operator, commissionAmount, min) {
     } else {
       // pending / processing — keep pending so admin retry / status poll can re-check
       booking.commissionStatus = 'pending';
-      console.warn(`[settle] Commission transfer still "${result.status}" for booking ${booking.id} — left as pending (ref ${reference}).`);
+      logger.warn('settle.commission.pending', {
+        bookingId,
+        status: result.status,
+        reference,
+        detail: 'left as pending',
+      });
     }
     await booking.save();
 
-    console.log(`[settle] Booking ${booking.id} commission payout status: ${result.status} → commissionStatus=${booking.commissionStatus}.`);
+    logger.info('settle.commission.done', {
+      bookingId,
+      status: result.status,
+      commissionStatus: booking.commissionStatus,
+    });
   } catch (err) {
-    console.error(`[settle] COMMISSION payout FAILED for booking ${booking.id}:`, err.response?.data || err.message);
+    logger.error('settle.commission.error', {
+      bookingId,
+      err: err.response?.data ? JSON.stringify(err.response.data) : err.message,
+    });
     try { booking.commissionStatus = 'failed'; await booking.save(); } catch (_) {}
   }
 }
