@@ -171,19 +171,19 @@
       const btn = document.getElementById('bookBtn');
       btn.disabled = true;
 
+      const tripType = document.getElementById('tripType').value;
       const data = {
         carId,
-        tripType: document.getElementById('tripType').value,
+        tripType,
         pickupLocation: document.getElementById('pickupLocation').value,
         dropoffLocation: document.getElementById('dropoffLocation').value,
         pickupDate: document.getElementById('pickupDate').value,
         pickupTime: document.getElementById('pickupTime').value,
         passengerCount: parseInt(document.getElementById('passengerCount').value) || 1,
-        guestPhone: document.getElementById('guestPhone').value,
         notes: document.getElementById('notes').value
       };
 
-      if (data.tripType === 'airport') data.flightNumber = document.getElementById('flightNumber').value;
+      if (tripType === 'airport') data.flightNumber = document.getElementById('flightNumber').value;
 
       if (!data.pickupLocation || !data.dropoffLocation || !data.pickupDate || !data.pickupTime) {
         msg.className = 'msg err';
@@ -192,21 +192,22 @@
         return;
       }
 
-      try {
-        const result = await api.createCarBooking(data);
-        if (result.error) {
-          msg.className = 'msg err';
-          msg.textContent = result.error;
-        } else {
-          msg.className = 'msg ok';
-          msg.textContent = 'Transfer booked! The driver will contact you.';
-          btn.textContent = 'Booked ✓';
-        }
-      } catch (err) {
-        msg.className = 'msg err';
-        msg.textContent = 'Booking failed. Try again.';
+      if (!api.isLoggedIn()) {
+        window.location.href = `guest-login.html?redirect=${encodeURIComponent(window.location.href)}`;
+        return;
       }
-      btn.disabled = false;
+
+      const price = car && (tripType === 'airport' ? car.airportPrice : car.pricePerKm);
+      if (!price) {
+        msg.className = 'msg err';
+        msg.textContent = 'This vehicle has no price configured for this trip type.';
+        btn.disabled = false;
+        return;
+      }
+
+      // Transfers follow the lodge payment flow: choose a provider and pay via USSD.
+      const params = new URLSearchParams({ ...data, model: car.model, driverName: car.driverName, price });
+      window.location.href = `transfer-payment.html?${params.toString()}`;
     }
 
     if (carId) loadCar();

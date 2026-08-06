@@ -1302,6 +1302,37 @@
           container.innerHTML = '<div class="empty-state"><i class="ti ti-calendar-off"></i><p>No ride requests yet</p></div>';
           return;
         }
+        const statusBadge = (b) => {
+          if (b.paymentStatus && b.paymentStatus !== 'successful' && b.status !== 'cancelled' && b.status !== 'paid') {
+            return `<span class="sb sb-pend">awaiting payment</span>`;
+          }
+          const map = {
+            'confirmed': 'sb-conf',
+            'completed': 'sb-conf',
+            'paid': 'sb-conf',
+            'cancelled': 'sb-canc',
+            'awaiting_payment': 'sb-pend'
+          };
+          return `<span class="sb ${map[b.status] || 'sb-pend'}">${b.status.replace('_', ' ')}</span>`;
+        };
+
+        const statusActions = (b) => {
+          if (b.status === 'confirmed') {
+            return `
+              <div style="display:flex;gap:8px;margin-top:8px;">
+                <button onclick="driverComplete('${b.id}')" style="flex:1;padding:8px;background:#1B5E20;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Complete trip</button>
+                <button onclick="driverDecline('${b.id}')" style="flex:1;padding:8px;background:#f5f5f5;color:#666;border:1px solid #ddd;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Cancel</button>
+              </div>`;
+          }
+          if (b.status === 'completed') {
+            return `
+              <div style="display:flex;gap:8px;margin-top:8px;">
+                <button onclick="driverMarkPaid('${b.id}')" style="flex:1;padding:8px;background:#1B5E20;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Mark paid</button>
+              </div>`;
+          }
+          return '';
+        };
+
         container.innerHTML = bookings.map(b => `
           <div style="background:var(--card);border-radius:var(--rsm);border:1px solid var(--border);padding:12px 14px;margin-bottom:10px;">
             <div style="display:flex;justify-content:space-between;align-items:start;">
@@ -1312,13 +1343,9 @@
                 </div>
                 <div style="font-size:12px;color:var(--muted);">K${b.totalAmount} · ${b.passengerCount} pax</div>
               </div>
-              <span class="sb ${b.status === 'confirmed' ? 'sb-conf' : b.status === 'cancelled' ? 'sb-canc' : 'sb-pend'}">${b.status}</span>
+              ${statusBadge(b)}
             </div>
-            ${b.status === 'pending' ? `
-            <div style="display:flex;gap:8px;margin-top:8px;">
-              <button onclick="driverAccept('${b.id}')" style="flex:1;padding:8px;background:#1B5E20;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Accept</button>
-              <button onclick="driverDecline('${b.id}')" style="flex:1;padding:8px;background:#f5f5f5;color:#666;border:1px solid #ddd;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Decline</button>
-            </div>` : ''}
+            ${statusActions(b)}
           </div>
         `).join('');
       } catch (err) {
@@ -1331,6 +1358,16 @@
       catch (err) { toast('Failed to accept', 'err'); }
     }
 
+    async function driverComplete(id) {
+      try { await api.updateCarBookingStatus(id, 'completed'); loadDriverBookings(); toast('Trip marked complete.'); }
+      catch (err) { toast('Failed to update', 'err'); }
+    }
+
+    async function driverMarkPaid(id) {
+      try { await api.updateCarBookingStatus(id, 'paid'); loadDriverBookings(); toast('Marked as paid.'); }
+      catch (err) { toast('Failed to update', 'err'); }
+    }
+
     async function driverDecline(id) {
       try { await api.updateCarBookingStatus(id, 'cancelled'); loadDriverBookings(); toast('Ride declined.'); }
       catch (err) { toast('Failed to decline', 'err'); }
@@ -1338,6 +1375,8 @@
 
     window.deleteCar = deleteCar;
     window.driverAccept = driverAccept;
+    window.driverComplete = driverComplete;
+    window.driverMarkPaid = driverMarkPaid;
     window.driverDecline = driverDecline;
 
     // ── Car Form ────────────────────────────────────────────────────────

@@ -381,6 +381,11 @@ const api = {
     return res.json();
   },
 
+  getCarBookingPaymentStatus: async (id) => {
+    const res = await fetch(`${API_BASE}/car-bookings/${id}/status`);
+    return res.json();
+  },
+
   getGuestCarBookings: async () => {
     const token = localStorage.getItem('lala_token');
     const res = await fetch(`${API_BASE}/car-bookings/guest/all`, {

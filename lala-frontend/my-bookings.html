@@ -290,6 +290,20 @@
         if (!bookings.length) { section.style.display = 'none'; return; }
 
         section.style.display = 'block';
+        const transBadge = (b) => {
+          if (b.paymentStatus && b.paymentStatus !== 'successful' && b.status !== 'cancelled') {
+            return `<span class="status-badge status-awaiting_payment"><i class="ti ti-alert-circle"></i> Awaiting Payment</span>`;
+          }
+          const map = {
+            'confirmed': 'Confirmed',
+            'completed': 'Completed',
+            'paid': 'Paid',
+            'cancelled': 'Cancelled',
+            'awaiting_payment': 'Awaiting Payment'
+          };
+          const cls = b.status === 'cancelled' ? 'cancelled' : (b.status === 'confirmed' || b.status === 'completed' || b.status === 'paid') ? 'confirmed' : 'pending';
+          return `<span class="status-badge status-${cls}">${map[b.status] || b.status.replace('_', ' ')}</span>`;
+        };
         container.innerHTML = bookings.map(b => `
           <div style="background:var(--card);border-radius:var(--r);border:1px solid var(--border);padding:14px;">
             <div style="display:flex;justify-content:space-between;align-items:start;">
@@ -300,11 +314,9 @@
                 </div>
                 ${b.car ? `<div style="font-size:11px;color:var(--muted);">${b.car.model} · ${b.car.driverName}</div>` : ''}
               </div>
-              <span class="status-badge status-${b.status === 'confirmed' ? 'confirmed' : b.status === 'cancelled' ? 'cancelled' : 'pending'}">
-                ${b.status === 'confirmed' ? 'Confirmed' : b.status === 'cancelled' ? 'Cancelled' : 'Pending'}
-              </span>
+              ${transBadge(b)}
             </div>
-            ${['pending', 'confirmed'].includes(b.status) ? `<div style="margin-top:8px;text-align:right;"><button onclick="cancelTransfer('${b.id}')" style="background:none;border:1px solid #ccc;border-radius:6px;padding:4px 10px;font-size:10px;cursor:pointer;color:#c62828;">Cancel</button></div>` : ''}
+            ${['pending', 'awaiting_payment'].includes(b.status) ? `<div style="margin-top:8px;text-align:right;"><button onclick="cancelTransfer('${b.id}')" style="background:none;border:1px solid #ccc;border-radius:6px;padding:4px 10px;font-size:10px;cursor:pointer;color:#c62828;">Cancel</button></div>` : ''}
           </div>
         `).join('');
       } catch (err) { /* silently fail */ }

@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const paymentService = require('./paymentService');
 const Listing = require('../models/Listing');
 const User = require('../models/User');
+const Car = require('../models/Car');
 const logger = require('../utils/logger');
 
 const VALID_OPERATORS = ['mtn', 'airtel', 'zamtel'];
@@ -284,4 +285,125 @@ async function payCommission(booking, operator, commissionAmount, min) {
   }
 }
 
-module.exports = { settleBooking, detectOperatorFromPhone, getCommissionNumbers };
+/**
+ * Settle a confirmed transfer (car/airport) booking.
+ * Guest was charged: transfer price + 10% service fee.
+ *   e.g. K90 transfer + K9 fee = K99 total
+ *   - driver gets full transfer price → Car.driverPhone
+ *   - 10% service fee → operator commission wallet (MTN_WALLET / ZAMTEL_WALLET / AIRTEL_WALLET)
+ * CRASH-SAFE: never throws. Failures are logged + flagged; booking stays confirmed.
+ * Idempotent: driver already paid still retries commission if commission is not paid.
+ */
+async function settleCarBooking(booking) {
+  const bookingId = booking.id;
+  try {
+    const rate = Number(process.env.LENCO_COMMISSION_RATE || 0.10);
+    const min  = Number(process.env.LENCO_MIN_TRANSFER || 5);
+    const total = Number(booking.totalAmount);
+
+    // total = price * (1 + rate)  →  driver = price, commission = fee
+    // e.g. total 99, rate 0.10 → driver 90, commission 9
+    const driverAmount = round2(total / (1 + rate));
+    const commissionAmount = round2(total - driverAmount);
+
+    booking.commissionAmount = commissionAmount;
+    booking.driverPayoutAmount = driverAmount;
+
+    // Guest payment operator (drives which commission wallet receives 10%)
+    const guestOperator = String(booking.provider || '').toLowerCase();
+    if (!VALID_OPERATORS.includes(guestOperator)) {
+      logger.error('car.settle.invalid-operator', {
+        bookingId,
+        operator: guestOperator,
+        reason: 'flagging failed',
+      });
+      if (booking.driverStatus !== 'paid') booking.driverStatus = 'failed';
+      if (booking.commissionStatus !== 'paid') booking.commissionStatus = 'failed';
+      await booking.save();
+      return;
+    }
+
+    // -- Payout #1: driver full price (skip if already paid) --
+    if (booking.driverStatus === 'paid') {
+      logger.info('car.settle.driver.skipped', { bookingId, reason: 'already paid — checking commission only' });
+    } else {
+      const car = await Car.findByPk(booking.carId);
+      const driverPhone = car?.driverPhone || null;
+      if (!driverPhone) {
+        logger.error('car.settle.driver.no-phone', {
+          bookingId,
+          carId: booking.carId,
+          detail: 'driver failed; still attempting commission',
+        });
+        booking.driverStatus = 'failed';
+        await booking.save();
+        // Still try commission so Lala still receives its cut when funds allow
+        await payCommission(booking, guestOperator, commissionAmount, min);
+        return;
+      }
+
+      // Driver may be on a different network than the guest who paid
+      const driverOperator = detectOperatorFromPhone(driverPhone) || guestOperator;
+
+      if (driverAmount < min) {
+        logger.warn('car.settle.driver.below-min', {
+          bookingId,
+          amount: driverAmount,
+          min,
+          detail: "flagging 'skipped' for manual settlement",
+        });
+        booking.driverStatus = 'skipped';
+        await booking.save();
+        await payCommission(booking, guestOperator, commissionAmount, min);
+        return;
+      }
+
+      const reference = `lala-driver-${booking.id}-${crypto.randomBytes(3).toString('hex')}`;
+      logger.info('car.settle.driver.start', {
+        bookingId,
+        amount: driverAmount,
+        operator: driverOperator,
+        phone: logger.maskPhone(driverPhone),
+        reference,
+      });
+
+      try {
+        const result = await paymentService.sendPayout({
+          amount: driverAmount,
+          reference,
+          phone: normalizePhone(driverPhone),
+          operator: driverOperator,
+          narration: `Lala transfer driver payout - booking ${booking.id}`,
+        });
+
+        booking.driverRef = reference;
+        booking.driverStatus = (result.status === 'failed') ? 'failed' : 'paid';
+        await booking.save();
+        logger.info('car.settle.driver.done', { bookingId, status: result.status, driverStatus: booking.driverStatus });
+      } catch (err) {
+        logger.error('car.settle.driver.error', {
+          bookingId,
+          err: err.response?.data ? JSON.stringify(err.response.data) : err.message,
+          reference,
+        });
+        booking.driverStatus = 'failed';
+        await booking.save();
+      }
+    }
+
+    // -- Payout #2: 10% commission to the guest-operator commission number --
+    await payCommission(booking, guestOperator, commissionAmount, min);
+  } catch (err) {
+    // NEVER let settlement crash the booking flow
+    logger.error('car.settle.failed', {
+      bookingId,
+      err: err.response?.data ? JSON.stringify(err.response.data) : err.message,
+    });
+    try {
+      if (booking.driverStatus !== 'paid') booking.driverStatus = 'failed';
+      await booking.save();
+    } catch (_) {}
+  }
+}
+
+module.exports = { settleBooking, settleCarBooking, detectOperatorFromPhone, getCommissionNumbers };

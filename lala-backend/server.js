@@ -34,8 +34,9 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(cors());
 
-// RAW body ONLY for the Lenco webhook (must come BEFORE express.json)
+// RAW body ONLY for the Lenco webhooks (must come BEFORE express.json)
 app.use('/api/bookings/webhook', express.raw({ type: 'application/json' }));
+app.use('/api/car-bookings/webhook', express.raw({ type: 'application/json' }));
 
 // JSON parser for everything else
 app.use(express.json());

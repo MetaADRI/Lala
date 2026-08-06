@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lala — Secure Transfer Payment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="logo-removebg-preview.png">
+  <style>
+    body { background: var(--bg); padding-bottom: 20px; }
+
+    /* ── GOLD HEADER ──────────────────────────────────────────────────── */
+    .gold-hdr {
+      background: linear-gradient(135deg, #F9A825, #E65100);
+      padding: 18px 18px 28px; position: relative;
+    }
+    .back-btn { font-size: 20px; color: #3E2700; text-decoration: none; }
+    .gold-hdr-title {
+      font-weight: 700; font-size: 16px;
+      color: #3E2700; margin-left: 12px;
+    }
+    .pay-summary {
+      background: rgba(255,255,255,0.28); border-radius: 14px;
+      padding: 16px; margin-top: 16px; backdrop-filter: blur(4px);
+    }
+    .pay-amount { font-weight: 800; font-size: 36px; color: #3E2700; }
+    .pay-meta { font-size: 12px; color: rgba(62,39,0,0.65); margin-top: 4px; }
+    .pay-dates { font-size: 11px; color: rgba(62,39,0,0.55); margin-top: 2px; }
+
+    /* ── BODY ─────────────────────────────────────────────────────────── */
+    .payment-body { padding: 20px 18px; display: flex; flex-direction: column; gap: 16px; }
+
+    .section-title { font-weight: 600; font-size: 14px; color: var(--text); }
+
+    /* ── PROVIDER CARDS ───────────────────────────────────────────────── */
+    .pprov {
+      background: var(--card); border: 2px solid var(--border); border-radius: var(--r);
+      padding: 14px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer;
+      transition: all 0.2s; position: relative;
+    }
+    .pprov.on { border-color: var(--g-dark); box-shadow: 0 0 0 3px rgba(27,94,32,0.08); }
+    .plogo {
+      width: 44px; height: 44px; border-radius: 12px; display: flex;
+      align-items: center; justify-content: center;
+      flex-shrink: 0; overflow: hidden;
+    }
+    .plogo img { width: 100%; height: 100%; object-fit: contain; }
+    .mtn  { background: #FFCC00; padding: 6px; }
+    .airtel { background: #fff; padding: 8px; }
+    .zamtel { background: #fff; padding: 8px; }
+    .pname { font-weight: 600; font-size: 14px; color: var(--text); }
+    .psub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .pchk  { color: var(--g-dark); font-size: 22px; margin-left: auto; display: none; }
+    .pprov.on .pchk { display: block; }
+
+    /* ── PHONE INPUT ──────────────────────────────────────────────────── */
+    .phone-box {
+      background: var(--card); border: 1.5px solid var(--border); border-radius: var(--r);
+      padding: 0; overflow: hidden; display: flex; align-items: center;
+      transition: border-color 0.2s;
+    }
+    .phone-box:focus-within { border-color: var(--g-dark); }
+    .phone-prefix {
+      background: var(--g-light); padding: 14px 14px; border-right: 1px solid var(--border);
+      font-size: 14px; font-weight: 700;
+      color: var(--g-dark); flex-shrink: 0;
+    }
+    .phone-input {
+      flex: 1; padding: 14px 14px; border: none; outline: none;
+      font-size: 15px; font-weight: 500;
+      color: var(--text); background: transparent; letter-spacing: 0.04em;
+    }
+    .phone-input::placeholder { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+
+    /* ── INFO BOX ─────────────────────────────────────────────────────── */
+    .info-box {
+      background: var(--g-light); border-radius: 12px; padding: 14px;
+      font-size: 12px; color: var(--g-mid); line-height: 1.7;
+      border: 1px solid rgba(46,125,50,0.12);
+    }
+    .info-box strong { color: var(--g-dark); }
+
+    /* ── PAY BUTTON & STATES ──────────────────────────────────────────── */
+    #payBtn {
+      padding: 16px; font-size: 15px; position: relative;
+      transition: all 0.3s;
+    }
+    #payBtn:disabled {
+      opacity: 0.6; cursor: not-allowed; transform: none !important;
+    }
+
+    /* ── USSD WAITING SCREEN ─────────────────────────────────────────── */
+    .ussd-screen {
+      display: none;
+      background: var(--card); border-radius: var(--r); border: 1px solid var(--border);
+      padding: 24px; text-align: center;
+    }
+    .ussd-screen.visible { display: block; }
+    .ussd-icon { font-size: 48px; color: var(--g-dark); margin-bottom: 12px; }
+    .ussd-title { font-weight: 700; font-size: 17px; margin-bottom: 8px; }
+    .ussd-msg { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 280px; margin: 0 auto; }
+    .ussd-ref { font-weight: 700; font-size: 13px; color: var(--g-dark); margin-top: 12px; }
+    .poll-dots { display: flex; justify-content: center; gap: 6px; margin-top: 16px; }
+    .poll-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--g-mid); animation: pulse 1.4s ease-in-out infinite; }
+    .poll-dot:nth-child(2) { animation-delay: 0.2s; }
+    .poll-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse { 0%,80%,100% { opacity: 0.3; transform: scale(0.9); } 40% { opacity: 1; transform: scale(1); } }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <div class="gold-hdr">
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div style="display:flex; align-items:center;">
+        <a id="backBtn" href="#" class="back-btn"><i class="ti ti-arrow-left"></i></a>
+        <span class="gold-hdr-title">Secure Payment</span>
+      </div>
+      <img src="logo-removebg-preview.png" alt="Lala" style="height:24px;">
+    </div>
+    <div class="pay-summary">
+      <div style="font-size:11px; color:rgba(62,39,0,0.6); margin-bottom:4px;">Total to pay</div>
+      <div class="pay-amount" id="displayAmount">K—</div>
+      <div class="pay-meta" id="displayMeta">Loading...</div>
+      <div class="pay-dates" id="displayDates"></div>
+      <div class="pay-dates" id="displayFeeNote" style="margin-top:4px;"></div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="payment-body container">
+
+    <!-- Provider selection -->
+    <div id="mainForm">
+      <div class="section-title" style="margin-bottom:10px;">Select your provider</div>
+
+      <div class="pprov on" id="prov-MTN" onclick="selectProvider('MTN')">
+        <div class="plogo mtn"><img src="MTN-Logo.png" alt="MTN"></div>
+        <div>
+          <div class="pname">MTN Mobile Money</div>
+          <div class="psub">Fast USSD push · ~50% market share</div>
+        </div>
+        <i class="ti ti-circle-check-filled pchk"></i>
+      </div>
+
+      <div class="pprov" id="prov-Airtel" onclick="selectProvider('Airtel')" style="margin-top:10px;">
+        <div class="plogo airtel"><img src="Airtel-logo-500x281-removebg-preview.png" alt="Airtel"></div>
+        <div>
+          <div class="pname">Airtel Money</div>
+          <div class="psub">Fast USSD push · Airtel Zambia</div>
+        </div>
+        <i class="ti ti-circle-check-filled pchk"></i>
+      </div>
+
+      <div class="pprov" id="prov-Zamtel" onclick="selectProvider('Zamtel')" style="margin-top:10px;">
+        <div class="plogo zamtel"><img src="zamtel_logo-removebg-preview.png" alt="Zamtel"></div>
+        <div>
+          <div class="pname">Zamtel Money</div>
+          <div class="psub">Secure USSD push · Zamtel network</div>
+        </div>
+        <i class="ti ti-circle-check-filled pchk"></i>
+      </div>
+
+      <!-- Phone input -->
+      <div style="margin-top:18px;">
+        <div class="section-title" style="margin-bottom:8px;">Your mobile money number</div>
+        <div class="phone-box">
+          <div class="phone-prefix">+260</div>
+          <input class="phone-input" type="tel" id="phoneInput" inputmode="numeric"
+            placeholder="97 000 0000" maxlength="9"
+            oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        </div>
+        <div style="font-size:11px; color:var(--muted); margin-top:5px; padding-left:2px;">Enter your 9-digit number (without country code)</div>
+      </div>
+
+      <!-- How it works -->
+      <div class="info-box">
+        <strong>How it works:</strong> After tapping Pay, you will receive a USSD prompt on your phone.
+        Enter your <strong>Mobile Money PIN</strong> to confirm. Your driver is notified as soon as the payment clears.
+        <br><br>
+        <strong>Security:</strong> Lala never stores your PIN. All transactions are encrypted.
+      </div>
+
+      <!-- Pay button -->
+      <div class="msg err" id="payError" role="alert" style="display:none;"></div>
+      <button id="payBtn" class="btn-gold" style="width:100%; margin-top:8px;" onclick="handlePayment()">
+        <i class="ti ti-send"></i> <span id="payBtnText">Pay via MTN</span>
+      </button>
+    </div>
+
+    <!-- USSD waiting screen (shown after payment initiated) -->
+    <div class="ussd-screen" id="ussdScreen">
+      <div class="ussd-icon"><i class="ti ti-device-mobile-vibration"></i></div>
+      <div class="ussd-title">Check your phone</div>
+      <div class="ussd-msg">
+        A USSD prompt has been sent to <strong id="confirmPhone">your phone</strong>.
+        Enter your Mobile Money PIN to complete the payment.
+      </div>
+      <div class="ussd-ref" id="transRef"></div>
+      <div class="poll-dots">
+        <div class="poll-dot"></div>
+        <div class="poll-dot"></div>
+        <div class="poll-dot"></div>
+      </div>
+      <div style="font-size:11px; color:var(--muted); margin-top:12px;">Waiting for confirmation...</div>
+      <div class="msg err" id="pollError" role="alert" style="display:none;"></div>
+      <button class="btn-outline" style="margin-top:20px; width:100%;" onclick="simulateConfirm()">
+        <i class="ti ti-refresh"></i> I've paid — check status
+      </button>
+    </div>
+
+  </div>
+
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script src="session.js"></script>
+  <script>
+    // ── Read URL params passed from car-detail.html ────────────────────────
+    const params = new URLSearchParams(window.location.search);
+    const carId          = params.get('carId')       || '';
+    const model          = params.get('model')       || 'Your Driver';
+    const tripType       = params.get('tripType')    || 'city';
+    const pickupLocation = params.get('pickupLocation')  || '';
+    const dropoffLocation= params.get('dropoffLocation') || '';
+    const pickupDate     = params.get('pickupDate')  || '';
+    const pickupTime     = params.get('pickupTime')  || '';
+    const passengerCount = parseInt(params.get('passengerCount') || '1');
+    const flightNumber   = params.get('flightNumber') || '';
+    const price          = parseFloat(params.get('price') || '0');
+
+    // Transfer price + 10% service fee (e.g. K90 + K9 = K99). Must match the backend.
+    const serviceFee = Math.round((price || 0) * 0.10);
+    const total = (price || 0) + serviceFee;
+
+    let selectedProvider = 'MTN';
+    let createdBookingId = null;
+
+    // ── Populate header summary ─────────────────────────────────────────
+    document.getElementById('displayAmount').textContent = total ? `K${Number(total).toLocaleString()}` : 'K—';
+    document.getElementById('displayMeta').textContent = `${tripType === 'airport' ? '✈️ Airport' : '📍 City'} transfer · ${model}`;
+    if (pickupDate && pickupTime) {
+      document.getElementById('displayDates').textContent = `${pickupDate} at ${pickupTime} · ${pickupLocation} → ${dropoffLocation}`;
+    }
+    const feeNote = document.getElementById('displayFeeNote');
+    if (feeNote && price) {
+      feeNote.textContent = `Transfer K${Number(price).toLocaleString()} + 10% service fee K${Number(serviceFee).toLocaleString()}`;
+    }
+
+    // Back button goes to car detail
+    if (carId) {
+      document.getElementById('backBtn').href = `car-detail.html?id=${carId}`;
+    }
+
+    // Pre-fill phone from logged-in user if available
+    const user = api.getUser();
+    if (user && user.phone) {
+      const phone = user.phone.replace(/^260/, '').replace(/\D/g, '');
+      document.getElementById('phoneInput').value = phone;
+    }
+
+    // ── Provider selection ───────────────────────────────────────────────
+    function selectProvider(name) {
+      selectedProvider = name;
+      document.querySelectorAll('.pprov').forEach(p => p.classList.remove('on'));
+      document.getElementById(`prov-${name}`).classList.add('on');
+      document.getElementById('payBtnText').textContent = `Pay K${total ? parseFloat(total).toLocaleString() : '—'} via ${name}`;
+    }
+    // Init button text
+    selectProvider('MTN');
+
+    // ── Initiate payment ─────────────────────────────────────────────────
+    const payError = document.getElementById('payError');
+    const pollError = document.getElementById('pollError');
+
+    function showPayError(msg) {
+      payError.textContent = msg;
+      payError.style.display = 'block';
+    }
+    function clearPayError() {
+      payError.textContent = '';
+      payError.style.display = 'none';
+    }
+    function showPollError(msg) {
+      pollError.textContent = msg;
+      pollError.style.display = 'block';
+    }
+    function clearPollError() {
+      pollError.textContent = '';
+      pollError.style.display = 'none';
+    }
+    function resetPayBtn() {
+      const btn = document.getElementById('payBtn');
+      btn.disabled = false;
+      btn.innerHTML = `<i class="ti ti-send"></i> <span id="payBtnText">Pay via ${selectedProvider}</span>`;
+    }
+
+    async function handlePayment() {
+      clearPayError();
+      const rawPhone = document.getElementById('phoneInput').value.trim();
+      if (!rawPhone || rawPhone.length < 9) {
+        showPayError('Please enter a valid 9-digit mobile money number.');
+        return;
+      }
+      if (!carId) {
+        showPayError('Booking information is missing. Please go back and try again.');
+        return;
+      }
+      if (!api.isLoggedIn()) {
+        window.location.href = `guest-login.html?redirect=${encodeURIComponent(window.location.href)}`;
+        return;
+      }
+
+      const phone = `260${rawPhone}`;
+      const btn = document.getElementById('payBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="btn-spinner"></span> Sending USSD prompt...`;
+
+      try {
+        const payload = {
+          carId,
+          tripType,
+          pickupLocation,
+          dropoffLocation,
+          pickupDate,
+          pickupTime,
+          passengerCount,
+          provider: selectedProvider,
+          phone
+        };
+        if (flightNumber) payload.flightNumber = flightNumber;
+
+        const result = await api.createCarBooking(payload);
+
+        if (result.error) {
+          throw new Error(result.error);
+        }
+
+        createdBookingId = result.bookingId;
+
+        // Show USSD waiting screen
+        document.getElementById('mainForm').style.display = 'none';
+        document.getElementById('ussdScreen').classList.add('visible');
+        document.getElementById('confirmPhone').textContent = `+${phone}`;
+        document.getElementById('transRef').textContent = result.reference
+          ? `Ref: ${result.reference}`
+          : '';
+
+        startPolling();
+
+      } catch (err) {
+        const msg = err.message || '';
+        if (msg.includes('Invalid token') || msg.includes('Access denied')) {
+          window.location.href = `guest-login.html?redirect=${encodeURIComponent(window.location.href)}`;
+          return;
+        }
+        resetPayBtn();
+        showPayError(msg ? `Payment failed: ${msg}` : 'Payment failed. Please try again.');
+        console.error(err);
+      }
+    }
+
+    // ── Poll payment status (triggers Lenco verify + settle on success) ──
+    let pollInterval = null;
+    let pollAttempts = 0;
+
+    function redirectConfirmed() {
+      window.location.href = 'my-bookings.html';
+    }
+
+    function startPolling() {
+      clearPollError();
+      pollAttempts = 0;
+      pollInterval = setInterval(async () => {
+        pollAttempts++;
+        if (pollAttempts > 40) {
+          clearInterval(pollInterval);
+          showPollError(
+            "We haven't confirmed your payment yet. If you completed the USSD prompt on your phone, " +
+            "tap \"I've paid — check status\" below. Your transfer is still reserved."
+          );
+          return;
+        }
+        try {
+          const result = await api.getCarBookingPaymentStatus(createdBookingId);
+          if (result.error) return;
+
+          if (result.paymentStatus === 'successful' || result.status === 'confirmed') {
+            clearInterval(pollInterval);
+            redirectConfirmed();
+          } else if (result.paymentStatus === 'failed') {
+            clearInterval(pollInterval);
+            document.getElementById('ussdScreen').classList.remove('visible');
+            document.getElementById('mainForm').style.display = '';
+            resetPayBtn();
+            showPayError('Payment failed or was cancelled. Please try again.');
+          }
+        } catch (err) {
+          console.error('[poll] status check failed:', err);
+          showPollError('Could not reach the payment service. Tap "I\'ve paid — check status" to retry.');
+        }
+      }, 3000);
+    }
+
+    // ── Manual re-check (same path as auto-poll — uses real Lenco status) ──
+    async function simulateConfirm() {
+      if (!createdBookingId) return;
+      clearPollError();
+      try {
+        const result = await api.getCarBookingPaymentStatus(createdBookingId);
+        if (result.error) throw new Error(result.error);
+
+        if (result.paymentStatus === 'successful' || result.status === 'confirmed') {
+          clearInterval(pollInterval);
+          redirectConfirmed();
+        } else if (result.paymentStatus === 'failed') {
+          showPollError('Payment failed or was cancelled. Please try paying again.');
+          document.getElementById('ussdScreen').classList.remove('visible');
+          document.getElementById('mainForm').style.display = '';
+          resetPayBtn();
+        } else {
+          showPollError('Payment not confirmed yet. Approve the USSD prompt on your phone, then tap check again.');
+        }
+      } catch (err) {
+        showPollError('Error checking payment: ' + err.message);
+      }
+    }
+  </script>
+</body>
+</html>

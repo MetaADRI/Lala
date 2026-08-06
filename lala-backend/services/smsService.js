@@ -42,6 +42,11 @@ const smsService = {
   sendBookingConfirmation: async (booking) => {
     const msg = `Lala: Booking confirmed! Your stay from ${booking.checkIn} to ${booking.checkOut}. Ref: ${booking.transactionRef || booking.id.split('-')[0].toUpperCase()}. Enjoy your stay!`;
     return smsService.sendSMS(booking.guestPhone, msg);
+  },
+
+  sendCarBookingConfirmation: async (booking) => {
+    const msg = `Lala: Transfer confirmed! Pickup ${booking.pickupDate} at ${booking.pickupTime} (${booking.pickupLocation} → ${booking.dropoffLocation}). Ref: ${booking.transactionRef || booking.id.split('-')[0].toUpperCase()}. Your driver will contact you.`;
+    return smsService.sendSMS(booking.guestPhone, msg);
   }
 };
 

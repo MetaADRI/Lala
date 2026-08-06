@@ -55,6 +55,31 @@ const CarBooking = sequelize.define('CarBooking', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  provider: {
+    type: DataTypes.STRING,
+    allowNull: true  // 'MTN', 'Airtel', 'Zamtel'
+  },
+  transactionRef: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  // --- Lenco payment fields ---
+  lencoReference: {
+    type: DataTypes.STRING,
+    allowNull: true, // Lenco's internal reference (lencoReference from the API)
+  },
+  paymentStatus: {
+    type: DataTypes.ENUM('pending', 'pay-offline', 'successful', 'failed'),
+    allowNull: false,
+    defaultValue: 'pending',
+  },
+  // --- Lenco split-settlement fields ---
+    driverStatus:       { type: DataTypes.ENUM('pending','paid','failed','skipped'), allowNull: false, defaultValue: 'pending' },
+    driverRef:          { type: DataTypes.STRING, allowNull: true },
+    driverPayoutAmount: { type: DataTypes.FLOAT,  allowNull: true },
+    commissionAmount:   { type: DataTypes.FLOAT,  allowNull: true }, // 10% commission amount
+    commissionStatus:   { type: DataTypes.ENUM('pending','paid','failed','skipped'), allowNull: false, defaultValue: 'pending' },
+    commissionRef:      { type: DataTypes.STRING, allowNull: true }, // Lenco ref for the commission payout
   notes: {
     type: DataTypes.TEXT,
     allowNull: true
