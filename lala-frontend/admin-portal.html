@@ -34,6 +34,72 @@
 
     .empty-state { text-align: center; padding: 60px 20px; color: #888; }
     .empty-state i { font-size: 48px; color: #DDD; margin-bottom: 16px; }
+
+    .admin-tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid #E0E0E0; }
+    .admin-tab {
+      background: transparent; border: none; border-bottom: 2px solid transparent;
+      padding: 10px 14px; font-size: 14px; font-weight: 600; color: #666;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+    }
+    .admin-tab:hover { color: #1B5E20; }
+    .admin-tab.active { color: #1B5E20; border-bottom-color: #1B5E20; }
+    .tab-count { background: #E8F5E9; color: #1B5E20; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+    .tab-count.hot { background: #FFF3E0; color: #E65100; }
+
+    .hbadge {
+      background: #E8F5E9; color: #1B5E20; font-size: 10px; font-weight: 700;
+      padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .hbadge.pending { background: #FFF3E0; color: #E65100; }
+    .hbadge.approved { background: #E8F5E9; color: #1B5E20; }
+    .hbadge.rejected { background: #FFEBEE; color: #C62828; }
+
+    .hcard {
+      background: #fff; border-radius: 12px; border: 1px solid #E0E0E0; padding: 18px 20px;
+      margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;
+      gap: 16px; flex-wrap: wrap; transition: transform 0.2s;
+    }
+    .hcard:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+    .hcard .hinfo { flex: 1; min-width: 220px; }
+    .hcard .hinfo h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .hcard .hmeta { font-size: 12.5px; color: #666; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+    .hcard .hdate { font-size: 11.5px; color: #999; margin-top: 6px; }
+
+    .pthumbs { display: flex; gap: 8px; margin-top: 12px; align-items: stretch; flex-wrap: wrap; }
+    .pthumbs .pth {
+      position: relative; width: 64px; height: 64px; border-radius: 8px; overflow: hidden;
+      cursor: zoom-in; border: 1px solid #eee; background: #f5f5f5; flex-shrink: 0;
+    }
+    .pthumbs .pth img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .pthumbs .lead { width: 96px; }
+    .pthumbs .more-badge {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.55); color: #fff;
+      font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    }
+    .pthumbs .empty-thumb {
+      color: #aaa; font-size: 12px; align-items: center; gap: 6px; display: flex;
+      border: 1px dashed #e0e0e0; border-radius: 8px; padding: 12px 16px; cursor: default;
+    }
+
+    .lightbox {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 500;
+      display: none; align-items: center; justify-content: center; flex-direction: column;
+    }
+    .lightbox img {
+      max-width: 88vw; max-height: 78vh; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+    .lb-close {
+      position: absolute; top: 18px; right: 18px; width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.15); color: #fff; border: none; font-size: 20px; cursor: pointer;
+    }
+    .lb-nav {
+      position: absolute; top: 50%; transform: translateY(-50%); width: 46px; height: 46px;
+      border-radius: 50%; background: rgba(255,255,255,0.15); color: #fff; border: none;
+      font-size: 26px; cursor: pointer; line-height: 1;
+    }
+    .lb-prev { left: 18px; }
+    .lb-next { right: 18px; }
+    .lb-count { position: absolute; bottom: 22px; color: #fff; font-size: 13px; font-weight: 600; background: rgba(0,0,0,0.5); padding: 4px 12px; border-radius: 14px; }
   </style>
 </head>
 <body>
@@ -50,18 +116,48 @@
   </div>
 
   <div class="admin-container">
-    <div class="flex-between" style="margin-bottom: 24px;">
-      <h1 class="sora" style="font-size: 22px;">Verification Queue</h1>
-      <div id="queueCount" class="pbadge">0 Pending</div>
+    <h1 class="sora" style="font-size: 22px; margin-bottom: 20px;">Admin Portal</h1>
+
+    <div class="admin-tabs">
+      <button class="admin-tab active" id="tabListings" onclick="switchTab('listings')">
+        Listing Verification <span id="listingCount" class="tab-count">0</span>
+      </button>
+      <button class="admin-tab" id="tabHosts" onclick="switchTab('hosts')">
+        Host Requests <span id="hostCount" class="tab-count">0</span>
+      </button>
     </div>
 
-    <div id="pendingList">
-      <!-- Listings will be injected here -->
-      <div class="empty-state">
-        <i class="ti ti-loader animate-spin"></i>
-        <p>Loading verification queue...</p>
+    <!-- LISTING VERIFICATION -->
+    <section id="sectionListings">
+      <div class="flex-between" style="margin-bottom: 24px;">
+        <h2 class="sora" style="font-size: 16px;">Verification Queue</h2>
+        <div id="queueCount" class="pbadge">0 Pending</div>
       </div>
-    </div>
+
+      <div id="pendingList">
+        <!-- Listings will be injected here -->
+        <div class="empty-state">
+          <i class="ti ti-loader animate-spin"></i>
+          <p>Loading verification queue...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOST REQUESTS -->
+    <section id="sectionHosts" style="display: none;">
+      <div class="flex-between" style="margin-bottom: 24px;">
+        <h2 class="sora" style="font-size: 16px;">Become-a-Host Applications</h2>
+        <div id="hostQueueCount" class="pbadge">0 Pending</div>
+      </div>
+
+      <div id="hostRequestList">
+        <!-- Host requests will be injected here -->
+        <div class="empty-state">
+          <i class="ti ti-loader animate-spin"></i>
+          <p>Loading host applications...</p>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script src="config.js"></script>
@@ -96,6 +192,7 @@
       try {
         const listings = await api.getPendingListings();
         countEl.innerText = `${listings.length} Pending`;
+        document.getElementById('listingCount').innerText = listings.length;
         
         listEl.innerHTML = '';
         if (listings.length === 0) {
@@ -108,15 +205,27 @@
           return;
         }
 
+        const lbData = {};
         listings.forEach(l => {
+          const photos = Array.isArray(l.photos) ? l.photos.filter(Boolean) : [];
+          lbData[l.id] = photos;
+          const thumbHtml = photos.length
+            ? `<div class="pthumbs">${photos.slice(0, 4).map((p, i) => `
+                <div class="pth ${i === 0 ? 'lead' : ''}" onclick="openLightbox('${l.id}', ${i})">
+                  <img src="${p}" alt="${esc(l.name)} photo">
+                  ${i === 0 && photos.length > 1 ? `<span class="more-badge">${photos.length}</span>` : ''}
+                </div>`).join('')}</div>`
+            : `<div class="pthumbs"><span class="empty-thumb"><i class="ti ti-photo-off"></i> No photos uploaded</span></div>`;
+
           listEl.insertAdjacentHTML('beforeend', `
             <div class="pcard fade-up visible">
               <div class="pinfo">
-                <h3>${l.name}</h3>
-                <div class="ploc"><i class="ti ti-map-pin"></i> ${l.district}, ${l.city}</div>
+                <h3>${esc(l.name)}</h3>
+                <div class="ploc"><i class="ti ti-map-pin"></i> ${esc(l.district)}, ${esc(l.city)}</div>
                 <div class="pdetails">
-                  Type: <strong>${l.type}</strong> · Price: <strong>K${l.price}</strong> · Host: <strong>${(l.hostId || '?').split('-')[0]}</strong>
+                  Type: <strong>${esc(l.type)}</strong> · Price: <strong>K${esc(l.price)}</strong> · Host: <strong>${esc((l.hostId || '?').split('-')[0])}</strong>
                 </div>
+                ${thumbHtml}
               </div>
               <div class="action-btns">
                 <button onclick="approveListing('${l.id}')" class="btn-approve">Approve</button>
@@ -125,11 +234,46 @@
             </div>
           `);
         });
+        window.__lbData = lbData;
       } catch (err) {
         console.error(err);
         listEl.innerHTML = '<div class="empty-state"><p>Couldn\'t load the verification queue.</p><button class="btn-outline" style="margin-top:12px;" onclick="loadQueue()">Retry</button></div>';
       }
     }
+
+    // ── Lightbox (photo review) ───────────────────────────────────────────
+    let lbPhotos = [];
+    let lbIndex = 0;
+
+    function openLightbox(id, index) {
+      const photos = window.__lbData?.[id];
+      if (!photos || !photos.length) return;
+      lbPhotos = photos;
+      lbIndex = index;
+      showLb();
+      document.getElementById('lightbox').style.display = 'flex';
+    }
+
+    function showLb() {
+      document.getElementById('lbImg').src = lbPhotos[lbIndex];
+      document.getElementById('lbCount').innerText = `${lbIndex + 1} / ${lbPhotos.length}`;
+    }
+
+    function changeLb(dir) {
+      lbIndex = (lbIndex + dir + lbPhotos.length) % lbPhotos.length;
+      showLb();
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (document.getElementById('lightbox').style.display !== 'flex') return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') changeLb(-1);
+      if (e.key === 'ArrowRight') changeLb(1);
+    });
 
     async function approveListing(id) {
       if (!confirm('Approve this listing for publication?')) return;
@@ -153,6 +297,105 @@
       }
     }
 
+    // ── TABS ──────────────────────────────────────────────────────────────
+    let hostsLoaded = false;
+
+    function switchTab(name) {
+      const listingActive = name === 'listings';
+      document.getElementById('sectionListings').style.display = listingActive ? '' : 'none';
+      document.getElementById('sectionHosts').style.display = listingActive ? 'none' : '';
+      document.getElementById('tabListings').classList.toggle('active', listingActive);
+      document.getElementById('tabHosts').classList.toggle('active', !listingActive);
+      if (!listingActive && !hostsLoaded) {
+        hostsLoaded = true;
+        loadHostRequests();
+      }
+    }
+
+    // ── HOST REQUESTS ─────────────────────────────────────────────────────
+    function esc(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    async function loadHostRequests() {
+      const listEl = document.getElementById('hostRequestList');
+      const countEl = document.getElementById('hostQueueCount');
+
+      try {
+        const requests = await api.getAllHostRequests();
+        const pending = requests.filter(r => r.status === 'pending').length;
+        countEl.innerText = `${pending} Pending`;
+        const countEl2 = document.getElementById('hostCount');
+        countEl2.innerText = pending;
+        countEl2.className = 'tab-count' + (pending > 0 ? ' hot' : '');
+
+        listEl.innerHTML = '';
+        if (requests.length === 0) {
+          listEl.innerHTML = `
+            <div class="empty-state">
+              <i class="ti ti-users" style="color: #2E7D32;"></i>
+              <p>No host applications yet.</p>
+            </div>
+          `;
+          return;
+        }
+
+        requests.forEach(r => {
+          const email = r.user ? r.user.email : '';
+          const badgeCls = r.status === 'pending' ? 'pending' : r.status;
+          const date = new Date(r.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+          const actions = r.status === 'pending' ? `
+            <div class="action-btns">
+              <button onclick="approveHostRequest('${r.id}')" class="btn-approve">Approve</button>
+              <button onclick="rejectHostRequest('${r.id}')" class="btn-reject">Reject</button>
+            </div>` : '';
+          listEl.insertAdjacentHTML('beforeend', `
+            <div class="hcard fade-up visible">
+              <div class="hinfo">
+                <h3>
+                  <span>${esc(r.name)}</span>
+                  <span class="hbadge ${badgeCls}">${esc(r.status)}</span>
+                </h3>
+                <div class="hmeta"><i class="ti ti-mail"></i> ${esc(email)}</div>
+                ${r.phone ? `<div class="hmeta"><i class="ti ti-phone"></i> ${esc(r.phone)}</div>` : ''}
+                <div class="hdate"><i class="ti ti-calendar"></i> Requested ${date}</div>
+              </div>
+              ${actions}
+            </div>
+          `);
+        });
+      } catch (err) {
+        console.error(err);
+        listEl.innerHTML = '<div class="empty-state"><p>Couldn\'t load host applications.</p><button class="btn-outline" style="margin-top:12px;" onclick="loadHostRequests()">Retry</button></div>';
+      }
+    }
+
+    async function approveHostRequest(id) {
+      if (!confirm('Approve this applicant as a host?')) return;
+      try {
+        const data = await api.reviewHostRequest(id, 'approve');
+        if (data.error) { toast(data.error, 'err'); return; }
+        loadHostRequests();
+        toast('Applicant approved as host.');
+      } catch (err) {
+        toast('Approval failed', 'err');
+      }
+    }
+
+    async function rejectHostRequest(id) {
+      if (!confirm('Reject this host application?')) return;
+      try {
+        const data = await api.reviewHostRequest(id, 'reject');
+        if (data.error) { toast(data.error, 'err'); return; }
+        loadHostRequests();
+        toast('Host application rejected.');
+      } catch (err) {
+        toast('Failed to reject application', 'err');
+      }
+    }
+
     function logout() {
       localStorage.removeItem('lala_token');
       localStorage.removeItem('lala_user');
@@ -161,5 +404,14 @@
 
     loadQueue();
   </script>
+
+  <!-- Photo review lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="lb-close" onclick="closeLightbox()"><i class="ti ti-x"></i></button>
+    <button class="lb-nav lb-prev" onclick="event.stopPropagation(); changeLb(-1)">&#8249;</button>
+    <img id="lbImg" src="" alt="Property photo" onclick="event.stopPropagation()">
+    <button class="lb-nav lb-next" onclick="event.stopPropagation(); changeLb(1)">&#8250;</button>
+    <div class="lb-count" id="lbCount"></div>
+  </div>
 </body>
 </html>

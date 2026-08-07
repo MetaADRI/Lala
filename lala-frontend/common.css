@@ -529,7 +529,7 @@ img { max-width: 100%; }
   outline: none;
 }
 .icon-field input::placeholder { color: #aaa; }
-.icon-field .toggle-pw { cursor: pointer; color: var(--muted); font-size: 18px; transition: color 0.2s; }
+.icon-field .toggle-pw { cursor: pointer; color: var(--muted); font-size: 18px; margin-right: 0; margin-left: 10px; transition: color 0.2s; }
 .icon-field .toggle-pw:hover { color: var(--text); }
 
 .btn-login {

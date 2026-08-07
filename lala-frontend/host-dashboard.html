@@ -499,6 +499,29 @@
 
     .modal-close:hover { background: #ddd; color: var(--text); }
 
+    .photo-upload {
+      display: block; border: 1.5px dashed var(--border); border-radius: 10px; padding: 16px;
+      text-align: center; cursor: pointer; color: var(--muted); font-size: 13px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .photo-upload:hover { border-color: var(--g-mid); background: #f7faf7; }
+    .photo-upload input { display: none; }
+    .photo-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .photo-preview .pth {
+      position: relative; width: 72px; height: 72px; border-radius: 8px; overflow: hidden;
+      border: 1px solid var(--border); background: #f3f5f3;
+    }
+    .photo-preview .pth img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-preview .pth .rm {
+      position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; border-radius: 50%;
+      background: rgba(0,0,0,0.55); color: #fff; border: none; font-size: 10px; line-height: 1;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;
+    }
+    .photo-preview .pth .up-spin {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.72);
+    }
+
     .form-group {
       margin-bottom: 16px;
     }
@@ -759,6 +782,15 @@
           <label>Description</label>
           <textarea name="description" placeholder="Describe your property..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;outline:none;min-height:60px;resize:vertical;"></textarea>
         </div>
+        <div class="form-group">
+          <label>Photos <span style="font-weight:400;color:var(--muted);">(up to 6)</span></label>
+          <label class="photo-upload">
+            <i class="ti ti-photo-plus" style="font-size:20px;display:block;margin-bottom:4px;"></i>
+            Tap to choose photos
+            <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(this.files)">
+          </label>
+          <div class="photo-preview" id="photoPreview"></div>
+        </div>
         <button type="submit" class="btn-primary">Submit for Review</button>
         <button type="button" class="btn-secondary" onclick="closeModal('listingModal')">Cancel</button>
       </form>
@@ -809,6 +841,15 @@
         <div class="form-group">
           <label>Description</label>
           <textarea name="description" id="editDescription" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;outline:none;min-height:60px;resize:vertical;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Photos <span style="font-weight:400;color:var(--muted);">(up to 6)</span></label>
+          <label class="photo-upload">
+            <i class="ti ti-photo-plus" style="font-size:20px;display:block;margin-bottom:4px;"></i>
+            Tap to add photos
+            <input type="file" id="editPhotoInput" accept="image/*" multiple onchange="handleEditPhotos(this.files)">
+          </label>
+          <div class="photo-preview" id="editPhotoPreview"></div>
         </div>
         <button type="submit" class="btn-primary">Save Changes</button>
         <button type="button" class="btn-secondary" onclick="closeModal('editListingModal')">Cancel</button>
@@ -1111,8 +1152,67 @@
     }
 
     // ── Add Listing Form ───────────────────────────────────────────────
+    let pendingPhotos = [];
+    let uploadingPhotos = 0;
+
+    async function handlePhotos(files) {
+      const remaining = 6 - pendingPhotos.length - uploadingPhotos;
+      const toUpload = Array.from(files).slice(0, Math.max(0, remaining));
+      if (files.length > remaining) {
+        toast(`You can add up to 6 photos (${Math.max(0, remaining)} more).`, 'err');
+      }
+      if (!toUpload.length) {
+        document.getElementById('photoInput').value = '';
+        return;
+      }
+
+      const preview = document.getElementById('photoPreview');
+      for (const file of toUpload) {
+        const id = 'up-' + Math.random().toString(36).slice(2, 8);
+        preview.insertAdjacentHTML('beforeend', `
+          <div class="pth" id="${id}">
+            <img src="${URL.createObjectURL(file)}" alt="">
+            <div class="up-spin"><span class="btn-spinner"></span></div>
+          </div>
+        `);
+        uploadingPhotos++;
+        try {
+          const data = await api.uploadPhotos([file]);
+          uploadingPhotos--;
+          const el = document.getElementById(id);
+          if (data.error) {
+            if (el) el.remove();
+            toast(data.error, 'err');
+            continue;
+          }
+          if (!el) continue;
+          el.dataset.url = data.urls[0];
+          el.querySelector('.up-spin')?.remove();
+          el.insertAdjacentHTML('beforeend',
+            '<button type="button" class="rm" onclick="removePendingPhoto(this)"><i class="ti ti-x"></i></button>');
+          pendingPhotos.push(data.urls[0]);
+        } catch (err) {
+          uploadingPhotos--;
+          document.getElementById(id)?.remove();
+          toast('Photo upload failed. Try again.', 'err');
+        }
+      }
+      document.getElementById('photoInput').value = '';
+    }
+
+    function removePendingPhoto(btn) {
+      const el = btn.closest('.pth');
+      const url = el.dataset.url;
+      pendingPhotos = pendingPhotos.filter(u => u !== url);
+      el.remove();
+    }
+
     document.getElementById('listingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (uploadingPhotos > 0) {
+        toast('Please wait for photos to finish uploading.', 'err');
+        return;
+      }
       const data = {
         name: e.target.name.value,
         type: e.target.type.value,
@@ -1120,13 +1220,16 @@
         district: e.target.district.value,
         price: parseFloat(e.target.price.value),
         amenities: e.target.amenities.value.split(',').map(a => a.trim()).filter(a => a),
-        description: e.target.description.value.trim() || undefined
+        description: e.target.description.value.trim() || undefined,
+        photos: pendingPhotos
       };
       try {
         await api.createListing(data);
         toast('Listing submitted for review! We\'ll notify you once approved.');
         closeModal('listingModal');
         e.target.reset();
+        pendingPhotos = [];
+        document.getElementById('photoPreview').innerHTML = '';
         loadListings();
       } catch (err) {
         toast('Failed to submit listing. Please try again.', 'err');
@@ -1134,6 +1237,68 @@
     });
 
     // ── Edit Listing ───────────────────────────────────────────────────
+    let editPhotos = [];
+    let editUploading = 0;
+
+    function renderEditPreview() {
+      const preview = document.getElementById('editPhotoPreview');
+      preview.innerHTML = editPhotos.map(u => `
+        <div class="pth" data-url="${u}">
+          <img src="${u}" alt="">
+          <button type="button" class="rm" onclick="removeEditPhoto(this)"><i class="ti ti-x"></i></button>
+        </div>`).join('');
+    }
+
+    async function handleEditPhotos(files) {
+      const remaining = 6 - editPhotos.length - editUploading;
+      const toUpload = Array.from(files).slice(0, Math.max(0, remaining));
+      if (files.length > remaining) {
+        toast(`You can add up to 6 photos (${Math.max(0, remaining)} more).`, 'err');
+      }
+      if (!toUpload.length) {
+        document.getElementById('editPhotoInput').value = '';
+        return;
+      }
+      const preview = document.getElementById('editPhotoPreview');
+      for (const file of toUpload) {
+        const id = 'upe-' + Math.random().toString(36).slice(2, 8);
+        preview.insertAdjacentHTML('beforeend', `
+          <div class="pth" id="${id}">
+            <img src="${URL.createObjectURL(file)}" alt="">
+            <div class="up-spin"><span class="btn-spinner"></span></div>
+          </div>
+        `);
+        editUploading++;
+        try {
+          const data = await api.uploadPhotos([file]);
+          editUploading--;
+          const el = document.getElementById(id);
+          if (data.error) {
+            if (el) el.remove();
+            toast(data.error, 'err');
+            continue;
+          }
+          if (!el) continue;
+          el.dataset.url = data.urls[0];
+          el.querySelector('.up-spin')?.remove();
+          el.insertAdjacentHTML('beforeend',
+            '<button type="button" class="rm" onclick="removeEditPhoto(this)"><i class="ti ti-x"></i></button>');
+          editPhotos.push(data.urls[0]);
+        } catch (err) {
+          editUploading--;
+          document.getElementById(id)?.remove();
+          toast('Photo upload failed. Try again.', 'err');
+        }
+      }
+      document.getElementById('editPhotoInput').value = '';
+    }
+
+    function removeEditPhoto(btn) {
+      const el = btn.closest('.pth');
+      editPhotos = editPhotos.filter(u => u !== el.dataset.url);
+      el.remove();
+    }
+
     async function openEditListing(id) {
       try {
         const listing = await api.getListing(id);
@@ -1146,6 +1311,9 @@
         document.getElementById('editPrice').value = listing.price || '';
         document.getElementById('editAmenities').value = (listing.amenities || []).join(', ');
         document.getElementById('editDescription').value = listing.description || '';
+        editPhotos = (listing.photos || []).filter(Boolean);
+        editUploading = 0;
+        renderEditPreview();
         openModal('editListingModal');
       } catch (err) {
         toast('Failed to load listing details.', 'err');
@@ -1154,6 +1322,10 @@
 
     document.getElementById('editListingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (editUploading > 0) {
+        toast('Please wait for photos to finish uploading.', 'err');
+        return;
+      }
       const id = document.getElementById('editListingId').value;
       const data = {
         name: document.getElementById('editName').value,
@@ -1162,7 +1334,8 @@
         district: document.getElementById('editDistrict').value,
         price: parseFloat(document.getElementById('editPrice').value),
         amenities: document.getElementById('editAmenities').value.split(',').map(a => a.trim()).filter(a => a),
-        description: document.getElementById('editDescription').value.trim() || undefined
+        description: document.getElementById('editDescription').value.trim() || undefined,
+        photos: editPhotos
       };
       try {
         const result = await api.updateListing(id, data);

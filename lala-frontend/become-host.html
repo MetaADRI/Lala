@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lala — Become a Host</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="logo-removebg-preview.png">
+  <style>
+    .host-note {
+      font-size: 12.5px; color: var(--muted); line-height: 1.55; background: #f5f7f5;
+      border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px;
+      display: flex; gap: 10px; align-items: flex-start; margin-bottom: var(--s4);
+    }
+    .host-note i { color: var(--g-mid); margin-top: 1px; }
+
+    .status-state { text-align: center; padding: 8px 0 2px; }
+    .status-icon {
+      width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 18px;
+      display: flex; align-items: center; justify-content: center; font-size: 32px;
+    }
+    .status-icon.pending { background: #FFF3E0; color: #E65100; }
+    .status-icon.approved { background: var(--g-light); color: var(--g-dark); }
+    .status-icon.rejected { background: #FFEBEE; color: #C62828; }
+    .status-state h2 { font-size: 20px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+    .status-state p { font-size: 13.5px; color: var(--muted); line-height: 1.6; max-width: 300px; margin: 0 auto 18px; }
+    .status-state .status-badge { margin: 0 auto 18px; }
+  </style>
+</head>
+<body class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-head">
+      <a href="index.html" class="auth-logo">
+        <img src="logo-removebg-preview.png" alt="Lala">
+        <span>lala</span>
+      </a>
+      <div class="auth-title">Become a Host</div>
+      <div class="auth-sub">List your property and start earning from travellers across Zambia</div>
+    </div>
+
+    <div class="auth-body" id="authBody">
+      <!-- State injected by JS -->
+      <div style="text-align:center; padding: 24px 0;">
+        <div class="btn-spinner" style="display:inline-block;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js?v=2"></script>
+  <script src="api.js?v=2"></script>
+  <script src="session.js?v=2"></script>
+  <script>
+    let currentUser = null;
+
+    function renderForm(prefill, rejectedNote) {
+      const name = prefill && prefill.name ? prefill.name : '';
+      const phone = prefill && prefill.phone ? prefill.phone : '';
+      document.getElementById('authBody').innerHTML = `
+        ${rejectedNote ? `
+        <div class="auth-err visible">
+          <i class="ti ti-alert-circle"></i>
+          <span>${rejectedNote}</span>
+        </div>` : ''}
+
+        <div class="host-note">
+          <i class="ti ti-info-circle"></i>
+          <span>An admin reviews your application. Once approved you'll be able to list properties and manage bookings. You'll need to sign in again after approval.</span>
+        </div>
+
+        <div class="fg">
+          <label>Full name</label>
+          <div class="icon-field">
+            <i class="ti ti-user"></i>
+            <input type="text" id="nameInput" placeholder="e.g. Bwalya Phiri" autocomplete="name" value="${name}">
+          </div>
+        </div>
+
+        <div class="fg">
+          <label>Phone number</label>
+          <div class="icon-field">
+            <i class="ti ti-phone"></i>
+            <input type="tel" id="phoneInput" placeholder="+260 97 000 0000" autocomplete="tel" value="${phone}">
+          </div>
+        </div>
+
+        <button class="btn-login" id="requestBtn" onclick="submitRequest()">
+          <i class="ti ti-building-estate"></i>
+          <span>Submit Application</span>
+        </button>
+
+        <div class="auth-link">
+          Not sure yet? <a href="index.html">Back to home</a>
+        </div>
+      `;
+    }
+
+    function renderPending() {
+      document.getElementById('authBody').innerHTML = `
+        <div class="status-state">
+          <div class="status-icon pending"><i class="ti ti-hourglass-high"></i></div>
+          <h2>Application under review</h2>
+          <p>We've received your application. Our team will review it shortly — you'll be able to start listing as soon as it's approved.</p>
+          <a href="index.html" class="btn-login" style="text-decoration:none; display:block;"><i class="ti ti-home"></i> Back to Home</a>
+        </div>
+      `;
+    }
+
+    function renderApproved() {
+      document.getElementById('authBody').innerHTML = `
+        <div class="status-state">
+          <div class="status-icon approved"><i class="ti ti-building-estate"></i></div>
+          <h2>You're a Host!</h2>
+          <p>Your application was approved. Sign in again to access your host dashboard and start listing properties.</p>
+          <button class="btn-login" onclick="signInAgain()">
+            <i class="ti ti-login"></i>
+            <span>Sign in again</span>
+          </button>
+        </div>
+      `;
+    }
+
+    function renderRejected() {
+      renderForm(currentUser, "Your previous application was not approved. You're welcome to apply again.");
+    }
+
+    function signInAgain() {
+      localStorage.removeItem('lala_token');
+      localStorage.removeItem('lala_user');
+      window.location.href = 'guest-login.html';
+    }
+
+    async function submitRequest() {
+      const name = document.getElementById('nameInput').value.trim();
+      const phone = document.getElementById('phoneInput').value.trim();
+
+      if (!name) return showError('Please enter your full name');
+
+      const btn = document.getElementById('requestBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-spinner"></span> Submitting...';
+
+      try {
+        const data = await api.requestToBecomeHost({ name, phone: phone || undefined });
+        if (data.error) {
+          if (/pending/i.test(data.error)) return renderPending();
+          showError(data.error);
+          btn.disabled = false;
+          btn.innerHTML = '<i class="ti ti-building-estate"></i> Submit Application';
+          return;
+        }
+        renderPending();
+      } catch (err) {
+        showError('Failed to connect. Is the backend running?');
+        console.error(err);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ti ti-building-estate"></i> Submit Application';
+      }
+    }
+
+    function showError(msg) {
+      let el = document.getElementById('authBody').querySelector('.auth-err');
+      if (!el) {
+        document.getElementById('authBody').insertAdjacentHTML('afterbegin',
+          '<div class="auth-err" id="requestErr"><i class="ti ti-alert-circle"></i><span></span></div>');
+        el = document.getElementById('requestErr');
+      }
+      el.querySelector('span').textContent = msg;
+      el.classList.add('visible');
+    }
+
+    async function init() {
+      try {
+        currentUser = JSON.parse(localStorage.getItem('lala_user'));
+      } catch (e) { currentUser = null; }
+
+      if (!currentUser || !localStorage.getItem('lala_token')) {
+        window.location.href = 'guest-login.html';
+        return;
+      }
+      if (currentUser.role === 'host') { window.location.href = 'host-dashboard.html'; return; }
+      if (currentUser.role === 'admin') { window.location.href = 'admin-portal.html'; return; }
+
+      try {
+        const data = await api.getMyHostRequest();
+        if (data.error) return renderForm(currentUser);
+        const r = data.request;
+        if (!r) return renderForm(currentUser);
+        if (r.status === 'pending') return renderPending();
+        if (r.status === 'approved') return renderApproved();
+        if (r.status === 'rejected') return renderRejected();
+        renderForm(currentUser);
+      } catch (err) {
+        console.error(err);
+        renderForm(currentUser);
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && document.getElementById('requestBtn')) submitRequest();
+    });
+
+    init();
+  </script>
+</body>
+</html>

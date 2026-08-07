@@ -153,6 +153,46 @@ const api = {
     return res.json();
   },
 
+  // ─── HOST REQUESTS (request + admin approval) ─────────────────────────────
+  requestToBecomeHost: async (data) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/host-requests`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(data)
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  getMyHostRequest: async () => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/host-requests/mine`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  getAllHostRequests: async () => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/host-requests`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  reviewHostRequest: async (id, decision) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/host-requests/${id}/${decision}`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
   // ─── PROFILE ───────────────────────────────────────────────────────────────
   updateProfile: async (data) => {
     const token = localStorage.getItem('lala_token');

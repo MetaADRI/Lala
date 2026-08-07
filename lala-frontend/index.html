@@ -439,6 +439,169 @@
     .bottom-nav a.active { color: var(--accent); font-weight: 600; }
     @media (max-width: 768px) { .bottom-nav { display: block; } body { padding-bottom: 72px; } }
 
+    /* ---- STICKY SEARCH SHRINK ---- */
+    .search-section { position: sticky; top: 64px; z-index: 60; }
+    .search-section .search-pill { transition: box-shadow 0.3s, height 0.25s, padding 0.25s; }
+    .search-section.stuck .search-pill { height: 52px; padding-left: 16px; }
+    .search-section.stuck .search-segment { padding: 6px 12px; }
+    .search-section.stuck .search-pill-btn { width: 40px; height: 40px; }
+    .search-section.stuck .services-strip { display: none; }
+    @media (max-width: 768px) {
+      .search-section { position: static; }
+    }
+
+    /* ---- CITY AUTOCOMPLETE ---- */
+    .search-where { position: relative; }
+    .city-suggest {
+      position: absolute; top: calc(100% + 8px); left: -10px; right: -10px;
+      background: var(--canvas); border: 1px solid var(--hairline);
+      border-radius: 14px; box-shadow: 0 12px 32px rgba(0,0,0,0.14);
+      z-index: 70; display: none; overflow: hidden; max-height: 264px; overflow-y: auto;
+    }
+    .city-suggest.open { display: block; }
+    .city-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; font-size: 14px; color: var(--ink);
+      cursor: pointer; transition: background 0.15s; font-family: 'Inter', sans-serif;
+    }
+    .city-item:hover, .city-item.active { background: var(--accent-light); }
+    .city-item i { color: var(--muted); font-size: 15px; flex-shrink: 0; }
+    .city-item small { margin-left: auto; color: var(--muted); font-size: 12px; font-weight: 500; }
+
+    /* ---- FILTER PILLS ---- */
+    .filter-pills { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 18px; }
+    .filter-pill {
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+      padding: 8px 16px; border-radius: 9999px; cursor: pointer;
+      background: var(--surface-soft); color: var(--ink);
+      border: 1px solid var(--hairline-soft); transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .filter-pill:hover { border-color: var(--accent); color: var(--accent); }
+    .filter-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .filter-pill.active:hover { color: #fff; }
+
+    /* ---- STAY CARD ENHANCEMENTS ---- */
+    .stay-card { position: relative; }
+    .wish-btn {
+      position: absolute; top: 10px; right: 10px; z-index: 7;
+      width: 32px; height: 32px; border-radius: 9999px;
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--muted); box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+      transition: transform 0.15s, color 0.2s;
+    }
+    .wish-btn:hover { transform: scale(1.12); }
+    .wish-btn i { font-size: 17px; }
+    .wish-btn.saved { color: #E0245E; }
+    .stay-carousel { position: relative; height: 180px; overflow: hidden; background: var(--surface-strong); }
+    .stay-carousel .slide {
+      position: absolute; inset: 0; background-size: cover; background-position: center;
+      opacity: 0; transition: opacity 0.4s ease; will-change: opacity;
+    }
+    .stay-carousel .slide.on { opacity: 1; }
+    .car-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%); z-index: 7;
+      width: 26px; height: 26px; border-radius: 9999px;
+      background: rgba(255,255,255,0.92); color: var(--ink); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.2s, transform 0.15s;
+    }
+    .stay-card:hover .car-arrow, .stay-card:focus-within .car-arrow { opacity: 1; }
+    .car-arrow:hover { transform: translateY(-50%) scale(1.12); }
+    .car-prev { left: 8px; } .car-next { right: 8px; }
+    .car-arrow i { font-size: 15px; }
+    .car-dots {
+      position: absolute; bottom: 8px; left: 0; right: 0; z-index: 7;
+      display: flex; justify-content: center; gap: 5px;
+    }
+    .car-dot { width: 6px; height: 6px; border-radius: 9999px; background: rgba(255,255,255,0.6); transition: all 0.2s; }
+    .car-dot.on { background: #fff; width: 14px; }
+    .stay-rating { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 8px; }
+    .rate-chip {
+      font-size: 10.5px; font-weight: 600; color: var(--ink);
+      background: var(--surface-soft); border: 1px solid var(--hairline-soft);
+      padding: 3px 8px; border-radius: 9999px;
+      display: inline-flex; align-items: center; gap: 3px;
+    }
+    .rate-chip i { color: #F9A825; font-size: 11px; }
+    .rate-chip span { color: var(--muted); font-weight: 500; }
+    .stay-card-meta { display: flex; align-items: center; gap: 4px; }
+
+    /* ---- STATS ---- */
+    .stats-section { margin-top: var(--section-gap); }
+    .stats-band {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      border-radius: 20px; padding: 36px 28px; color: #fff;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center;
+    }
+    .stat-value { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+    .stat-label { margin-top: 6px; font-size: 13px; color: rgba(255,255,255,0.72); font-weight: 500; }
+    @media (max-width: 768px) { .stats-band { grid-template-columns: repeat(2, 1fr); gap: 24px 12px; } .stat-value { font-size: 28px; } }
+
+    /* ---- TESTIMONIALS ---- */
+    .testi-section { margin-top: var(--section-gap); }
+    .testi-wrap { position: relative; max-width: 640px; margin: 0 auto; }
+    .testi-cards { display: grid; }
+    .testi-card {
+      grid-area: 1 / 1;
+      background: var(--surface-soft); border: 1px solid var(--hairline-soft);
+      border-radius: 18px; padding: 28px 44px; text-align: center;
+      opacity: 0; transform: translateY(10px); pointer-events: none;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .testi-card.on { opacity: 1; transform: none; pointer-events: auto; }
+    .testi-quote { font-size: 16.5px; line-height: 1.6; color: var(--ink); font-weight: 500; margin: 10px 0 0; }
+    .testi-name { margin-top: 18px; font-size: 14px; font-weight: 700; color: var(--ink); }
+    .testi-city { font-size: 13px; color: var(--muted); }
+    .testi-arrow {
+      position: absolute; top: calc(50% - 24px); z-index: 8;
+      width: 36px; height: 36px; border-radius: 9999px; cursor: pointer;
+      background: var(--canvas); border: 1px solid var(--hairline);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--ink); transition: all 0.2s;
+    }
+    .testi-arrow:hover { border-color: var(--accent); color: var(--accent); }
+    .testi-prev { left: -58px; } .testi-next { right: -58px; }
+    .testi-dots { display: flex; justify-content: center; gap: 6px; margin-top: 18px; }
+    .testi-dot { width: 8px; height: 8px; border-radius: 9999px; background: var(--hairline); cursor: pointer; transition: all 0.25s; }
+    .testi-dot.on { background: var(--accent); width: 20px; }
+    @media (max-width: 640px) {
+      .testi-card { padding: 22px 20px; }
+      .testi-arrow { width: 30px; height: 30px; }
+      .testi-prev { left: -8px; } .testi-next { right: -8px; }
+    }
+
+    /* ---- WHATSAPP FAB ---- */
+    .wa-fab {
+      position: fixed; right: 18px; bottom: 18px; z-index: 200;
+      width: 54px; height: 54px; border-radius: 9999px;
+      background: #25D366; color: #fff; text-decoration: none;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4);
+      transition: transform 0.2s;
+    }
+    .wa-fab:hover { transform: scale(1.08); }
+    .wa-fab i { font-size: 28px; }
+    .wa-fab::before {
+      content: ''; position: absolute; inset: 0; border-radius: 9999px;
+      background: #25D366; z-index: -1; animation: wa-pulse 2.2s ease-out infinite;
+    }
+    @keyframes wa-pulse {
+      0% { transform: scale(1); opacity: 0.55; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+    @media (max-width: 768px) {
+      .wa-fab { bottom: 84px; right: 14px; width: 48px; height: 48px; }
+      .wa-fab i { font-size: 24px; }
+    }
+
+    /* ---- REVEAL ---- */
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+    .reveal.visible { opacity: 1; transform: none; }
+
     /* ---- ANIMATIONS ---- */
     .fade-up-d1 { transition-delay: 0.1s; }
     .fade-up-d2 { transition-delay: 0.2s; }
@@ -456,7 +619,7 @@
       <a href="search.html">Stays</a>
       <a href="transfers.html">Rides</a>
       <a href="my-bookings.html">Trips</a>
-      <a href="host-signup.html" class="nav-cta">Host</a>
+      <a href="host-signup.html" class="nav-cta host-entry">Host</a>
       <a href="guest-login.html">Sign In</a>
     </div>
     <button class="hamburger" onclick="document.getElementById('mobileMenu').classList.toggle('open')" aria-label="Menu">
@@ -470,7 +633,7 @@
     <a href="search.html">Stays</a>
     <a href="transfers.html">Rides</a>
     <a href="my-bookings.html">My Trips</a>
-    <a href="host-signup.html" class="nav-cta">List Your Property</a>
+    <a href="host-signup.html" class="nav-cta host-entry">List Your Property</a>
     <a href="guest-login.html">Sign In</a>
   </div>
 
@@ -489,7 +652,7 @@
         <p class="fade-up">Verified guesthouses, lodges & township stays. Book via WhatsApp, pay with mobile money.</p>
         <div class="hero-buttons fade-up">
           <a href="search.html" class="btn-primary"><i class="ti ti-search"></i> Browse Stays</a>
-          <a href="host-signup.html" class="btn-secondary"><i class="ti ti-home-plus"></i> List Your Property</a>
+          <a href="host-signup.html" class="btn-secondary host-entry"><i class="ti ti-home-plus"></i> List Your Property</a>
         </div>
       </div>
     </div>
@@ -501,7 +664,8 @@
       <div class="search-pill">
         <div class="search-segment search-where">
           <i class="ti ti-map-pin"></i>
-          <input type="text" placeholder="Where are you going?" onkeypress="if(event.key==='Enter') window.location.href='search.html'">
+          <input type="text" id="cityInput" placeholder="Where are you going?" autocomplete="off" aria-label="Search by city">
+          <div class="city-suggest" id="citySuggest" role="listbox"></div>
         </div>
         <div class="search-segment" onclick="window.location.href='search.html'">
           <i class="ti ti-calendar"></i>
@@ -641,39 +805,138 @@
         </div>
         <a href="search.html" class="section-link">View all <i class="ti ti-arrow-right"></i></a>
       </div>
+      <div class="filter-pills" id="filterPills" aria-label="Filter stays by category">
+        <button class="filter-pill active" data-filter="all">All</button>
+        <button class="filter-pill" data-filter="guesthouse">Guesthouses</button>
+        <button class="filter-pill" data-filter="lodge">Lodges</button>
+        <button class="filter-pill" data-filter="township">Township stays</button>
+        <button class="filter-pill" data-filter="selfcatering">Self-catering</button>
+      </div>
       <div class="stays-scroll">
-        <a href="search.html" class="stay-card fade-up">
-          <div class="stay-card-img" style="background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=560&h=360&fit=crop'); background-size: cover; background-position: center;"></div>
+        <a href="search.html" class="stay-card fade-up" data-category="guesthouse" data-wish-id="sunrise-guesthouse" data-clean="4.9" data-location="4.7" data-value="4.5">
+          <div class="stay-carousel">
+            <div class="slide on" style="background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=560&h=360&fit=crop'); background-size: cover; background-position: center;"></div>
+            <div class="slide"></div>
+            <div class="slide"></div>
+            <span class="wish-btn" role="button" tabindex="0" aria-label="Save Sunrise Guesthouse to wishlist"><i class="ti ti-heart"></i></span>
+            <span class="car-arrow car-prev" role="button" tabindex="0" aria-label="Previous photo"><i class="ti ti-chevron-left"></i></span>
+            <span class="car-arrow car-next" role="button" tabindex="0" aria-label="Next photo"><i class="ti ti-chevron-right"></i></span>
+            <div class="car-dots"><span class="car-dot on"></span><span class="car-dot"></span><span class="car-dot"></span></div>
+          </div>
           <div class="stay-card-body">
             <h4>Sunrise Guesthouse</h4>
-            <div class="stay-card-meta"><i class="ti ti-star-filled" style="color: #F9A825; font-size: 12px;"></i> 4.8 &bull; Lusaka</div>
+            <div class="stay-card-meta"><i class="ti ti-map-pin" style="font-size: 12px;"></i> Lusaka</div>
+            <div class="stay-rating"></div>
             <div class="stay-card-price">K450 <span>/ night</span></div>
           </div>
         </a>
-        <a href="search.html" class="stay-card fade-up fade-up-d1">
-          <div class="stay-card-img" style="background-image: url('https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=560&h=360&fit=crop'); background-size: cover; background-position: center;"></div>
+        <a href="search.html" class="stay-card fade-up fade-up-d1" data-category="lodge" data-wish-id="royal-livingstone" data-clean="4.9" data-location="4.8" data-value="4.6">
+          <div class="stay-carousel">
+            <div class="slide on" style="background-image: url('https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=560&h=360&fit=crop'); background-size: cover; background-position: center;"></div>
+            <div class="slide"></div>
+            <div class="slide"></div>
+            <span class="wish-btn" role="button" tabindex="0" aria-label="Save Royal Livingstone Hotel to wishlist"><i class="ti ti-heart"></i></span>
+            <span class="car-arrow car-prev" role="button" tabindex="0" aria-label="Previous photo"><i class="ti ti-chevron-left"></i></span>
+            <span class="car-arrow car-next" role="button" tabindex="0" aria-label="Next photo"><i class="ti ti-chevron-right"></i></span>
+            <div class="car-dots"><span class="car-dot on"></span><span class="car-dot"></span><span class="car-dot"></span></div>
+          </div>
           <div class="stay-card-body">
             <h4>Royal Livingstone Hotel</h4>
-            <div class="stay-card-meta"><i class="ti ti-star-filled" style="color: #F9A825; font-size: 12px;"></i> 4.9 &bull; Livingstone</div>
+            <div class="stay-card-meta"><i class="ti ti-map-pin" style="font-size: 12px;"></i> Livingstone</div>
+            <div class="stay-rating"></div>
             <div class="stay-card-price">K1,200 <span>/ night</span></div>
           </div>
         </a>
-        <a href="search.html" class="stay-card fade-up fade-up-d2">
-          <div class="stay-card-img" style="background-image: url('https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=560&h=360&fit=crop'); background-size: cover; background-position: center;"></div>
+        <a href="search.html" class="stay-card fade-up fade-up-d2" data-category="lodge" data-wish-id="kitwe-city-lodge" data-clean="4.6" data-location="4.4" data-value="4.7">
+          <div class="stay-carousel">
+            <div class="slide on" style="background-image: url('https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=560&h=360&fit=crop'); background-size: cover; background-position: center;"></div>
+            <div class="slide"></div>
+            <div class="slide"></div>
+            <span class="wish-btn" role="button" tabindex="0" aria-label="Save Kitwe City Lodge to wishlist"><i class="ti ti-heart"></i></span>
+            <span class="car-arrow car-prev" role="button" tabindex="0" aria-label="Previous photo"><i class="ti ti-chevron-left"></i></span>
+            <span class="car-arrow car-next" role="button" tabindex="0" aria-label="Next photo"><i class="ti ti-chevron-right"></i></span>
+            <div class="car-dots"><span class="car-dot on"></span><span class="car-dot"></span><span class="car-dot"></span></div>
+          </div>
           <div class="stay-card-body">
             <h4>Kitwe City Lodge</h4>
-            <div class="stay-card-meta"><i class="ti ti-star-filled" style="color: #F9A825; font-size: 12px;"></i> 4.6 &bull; Kitwe</div>
+            <div class="stay-card-meta"><i class="ti ti-map-pin" style="font-size: 12px;"></i> Kitwe</div>
+            <div class="stay-rating"></div>
             <div class="stay-card-price">K380 <span>/ night</span></div>
           </div>
         </a>
-        <a href="search.html" class="stay-card fade-up fade-up-d3">
-          <div class="stay-card-img" style="background-image: url('https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=560&h=360&fit=crop'); background-size: cover; background-position: center;"></div>
+        <a href="search.html" class="stay-card fade-up fade-up-d3" data-category="guesthouse" data-wish-id="ndola-garden-inn" data-clean="4.5" data-location="4.3" data-value="4.4">
+          <div class="stay-carousel">
+            <div class="slide on" style="background-image: url('https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=560&h=360&fit=crop'); background-size: cover; background-position: center;"></div>
+            <div class="slide"></div>
+            <div class="slide"></div>
+            <span class="wish-btn" role="button" tabindex="0" aria-label="Save Ndola Garden Inn to wishlist"><i class="ti ti-heart"></i></span>
+            <span class="car-arrow car-prev" role="button" tabindex="0" aria-label="Previous photo"><i class="ti ti-chevron-left"></i></span>
+            <span class="car-arrow car-next" role="button" tabindex="0" aria-label="Next photo"><i class="ti ti-chevron-right"></i></span>
+            <div class="car-dots"><span class="car-dot on"></span><span class="car-dot"></span><span class="car-dot"></span></div>
+          </div>
           <div class="stay-card-body">
             <h4>Ndola Garden Inn</h4>
-            <div class="stay-card-meta"><i class="ti ti-star-filled" style="color: #F9A825; font-size: 12px;"></i> 4.5 &bull; Ndola</div>
+            <div class="stay-card-meta"><i class="ti ti-map-pin" style="font-size: 12px;"></i> Ndola</div>
+            <div class="stay-rating"></div>
             <div class="stay-card-price">K400 <span>/ night</span></div>
           </div>
         </a>
+        <a href="search.html" class="stay-card fade-up" data-category="township" data-wish-id="kanyama-sunset-stays" data-clean="4.4" data-location="4.2" data-value="4.8">
+          <div class="stay-carousel">
+            <div class="slide on" style="background-image: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=560&h=360&fit=crop'); background-size: cover; background-position: center;"></div>
+            <div class="slide"></div>
+            <div class="slide"></div>
+            <span class="wish-btn" role="button" tabindex="0" aria-label="Save Kanyama Sunset Stays to wishlist"><i class="ti ti-heart"></i></span>
+            <span class="car-arrow car-prev" role="button" tabindex="0" aria-label="Previous photo"><i class="ti ti-chevron-left"></i></span>
+            <span class="car-arrow car-next" role="button" tabindex="0" aria-label="Next photo"><i class="ti ti-chevron-right"></i></span>
+            <div class="car-dots"><span class="car-dot on"></span><span class="car-dot"></span><span class="car-dot"></span></div>
+          </div>
+          <div class="stay-card-body">
+            <h4>Kanyama Sunset Stays</h4>
+            <div class="stay-card-meta"><i class="ti ti-map-pin" style="font-size: 12px;"></i> Lusaka</div>
+            <div class="stay-rating"></div>
+            <div class="stay-card-price">K180 <span>/ night</span></div>
+          </div>
+        </a>
+        <a href="search.html" class="stay-card fade-up fade-up-d1" data-category="selfcatering" data-wish-id="chilenje-flats" data-clean="4.7" data-location="4.5" data-value="4.6">
+          <div class="stay-carousel">
+            <div class="slide on" style="background-image: url('https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=560&h=360&fit=crop'); background-size: cover; background-position: center;"></div>
+            <div class="slide"></div>
+            <div class="slide"></div>
+            <span class="wish-btn" role="button" tabindex="0" aria-label="Save Chilenje Self-Catering Flats to wishlist"><i class="ti ti-heart"></i></span>
+            <span class="car-arrow car-prev" role="button" tabindex="0" aria-label="Previous photo"><i class="ti ti-chevron-left"></i></span>
+            <span class="car-arrow car-next" role="button" tabindex="0" aria-label="Next photo"><i class="ti ti-chevron-right"></i></span>
+            <div class="car-dots"><span class="car-dot on"></span><span class="car-dot"></span><span class="car-dot"></span></div>
+          </div>
+          <div class="stay-card-body">
+            <h4>Chilenje Self-Catering Flats</h4>
+            <div class="stay-card-meta"><i class="ti ti-map-pin" style="font-size: 12px;"></i> Lusaka</div>
+            <div class="stay-rating"></div>
+            <div class="stay-card-price">K320 <span>/ night</span></div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats-section">
+      <div class="stats-band reveal">
+        <div class="stat">
+          <div class="stat-value" data-target="500" data-suffix="+">0</div>
+          <div class="stat-label">Verified stays</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" data-target="10">0</div>
+          <div class="stat-label">Cities across Zambia</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" data-target="4.7" data-decimals="1">0</div>
+          <div class="stat-label">Average guest rating</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" data-target="1200" data-suffix="+">0</div>
+          <div class="stat-label">Happy guests</div>
+        </div>
       </div>
     </section>
 
@@ -707,6 +970,47 @@
           <h4>No Fees</h4>
           <p>Zero hidden charges. What you see is what you pay.</p>
         </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="testi-section">
+      <div class="section-header reveal">
+        <div>
+          <h2>What guests say</h2>
+          <p class="muted-text">Real reviews from travelers across Zambia</p>
+        </div>
+      </div>
+      <div class="testi-wrap reveal">
+        <span class="testi-arrow testi-prev" role="button" tabindex="0" aria-label="Previous testimonial"><i class="ti ti-chevron-left"></i></span>
+        <div class="testi-cards">
+          <div class="testi-card on">
+            <i class="ti ti-quote" style="font-size: 26px; color: var(--accent);"></i>
+            <p class="testi-quote">&ldquo;Booked a guesthouse near work in five minutes over WhatsApp. Paid with MTN — no card, no stress.&rdquo;</p>
+            <div class="testi-name">Chanda M.</div>
+            <div class="testi-city">Lusaka</div>
+          </div>
+          <div class="testi-card">
+            <i class="ti ti-quote" style="font-size: 26px; color: var(--accent);"></i>
+            <p class="testi-quote">&ldquo;The lodge was exactly as described. Verified stays really are verified — the host even met me at the gate.&rdquo;</p>
+            <div class="testi-name">Natasha K.</div>
+            <div class="testi-city">Livingstone</div>
+          </div>
+          <div class="testi-card">
+            <i class="ti ti-quote" style="font-size: 26px; color: var(--accent);"></i>
+            <p class="testi-quote">&ldquo;Host replied the moment I booked. It felt like messaging a friend, not using a website.&rdquo;</p>
+            <div class="testi-name">Brian T.</div>
+            <div class="testi-city">Kitwe</div>
+          </div>
+          <div class="testi-card">
+            <i class="ti ti-quote" style="font-size: 26px; color: var(--accent);"></i>
+            <p class="testi-quote">&ldquo;The page loaded fast even on my 2G connection. This is what booking should feel like in Zambia.&rdquo;</p>
+            <div class="testi-name">Mutale C.</div>
+            <div class="testi-city">Ndola</div>
+          </div>
+        </div>
+        <div class="testi-dots"></div>
+        <span class="testi-arrow testi-next" role="button" tabindex="0" aria-label="Next testimonial"><i class="ti ti-chevron-right"></i></span>
       </div>
     </section>
 
@@ -757,6 +1061,11 @@
     </footer>
   </div>
 
+  <!-- WHATSAPP FAB -->
+  <a class="wa-fab" href="https://wa.me/2609770000000" target="_blank" rel="noopener" aria-label="Chat with Lala on WhatsApp">
+    <i class="ti ti-brand-whatsapp"></i>
+  </a>
+
   <!-- BOTTOM NAV (mobile) -->
   <nav class="bottom-nav">
     <div class="bottom-nav-inner">
@@ -767,6 +1076,269 @@
       <a href="guest-login.html"><i class="ti ti-user"></i> Profile</a>
     </div>
   </nav>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var isMobile = function() { return window.innerWidth <= 768; };
+
+      // ---- 1. Sticky shrinking search bar ----
+      var searchSec = document.querySelector('.search-section');
+      var searchDocTop = searchSec ? searchSec.offsetTop : 0;
+      var pinSearch = function() {
+        if (!searchSec) return;
+        if (isMobile()) { searchSec.classList.remove('stuck'); return; }
+        searchSec.classList.toggle('stuck', window.scrollY + 64 >= searchDocTop + 2);
+      };
+      var measureSearch = function() { if (searchSec) searchDocTop = searchSec.offsetTop; };
+      pinSearch();
+      window.addEventListener('scroll', pinSearch, { passive: true });
+      window.addEventListener('resize', function() { measureSearch(); pinSearch(); }, { passive: true });
+      window.addEventListener('load', function() { measureSearch(); pinSearch(); });
+
+      // ---- 2. City autocomplete ----
+      var CITIES = [
+        { n: 'Lusaka', c: '24 stays' }, { n: 'Livingstone', c: '15 stays' }, { n: 'Kitwe', c: '18 stays' },
+        { n: 'Ndola', c: '12 stays' }, { n: 'Chipata', c: '9 stays' }, { n: 'Solwezi', c: '8 stays' },
+        { n: 'Kabwe', c: '6 stays' }, { n: 'Choma', c: '3 stays' }, { n: 'Mazabuka', c: '4 stays' },
+        { n: 'Kafue', c: '5 stays' }, { n: 'Siavonga', c: '3 stays' }, { n: 'Chingola', c: '5 stays' },
+        { n: 'Mufulira', c: '4 stays' }, { n: 'Luanshya', c: '3 stays' }, { n: 'Mongu', c: '4 stays' },
+        { n: 'Kasama', c: '5 stays' }, { n: 'Kapiri Mposhi', c: '3 stays' }, { n: 'Chillabombwe', c: '2 stays' }
+      ];
+      var cityInput = document.getElementById('cityInput');
+      var citySuggest = document.getElementById('citySuggest');
+      var activeItem = -1;
+      var currentItems = [];
+      var goToSearch = function(city) {
+        window.location.href = 'search.html' + (city ? '?city=' + encodeURIComponent(city) : '');
+      };
+      var closeSuggest = function() { citySuggest.classList.remove('open'); activeItem = -1; };
+      var renderCities = function(q) {
+        q = (q || '').trim().toLowerCase();
+        var matches = q ? CITIES.filter(function(x) { return x.n.toLowerCase().indexOf(q) !== -1; }) : CITIES.slice(0, 8);
+        if (!matches.length) { closeSuggest(); return; }
+        currentItems = matches;
+        citySuggest.innerHTML = matches.map(function(x, i) {
+          return '<div class="city-item" role="option" data-i="' + i + '"><i class="ti ti-map-pin"></i>' + x.n + '<small>' + x.c + '</small></div>';
+        }).join('');
+        citySuggest.classList.add('open');
+        activeItem = -1;
+      };
+      if (cityInput && citySuggest) {
+        cityInput.addEventListener('input', function() { renderCities(cityInput.value); });
+        cityInput.addEventListener('keydown', function(e) {
+          var items = citySuggest.querySelectorAll('.city-item');
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (!items.length) return;
+            activeItem = e.key === 'ArrowDown' ? (activeItem + 1) % items.length : (activeItem - 1 + items.length) % items.length;
+            for (var i = 0; i < items.length; i++) items[i].classList.toggle('active', i === activeItem);
+            items[activeItem].scrollIntoView({ block: 'nearest' });
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (activeItem >= 0 && currentItems[activeItem]) goToSearch(currentItems[activeItem].n);
+            else goToSearch(cityInput.value.trim());
+          } else if (e.key === 'Escape') {
+            closeSuggest();
+          }
+        });
+        citySuggest.addEventListener('mousedown', function(e) {
+          var item = e.target.closest('.city-item');
+          if (item) { e.preventDefault(); goToSearch(currentItems[parseInt(item.getAttribute('data-i'), 10)].n); }
+        });
+        document.addEventListener('click', function(e) {
+          if (!e.target.closest('.search-where')) closeSuggest();
+        });
+      }
+
+      // ---- Placeholder image pool (loaded lazily by the carousels) ----
+      var IMG_POOL = [
+        'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=560&h=360&fit=crop',
+        'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=560&h=360&fit=crop',
+        'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=560&h=360&fit=crop',
+        'https://images.unsplash.com/photo-1595576508898-0ad5c879a061?w=560&h=360&fit=crop',
+        'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=560&h=360&fit=crop',
+        'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=560&h=360&fit=crop',
+        'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=560&h=360&fit=crop',
+        'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=560&h=360&fit=crop',
+        'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=560&h=360&fit=crop'
+      ];
+
+      // ---- 4 & 5 & 9: wishlist + image carousel + rating chips per card ----
+      var WL_KEY = 'lala_wishlist';
+      var getWish = function() { try { return JSON.parse(localStorage.getItem(WL_KEY)) || []; } catch (e) { return []; } };
+      var setWish = function(list) { try { localStorage.setItem(WL_KEY, JSON.stringify(list)); } catch (e) {} };
+
+      var stayCards = document.querySelectorAll('.stay-card');
+      stayCards.forEach(function(card, cardIdx) {
+        var id = card.getAttribute('data-wish-id');
+        var slides = card.querySelectorAll('.slide');
+        var dots = card.querySelectorAll('.car-dot');
+        var prev = card.querySelector('.car-prev');
+        var next = card.querySelector('.car-next');
+        var wishBtn = card.querySelector('.wish-btn');
+        var ratingBox = card.querySelector('.stay-rating');
+        var idx = 0, timer = null, touchX = null;
+
+        if (slides.length > 1) {
+          for (var s = 1; s < slides.length; s++) {
+            slides[s].setAttribute('data-src', IMG_POOL[(cardIdx * 2 + s - 1) % IMG_POOL.length]);
+          }
+        }
+        var showSlide = function(i) {
+          if (!slides.length) return;
+          idx = (i + slides.length) % slides.length;
+          slides.forEach(function(sl, k) { sl.classList.toggle('on', k === idx); });
+          dots.forEach(function(d, k) { d.classList.toggle('on', k === idx); });
+          var cur = slides[idx];
+          if (cur && cur.getAttribute('data-src') && !cur.style.backgroundImage) {
+            cur.style.backgroundImage = 'url(' + cur.getAttribute('data-src') + ')';
+          }
+        };
+        var startAuto = function() { stopAuto(); timer = setInterval(function() { showSlide(idx + 1); }, 2200); };
+        var stopAuto = function() { if (timer) { clearInterval(timer); timer = null; } };
+        if (slides.length) showSlide(0);
+        card.addEventListener('mouseenter', startAuto);
+        card.addEventListener('mouseleave', stopAuto);
+        card.addEventListener('focusin', startAuto);
+        card.addEventListener('focusout', stopAuto);
+        var bindCar = function(el, dir) {
+          if (!el) return;
+          el.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); showSlide(idx + dir); });
+          el.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); showSlide(idx + dir); }
+          });
+        };
+        bindCar(prev, -1);
+        bindCar(next, 1);
+        dots.forEach(function(d, k) {
+          d.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); showSlide(k); });
+        });
+        card.addEventListener('touchstart', function(e) { touchX = e.touches[0].clientX; }, { passive: true });
+        card.addEventListener('touchend', function(e) {
+          if (touchX === null) return;
+          var dx = e.changedTouches[0].clientX - touchX;
+          touchX = null;
+          if (Math.abs(dx) > 30) { e.preventDefault(); showSlide(idx + (dx < 0 ? 1 : -1)); }
+        }, { passive: false });
+
+        if (wishBtn && id) {
+          var saved = getWish().indexOf(id) !== -1;
+          var renderWish = function() {
+            wishBtn.classList.toggle('saved', saved);
+            var ic = wishBtn.querySelector('i');
+            ic.className = saved ? 'ti ti-heart-filled' : 'ti ti-heart';
+          };
+          var toggleWish = function() {
+            saved = !saved;
+            var w = getWish(), wi = w.indexOf(id);
+            if (saved && wi === -1) w.push(id);
+            if (!saved && wi !== -1) w.splice(wi, 1);
+            setWish(w);
+            renderWish();
+          };
+          renderWish();
+          wishBtn.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); toggleWish(); });
+          wishBtn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggleWish(); }
+          });
+        }
+
+        if (ratingBox) {
+          var parts = [
+            ['Cleanliness', card.getAttribute('data-clean')],
+            ['Location', card.getAttribute('data-location')],
+            ['Value', card.getAttribute('data-value')]
+          ];
+          var chips = '';
+          parts.forEach(function(p) {
+            if (p[1]) chips += '<span class="rate-chip"><i class="ti ti-star-filled"></i>' + p[0] + ' <span>' + p[1] + '</span></span>';
+          });
+          ratingBox.innerHTML = chips;
+        }
+      });
+
+      // ---- 3. Category filter pills ----
+      var pills = document.querySelectorAll('.filter-pill');
+      pills.forEach(function(pill) {
+        pill.addEventListener('click', function() {
+          pills.forEach(function(p) { p.classList.remove('active'); });
+          pill.classList.add('active');
+          var f = pill.getAttribute('data-filter');
+          stayCards.forEach(function(card) {
+            var show = f === 'all' || card.getAttribute('data-category') === f;
+            card.style.display = show ? '' : 'none';
+          });
+        });
+      });
+
+      // ---- 6. Count-up stats ----
+      var countUp = function(el) {
+        var target = parseFloat(el.getAttribute('data-target')) || 0;
+        var dec = parseInt(el.getAttribute('data-decimals') || '0', 10);
+        var suffix = el.getAttribute('data-suffix') || '';
+        var dur = 1400, start = null;
+        var step = function(ts) {
+          if (!start) start = ts;
+          var p = Math.min((ts - start) / dur, 1);
+          var ease = 1 - Math.pow(1 - p, 3);
+          var val = target * ease;
+          el.textContent = val.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + suffix;
+          if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      };
+      var statObs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(en) {
+          if (en.isIntersecting) { countUp(en.target); statObs.unobserve(en.target); }
+        });
+      }, { threshold: 0.4 });
+      document.querySelectorAll('.stat-value').forEach(function(el) { statObs.observe(el); });
+
+      // ---- 7. Auto-rotating testimonials ----
+      var testiCards = document.querySelectorAll('.testi-card');
+      var dotsWrap = document.querySelector('.testi-dots');
+      var tIdx = 0, tTimer = null;
+      if (testiCards.length && dotsWrap) {
+        var tDots = [];
+        testiCards.forEach(function(c, i) {
+          var d = document.createElement('span');
+          d.className = 'testi-dot' + (i === 0 ? ' on' : '');
+          d.setAttribute('role', 'button');
+          d.setAttribute('tabindex', '0');
+          d.setAttribute('aria-label', 'Show testimonial ' + (i + 1));
+          d.addEventListener('click', function() { goTesti(i); });
+          d.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goTesti(i); } });
+          dotsWrap.appendChild(d);
+          tDots.push(d);
+        });
+        var goTesti = function(i) {
+          tIdx = (i + testiCards.length) % testiCards.length;
+          testiCards.forEach(function(c, k) { c.classList.toggle('on', k === tIdx); });
+          tDots.forEach(function(d, k) { d.classList.toggle('on', k === tIdx); });
+        };
+        var stopT = function() { if (tTimer) clearInterval(tTimer); };
+        var startT = function() { stopT(); tTimer = setInterval(function() { goTesti(tIdx + 1); }, 5200); };
+        var wrap = document.querySelector('.testi-wrap');
+        wrap.addEventListener('mouseenter', stopT);
+        wrap.addEventListener('mouseleave', startT);
+        wrap.addEventListener('touchstart', stopT, { passive: true });
+        var tp = document.querySelector('.testi-prev'), tn = document.querySelector('.testi-next');
+        if (tp) tp.addEventListener('click', function(e) { e.preventDefault(); stopT(); goTesti(tIdx - 1); startT(); });
+        if (tn) tn.addEventListener('click', function(e) { e.preventDefault(); stopT(); goTesti(tIdx + 1); startT(); });
+        startT();
+      }
+
+      // ---- 10. Reveal-on-scroll for new sections ----
+      var revealObs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(en) {
+          if (en.isIntersecting) { en.target.classList.add('visible'); revealObs.unobserve(en.target); }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('.reveal').forEach(function(el) { revealObs.observe(el); });
+    })();
+  </script>
 
   <script>
     (function() {
@@ -796,6 +1368,27 @@
         });
       }, appearOptions);
       faders.forEach(fader => appearOnScroll.observe(fader));
+    })();
+
+    (function() {
+      // Route the "Host" / "List Your Property" entry points by auth state:
+      // guests submit a host application, hosts/admins go straight to their dashboard.
+      function hostTarget() {
+        try {
+          const u = JSON.parse(localStorage.getItem('lala_user'));
+          if (!u) return 'host-signup.html';
+          if (u.role === 'guest') return 'become-host.html';
+          if (u.role === 'host') return 'host-dashboard.html';
+          if (u.role === 'admin') return 'admin-portal.html';
+        } catch (e) {}
+        return 'host-signup.html';
+      }
+      document.querySelectorAll('.host-entry').forEach(function(a) {
+        a.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = hostTarget();
+        });
+      });
     })();
 
     if ('serviceWorker' in navigator) {

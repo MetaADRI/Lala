@@ -21,6 +21,9 @@ const REQUIRED_ENV_VARS = [
 
   // Email (password resets)
   'RESEND_API_KEY',
+
+  // Cloudinary (property photo uploads)
+  'CLOUDINARY_URL',
 ];
 
 /**
