@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="common.css?v=4">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
@@ -68,7 +68,7 @@
 
         <div class="host-note">
           <i class="ti ti-info-circle"></i>
-          <span>An admin reviews your application. Once approved you'll be able to list properties and manage bookings. You'll need to sign in again after approval.</span>
+          <span>An admin reviews your application. You'll need to provide your property and national ID details below. Once approved you'll be able to list properties and manage bookings — sign in again after approval.</span>
         </div>
 
         <div class="fg">
@@ -84,6 +84,38 @@
           <div class="icon-field">
             <i class="ti ti-phone"></i>
             <input type="tel" id="phoneInput" placeholder="+260 97 000 0000" autocomplete="tel" value="${phone}">
+          </div>
+        </div>
+
+        <div class="fg">
+          <label>National ID (NRC) number</label>
+          <div class="icon-field">
+            <i class="ti ti-id"></i>
+            <input type="text" id="nrcInput" placeholder="e.g. 478200/12/1" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="fg">
+          <label>Property / plot number</label>
+          <div class="icon-field">
+            <i class="ti ti-building-estate"></i>
+            <input type="text" id="propertyInput" placeholder="e.g. Plot 14, Kabwe" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="fg">
+          <label>Photo of your national ID</label>
+          <div class="icon-field">
+            <i class="ti ti-photo"></i>
+            <input type="file" id="idPhotoInput" accept="image/jpeg,image/png,image/webp,image/gif">
+          </div>
+        </div>
+
+        <div class="fg">
+          <label>Proof of ownership (title deed or council letter)</label>
+          <div class="icon-field">
+            <i class="ti ti-file-check"></i>
+            <input type="file" id="proofInput" accept="image/jpeg,image/png,image/webp,image/gif">
           </div>
         </div>
 
@@ -123,8 +155,12 @@
       `;
     }
 
-    function renderRejected() {
-      renderForm(currentUser, "Your previous application was not approved. You're welcome to apply again.");
+    function renderRejected(r) {
+      const reason = r && r.rejectionReason ? r.rejectionReason : '';
+      const note = reason
+        ? `Your previous application was not approved: ${reason}`
+        : "Your previous application was not approved. You're welcome to apply again.";
+      renderForm(currentUser, note);
     }
 
     function signInAgain() {
@@ -136,15 +172,39 @@
     async function submitRequest() {
       const name = document.getElementById('nameInput').value.trim();
       const phone = document.getElementById('phoneInput').value.trim();
+      const nationalIdNumber = document.getElementById('nrcInput').value.trim();
+      const propertyNumber = document.getElementById('propertyInput').value.trim();
+      const idPhoto = document.getElementById('idPhotoInput').files;
+      const proof = document.getElementById('proofInput').files;
 
       if (!name) return showError('Please enter your full name');
+      if (!nationalIdNumber) return showError('Please enter your national ID (NRC) number');
+      if (!propertyNumber) return showError('Please enter your property / plot number');
+      if (!idPhoto || idPhoto.length === 0) return showError('Please upload a photo of your national ID');
+      if (!proof || proof.length === 0) return showError('Please upload proof of ownership (title deed or council letter)');
 
       const btn = document.getElementById('requestBtn');
       btn.disabled = true;
-      btn.innerHTML = '<span class="btn-spinner"></span> Submitting...';
+      btn.innerHTML = '<span class="btn-spinner"></span> Uploading documents...';
 
       try {
-        const data = await api.requestToBecomeHost({ name, phone: phone || undefined });
+        const [idResult, proofResult] = await Promise.all([
+          api.uploadPhotos(idPhoto),
+          api.uploadPhotos(proof)
+        ]);
+        if (idResult.error) return showError(idResult.error);
+        if (proofResult.error) return showError(proofResult.error);
+
+        btn.innerHTML = '<span class="btn-spinner"></span> Submitting...';
+
+        const data = await api.requestToBecomeHost({
+          name,
+          phone: phone || undefined,
+          nationalIdNumber,
+          propertyNumber,
+          idDocumentPhoto: idResult.urls[0],
+          proofOfOwnershipDocument: proofResult.urls[0]
+        });
         if (data.error) {
           if (/pending/i.test(data.error)) return renderPending();
           showError(data.error);
@@ -191,7 +251,7 @@
         if (!r) return renderForm(currentUser);
         if (r.status === 'pending') return renderPending();
         if (r.status === 'approved') return renderApproved();
-        if (r.status === 'rejected') return renderRejected();
+        if (r.status === 'rejected') return renderRejected(r);
         renderForm(currentUser);
       } catch (err) {
         console.error(err);

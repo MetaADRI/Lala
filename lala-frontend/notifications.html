@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lala — Notifications</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="common.css?v=4">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="logo-removebg-preview.png">
+  <style>
+    .notif-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 14px 0 18px; border-bottom: 1px solid var(--border); margin-bottom: 18px;
+    }
+    .notif-head h1 { font-size: 20px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 10px; }
+    .notif-head h1 i { color: var(--g-mid); }
+    .notif-card {
+      display: flex; gap: 12px; padding: 14px 16px; border: 1px solid var(--border);
+      border-radius: 14px; margin-bottom: 10px; background: var(--surface, #fff);
+      transition: opacity .2s, background .2s;
+    }
+    .notif-card.unread { background: #F0F7F0; border-color: #CDE3CD; }
+    .notif-card .nicon {
+      flex: 0 0 38px; height: 38px; border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-size: 18px; background: var(--g-light); color: var(--g-dark);
+    }
+    .notif-card .nbody { flex: 1; min-width: 0; }
+    .notif-card .ntitle { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+    .notif-card.unread .ntitle { color: var(--g-dark); }
+    .notif-card .nmsg { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+    .notif-card .ntime { font-size: 11px; color: #999; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+    .notif-card .nicon i { margin: 0; }
+  </style>
+</head>
+<body class="auth-shell">
+  <div class="auth-card" style="max-width: 560px;">
+    <div class="auth-head">
+      <a href="index.html" class="auth-logo">
+        <img src="logo-removebg-preview.png" alt="Lala">
+        <span>lala</span>
+      </a>
+      <div class="auth-title">Notifications</div>
+    </div>
+
+    <div class="auth-body">
+      <div class="notif-head">
+        <h1><i class="ti ti-bell"></i> Your activity</h1>
+        <button class="btn-login" id="markAllBtn" style="width:auto; padding:8px 14px; font-size:12.5px;" onclick="markAll()">
+          <i class="ti ti-check-all"></i> Mark all read
+        </button>
+      </div>
+      <div id="notifList">
+        <div style="text-align:center; padding: 24px 0;">
+          <div class="btn-spinner" style="display:inline-block;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js?v=2"></script>
+  <script src="api.js?v=2"></script>
+  <script src="session.js?v=2"></script>
+  <script>
+    function esc(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function typeIcon(type) {
+      switch (type) {
+        case 'host_approved': return 'ti-building-estate';
+        case 'host_rejected': return 'ti-user-off';
+        case 'booking_confirmed': return 'ti-check';
+        case 'booking_cancelled': return 'ti-x';
+        default: return 'ti-bell';
+      }
+    }
+
+    function timeAgo(ts) {
+      const diff = Date.now() - new Date(ts).getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1) return 'Just now';
+      if (mins < 60) return `${mins} min ago`;
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return `${hrs} hr${hrs > 1 ? 's' : ''} ago`;
+      return new Date(ts).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+    }
+
+    async function load() {
+      const listEl = document.getElementById('notifList');
+      try {
+        const notifications = await api.getNotifications();
+        if (!Array.isArray(notifications) || notifications.length === 0) {
+          listEl.innerHTML = `
+            <div class="empty-state">
+              <i class="ti ti-bell-off" style="color:#2E7D32;"></i>
+              <p>You're all caught up — no notifications yet.</p>
+              <a href="index.html" class="btn-outline" style="margin-top:12px;">Back to home</a>
+            </div>`;
+          return;
+        }
+        listEl.innerHTML = '';
+        notifications.forEach(n => {
+          const unread = !n.readAt;
+          const icon = typeIcon(n.type);
+          const linkAttr = n.link ? ` onclick="openLink('${esc(n.link)}')" style="cursor:pointer;"` : '';
+          listEl.insertAdjacentHTML('beforeend', `
+            <div class="notif-card ${unread ? 'unread' : ''}"${linkAttr}>
+              <div class="nicon"><i class="ti ${icon}"></i></div>
+              <div class="nbody">
+                <div class="ntitle">${esc(n.title)}</div>
+                <div class="nmsg">${esc(n.message)}</div>
+                <div class="ntime"><i class="ti ti-clock"></i> ${timeAgo(n.createdAt)}${unread ? ' · Unread' : ''}</div>
+              </div>
+            </div>
+          `);
+          if (unread) api.markNotificationRead(n.id);
+        });
+      } catch (err) {
+        console.error(err);
+        listEl.innerHTML = '<div class="empty-state"><p>Couldn\'t load notifications.</p><button class="btn-outline" style="margin-top:12px;" onclick="location.reload()">Retry</button></div>';
+      }
+    }
+
+    function openLink(href) {
+      window.location.href = href;
+    }
+
+    async function markAll() {
+      try {
+        await api.markAllNotificationsRead();
+        document.querySelectorAll('.notif-card.unread').forEach(c => c.classList.remove('unread'));
+        toast('All notifications marked as read');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    let toastTimer;
+    function toast(msg, type) {
+      let t = document.getElementById('toastBox');
+      if (!t) {
+        t = document.createElement('div');
+        t.id = 'toastBox';
+        t.className = 'toast';
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      t.className = 'toast ' + (type || 'ok') + ' show';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    (async function init() {
+      if (!localStorage.getItem('lala_token') || !localStorage.getItem('lala_user')) {
+        window.location.href = 'guest-login.html?redirect=notifications.html';
+        return;
+      }
+      load();
+    })();
+  </script>
+</body>
+</html>

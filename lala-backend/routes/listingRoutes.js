@@ -4,6 +4,7 @@ const listingController = require('../controllers/listingController');
 const { authMiddleware, roleMiddleware } = require('../middleware/auth');
 
 router.get('/', listingController.getAllListings);
+router.get('/stats', listingController.getStats);
 router.get('/pending', authMiddleware, roleMiddleware(['admin']), listingController.getPendingListings);
 router.get('/mine', authMiddleware, roleMiddleware(['host', 'admin']), listingController.getMyListings);
 router.get('/:id', listingController.getListingById);

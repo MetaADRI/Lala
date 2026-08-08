@@ -6,7 +6,7 @@
   <title>Lala — My Bookings</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="common.css?v=4">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
@@ -89,6 +89,7 @@
       <div>
         <h1>My Bookings</h1>
         <p>View and manage your stays</p>
+        <span id="guestRoleBadge" style="display:none;margin-top:6px;font-size:11px;font-weight:700;padding:2px 10px;border-radius:9999px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);"></span>
       </div>
     </div>
     <div class="hdr-tabs" id="hdrTabs">
@@ -212,6 +213,14 @@
         sessionStorage.setItem('redirect_after_login', window.location.href);
         window.location.href = 'guest-login.html';
         return;
+      }
+
+      const u = api.getUser();
+      const badge = document.getElementById('guestRoleBadge');
+      if (badge && u) {
+        const label = u.role === 'host' ? 'Host Account' : u.role === 'admin' ? 'Admin Account' : 'Guest Account';
+        badge.textContent = `${u.name || 'My Account'} · ${label}`;
+        badge.style.display = 'inline-block';
       }
 
       try {

@@ -7,10 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="common.css?v=4">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <link rel="manifest" href="manifest.json">
+  <script src="config.js?v=4"></script>
   <style>
     :root { --section-gap: 40px; --card-pad: 20px; }
 
@@ -102,12 +103,18 @@
 
     /* ---- HERO ---- */
     .hero {
-      position: relative; min-height: 74vh; display: flex; align-items: center;
+      position: relative;
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex; align-items: center;
       overflow: hidden;
+      padding-bottom: 96px;
     }
     .hero-video {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       object-fit: cover; z-index: 0;
+      transform: scale(1);
+      will-change: transform;
     }
     .hero-overlay {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -117,6 +124,7 @@
     .hero-content {
       max-width: 540px; position: relative; z-index: 2; color: #fff;
       padding: 0 40px; margin-top: -24px;
+      will-change: transform, opacity;
     }
     .hero h1 {
       font-size: 42px; font-weight: 700; color: #fff;
@@ -157,14 +165,20 @@
     .btn-secondary i { font-size: 16px; }
 
     @media (max-width: 768px) {
-      .hero { min-height: 69vh; }
+      .hero { min-height: 100vh; min-height: 100svh; padding-bottom: 84px; }
       .hero h1 { font-size: 32px; }
       .hero-content { padding: 0 20px; margin-top: -16px; }
       .hero p { font-size: 15px; }
     }
 
     /* ---- SEARCH BAR (multi-step) ---- */
-    .search-section { margin-top: -36px; position: relative; z-index: 10; }
+    .search-section {
+      margin-top: -64px;
+      position: relative; z-index: 10;
+    }
+    @media (max-width: 768px) {
+      .search-section { margin-top: -28px; }
+    }
     .search-pill {
       background: var(--canvas); border-radius: 9999px;
       display: flex; align-items: center;
@@ -445,7 +459,6 @@
     .search-section.stuck .search-pill { height: 52px; padding-left: 16px; }
     .search-section.stuck .search-segment { padding: 6px 12px; }
     .search-section.stuck .search-pill-btn { width: 40px; height: 40px; }
-    .search-section.stuck .services-strip { display: none; }
     @media (max-width: 768px) {
       .search-section { position: static; }
     }
@@ -534,7 +547,7 @@
     .stats-band {
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
       border-radius: 20px; padding: 36px 28px; color: #fff;
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; text-align: center;
     }
     .stat-value { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
     .stat-label { margin-top: 6px; font-size: 13px; color: rgba(255,255,255,0.72); font-weight: 500; }
@@ -619,7 +632,7 @@
       <a href="search.html">Stays</a>
       <a href="transfers.html">Rides</a>
       <a href="my-bookings.html">Trips</a>
-      <a href="host-signup.html" class="nav-cta host-entry">Host</a>
+      <a href="signup.html" class="nav-cta host-entry">Host</a>
       <a href="guest-login.html">Sign In</a>
     </div>
     <button class="hamburger" onclick="document.getElementById('mobileMenu').classList.toggle('open')" aria-label="Menu">
@@ -633,7 +646,7 @@
     <a href="search.html">Stays</a>
     <a href="transfers.html">Rides</a>
     <a href="my-bookings.html">My Trips</a>
-    <a href="host-signup.html" class="nav-cta host-entry">List Your Property</a>
+    <a href="signup.html" class="nav-cta host-entry">List Your Property</a>
     <a href="guest-login.html">Sign In</a>
   </div>
 
@@ -652,7 +665,7 @@
         <p class="fade-up">Verified guesthouses, lodges & township stays. Book via WhatsApp, pay with mobile money.</p>
         <div class="hero-buttons fade-up">
           <a href="search.html" class="btn-primary"><i class="ti ti-search"></i> Browse Stays</a>
-          <a href="host-signup.html" class="btn-secondary host-entry"><i class="ti ti-home-plus"></i> List Your Property</a>
+          <a href="signup.html" class="btn-secondary host-entry"><i class="ti ti-home-plus"></i> List Your Property</a>
         </div>
       </div>
     </div>
@@ -692,9 +705,10 @@
           <i class="ti ti-search"></i>
         </button>
       </div>
+    </div>
 
-      <!-- SERVICES STRIP -->
-      <div class="services-strip fade-up fade-up-d1">
+    <!-- SERVICES STRIP -->
+    <div class="services-strip fade-up fade-up-d1">
         <a href="transfers.html" class="service-card">
           <div class="service-icon"><i class="ti ti-plane-landing"></i></div>
           <div class="service-body">
@@ -922,20 +936,12 @@
     <section class="stats-section">
       <div class="stats-band reveal">
         <div class="stat">
-          <div class="stat-value" data-target="500" data-suffix="+">0</div>
+          <div class="stat-value" id="statStays" data-target="0" data-suffix="">0</div>
           <div class="stat-label">Verified stays</div>
         </div>
         <div class="stat">
-          <div class="stat-value" data-target="10">0</div>
+          <div class="stat-value" id="statCities" data-target="0">0</div>
           <div class="stat-label">Cities across Zambia</div>
-        </div>
-        <div class="stat">
-          <div class="stat-value" data-target="4.7" data-decimals="1">0</div>
-          <div class="stat-label">Average guest rating</div>
-        </div>
-        <div class="stat">
-          <div class="stat-value" data-target="1200" data-suffix="+">0</div>
-          <div class="stat-label">Happy guests</div>
         </div>
       </div>
     </section>
@@ -1019,7 +1025,7 @@
       <div class="cta-banner fade-up">
         <h2>Got a spare room?</h2>
         <p>Join hundreds of guesthouse owners earning more with Lala. List your property in minutes — free.</p>
-        <a href="host-signup.html" class="btn-primary"><i class="ti ti-home-plus"></i> List your property</a>
+        <a href="signup.html" class="btn-primary"><i class="ti ti-home-plus"></i> List your property</a>
       </div>
     </section>
 
@@ -1038,7 +1044,7 @@
         </div>
         <div class="footer-col">
           <h5>Host</h5>
-          <a href="host-signup.html">List your property</a>
+          <a href="signup.html">List your property</a>
           <a href="host-dashboard.html">Host dashboard</a>
           <a href="faq.html">Host FAQ</a>
         </div>
@@ -1096,6 +1102,40 @@
       window.addEventListener('scroll', pinSearch, { passive: true });
       window.addEventListener('resize', function() { measureSearch(); pinSearch(); }, { passive: true });
       window.addEventListener('load', function() { measureSearch(); pinSearch(); });
+
+      // ---- 1b. Hero scroll-exit "remove" animation ----
+      // As the visitor scrolls, the hero content fades and rises while the video
+      // slowly zooms in, so the hero gracefully "leaves" as the search bar pins.
+      var heroEl = document.querySelector('.hero');
+      var heroContent = document.querySelector('.hero-content');
+      var heroVideo = document.querySelector('.hero-video');
+      var animatingHero = false;
+      var heroExit = function() {
+        if (!heroEl) return;
+        var h = heroEl.offsetHeight || window.innerHeight;
+        var p = Math.min(window.scrollY / h, 1);
+        if (heroContent) {
+          heroContent.style.opacity = String(1 - p * 1.15);
+          heroContent.style.transform = 'translateY(' + (-p * 90) + 'px)';
+        }
+        if (heroVideo) {
+          heroVideo.style.transform = 'scale(' + (1 + p * 0.22) + ')';
+        }
+      };
+      var heroRaf = function() {
+        animatingHero = false;
+        heroExit();
+      };
+      var onHeroScroll = function() {
+        if (!animatingHero) {
+          animatingHero = true;
+          requestAnimationFrame(heroRaf);
+        }
+      };
+      heroExit();
+      window.addEventListener('scroll', onHeroScroll, { passive: true });
+      window.addEventListener('resize', onHeroScroll, { passive: true });
+      window.addEventListener('load', onHeroScroll);
 
       // ---- 2. City autocomplete ----
       var CITIES = [
@@ -1273,7 +1313,7 @@
         });
       });
 
-      // ---- 6. Count-up stats ----
+      // ---- 6. Count-up stats (live data from backend) ----
       var countUp = function(el) {
         var target = parseFloat(el.getAttribute('data-target')) || 0;
         var dec = parseInt(el.getAttribute('data-decimals') || '0', 10);
@@ -1294,7 +1334,20 @@
           if (en.isIntersecting) { countUp(en.target); statObs.unobserve(en.target); }
         });
       }, { threshold: 0.4 });
-      document.querySelectorAll('.stat-value').forEach(function(el) { statObs.observe(el); });
+      var statEls = document.querySelectorAll('.stat-value');
+      var observeStats = function() { statEls.forEach(function(el) { statObs.observe(el); }); };
+      fetch((window.API_URL || 'http://localhost:5000/api') + '/listings/stats')
+        .then(function(r) { return r.json(); })
+        .then(function(s) {
+          var stays = parseInt(s.approvedStays, 10) || 0;
+          var cities = parseInt(s.cities, 10) || 0;
+          var staysEl = document.getElementById('statStays');
+          var citiesEl = document.getElementById('statCities');
+          if (staysEl) staysEl.setAttribute('data-target', stays);
+          if (citiesEl) citiesEl.setAttribute('data-target', cities);
+        })
+        .catch(function() {})
+        .then(observeStats);
 
       // ---- 7. Auto-rotating testimonials ----
       var testiCards = document.querySelectorAll('.testi-card');
@@ -1372,16 +1425,17 @@
 
     (function() {
       // Route the "Host" / "List Your Property" entry points by auth state:
+      // signed-out users get the unified sign-up page with the guest/host toggle,
       // guests submit a host application, hosts/admins go straight to their dashboard.
       function hostTarget() {
         try {
           const u = JSON.parse(localStorage.getItem('lala_user'));
-          if (!u) return 'host-signup.html';
+          if (!u) return 'signup.html';
           if (u.role === 'guest') return 'become-host.html';
           if (u.role === 'host') return 'host-dashboard.html';
           if (u.role === 'admin') return 'admin-portal.html';
         } catch (e) {}
-        return 'host-signup.html';
+        return 'signup.html';
       }
       document.querySelectorAll('.host-entry').forEach(function(a) {
         a.addEventListener('click', function(e) {
@@ -1400,5 +1454,6 @@
     }
   </script>
   <script src="session.js"></script>
+  <script src="auth-nav.js?v=1"></script>
 </body>
 </html>

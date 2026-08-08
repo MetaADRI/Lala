@@ -9,7 +9,8 @@
     "test": "node test/settle.test.js && node test/transferSettle.test.js",
     "migrate": "sequelize-cli db:migrate",
     "migration:generate": "sequelize-cli migration:generate",
-    "migrate:undo": "sequelize-cli db:migrate:undo"
+    "migrate:undo": "sequelize-cli db:migrate:undo",
+    "seed:admin": "node scripts/seedAdmin.js"
   },
   "keywords": [],
   "author": "",

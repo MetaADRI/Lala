@@ -6,6 +6,7 @@ const User = require('../models/User');
 const sequelize = require('../config/database');
 const paymentService = require('../services/paymentService');
 const smsService = require('../services/smsService');
+const { notify } = require('../services/notificationService');
 const logger = require('../utils/logger');
 const {
   AppError,
@@ -235,6 +236,16 @@ async function confirmBooking(booking) {
   try { await smsService.sendBookingConfirmation(booking); }
   catch (e) { logger.warn('booking.sms.failed', { bookingId: booking.id, err: e.message }); }
 
+  // In-app notification to the listing host
+  try {
+    const listing = await Listing.findByPk(booking.listingId, { attributes: ['hostId', 'name'] });
+    if (listing) {
+      notify(listing.hostId, 'booking_confirmed', 'New confirmed booking', `You have a new confirmed booking for ${listing.name}.`, 'host-dashboard.html');
+    }
+  } catch (e) {
+    logger.warn('booking.notify.failed', { bookingId: booking.id, err: e.message });
+  }
+
   // Settle: 90% to lodge hostPhone + 10% to operator commission number. Crash-safe — won't throw.
   await require('../services/settlementService').settleBooking(booking);
 
@@ -353,6 +364,16 @@ const cancelBooking = asyncHandler(async (req, res) => {
   booking.status = 'cancelled';
   await booking.save();
 
+  // Notify the listing host that a guest cancelled
+  try {
+    const listing = await Listing.findByPk(booking.listingId, { attributes: ['hostId', 'name'] });
+    if (listing) {
+      notify(listing.hostId, 'booking_cancelled', 'Booking cancelled', `A guest cancelled their booking for ${listing.name}.`, 'host-dashboard.html');
+    }
+  } catch (e) {
+    logger.warn('booking.notify.failed', { bookingId: booking.id, err: e.message });
+  }
+
   logger.info('booking.cancelled', { bookingId: booking.id, by: 'guest' });
   res.json({ message: 'Booking cancelled', booking });
 });
@@ -372,6 +393,13 @@ const hostCancelBooking = asyncHandler(async (req, res) => {
 
   booking.status = 'cancelled';
   await booking.save();
+
+  // Notify the guest that the host cancelled
+  try {
+    notify(booking.guestId, 'booking_cancelled', 'Booking cancelled', 'The host cancelled your booking. Contact support if you already paid.', 'my-bookings.html');
+  } catch (e) {
+    logger.warn('booking.notify.failed', { bookingId: booking.id, err: e.message });
+  }
 
   logger.info('booking.cancelled', { bookingId: booking.id, by: 'host' });
   res.json({ message: 'Booking cancelled by host', booking });

@@ -21,12 +21,36 @@ const HostRequest = sequelize.define('HostRequest', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  propertyNumber: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  nationalIdNumber: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  idDocumentPhoto: {
+    type: DataTypes.STRING,
+    allowNull: true // Cloudinary URL
+  },
+  proofOfOwnershipDocument: {
+    type: DataTypes.STRING,
+    allowNull: true // Cloudinary URL
+  },
   status: {
     type: DataTypes.STRING,
     defaultValue: 'pending' // pending | approved | rejected
   },
   reviewedAt: {
     type: DataTypes.DATE,
+    allowNull: true
+  },
+  reviewedBy: {
+    type: DataTypes.UUID,
+    allowNull: true // id of the admin who decided
+  },
+  rejectionReason: {
+    type: DataTypes.STRING,
     allowNull: true
   }
 });

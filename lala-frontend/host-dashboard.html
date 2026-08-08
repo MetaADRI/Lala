@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="common.css?v=4">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
@@ -614,6 +614,7 @@
     </div>
     <div class="topbar-greeting">Welcome back</div>
     <div class="topbar-name" id="hostName">Loading...</div>
+    <span class="role-badge" id="roleBadge" style="display:inline-block;font-size:11px;font-weight:700;padding:2px 10px;border-radius:9999px;background:var(--gold-lt);color:#7B4F00;margin-top:2px;"></span>
   </div>
 
   <!-- STATS ROW -->
@@ -713,6 +714,10 @@
         <div class="form-group">
           <label>Full Name</label>
           <input type="text" name="name" id="profileName" placeholder="Your name" required>
+        </div>
+        <div class="form-group" style="margin-top:12px;">
+          <label>Account Type</label>
+          <div id="profileRole" style="font-size:13px;font-weight:700;color:var(--g-dark);background:var(--g-light);border-radius:9999px;padding:8px 14px;display:inline-flex;align-items:center;gap:8px;"></div>
         </div>
         <div class="form-group">
           <label>Avatar URL</label>
@@ -928,6 +933,11 @@
       document.getElementById('adminShortcut').style.display = 'block';
     }
 
+    const roleBadge = document.getElementById('roleBadge');
+    if (roleBadge) {
+      roleBadge.textContent = user.role === 'admin' ? 'Admin Account' : 'Host Account';
+    }
+
     document.getElementById('hostName').innerText = user.name || user.phone || 'Host';
 
     function updateProfileBtn() {
@@ -978,6 +988,11 @@
       if (id === 'profileModal') {
         document.getElementById('profileName').value = user.name || '';
         document.getElementById('profileAvatar').value = user.avatar || '';
+        const roleEl = document.getElementById('profileRole');
+        if (roleEl) {
+          roleEl.innerHTML = '<i class="ti ' + (user.role === 'admin' ? 'ti-shield' : 'ti-building-estate') + '"></i> ' +
+            (user.role === 'admin' ? 'Admin Account' : 'Host Account');
+        }
         const input = document.getElementById('profileAvatar');
         const preview = document.getElementById('avatarPreview');
         const img = preview.querySelector('img');

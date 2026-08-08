@@ -12,7 +12,6 @@ const REQUIRED_ENV_VARS = [
   // Lenco (mobile money collections + payouts)
   'LENCO_API_URL',
   'LENCO_API_KEY',
-  'LENCO_ACCOUNT_ID',
 
   // Commission wallet numbers (payment settlement must never guess a destination)
   'MTN_WALLET',

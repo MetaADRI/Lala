@@ -29,6 +29,10 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     defaultValue: 'guest'
   },
+  status: {
+    type: DataTypes.ENUM('active', 'suspended', 'paused'),
+    defaultValue: 'active'
+  },
   avatar: {
     type: DataTypes.STRING,
     allowNull: true

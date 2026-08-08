@@ -15,6 +15,19 @@ const intOrDefault = (raw, def) => {
   return Number.isNaN(n) ? def : n;
 };
 
+/** Public stats: count of approved stays and distinct cities with approved listings. */
+exports.getStats = asyncHandler(async (req, res) => {
+  const [approvedStays, cityRows] = await Promise.all([
+    Listing.count({ where: { isApproved: true } }),
+    Listing.findAll({
+      attributes: [[sequelize.fn('DISTINCT', sequelize.col('city')), 'city']],
+      where: { isApproved: true },
+      raw: true
+    })
+  ]);
+  res.json({ approvedStays, cities: cityRows.length });
+});
+
 exports.getAllListings = asyncHandler(async (req, res) => {
   const { city, type, minPrice, maxPrice, sort, limit, offset } = req.query;
   const where = { isApproved: true };

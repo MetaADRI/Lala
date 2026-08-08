@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="common.css?v=4">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
@@ -50,7 +50,7 @@
       <a href="search.html">Stays</a>
       <a href="transfers.html">Transfers</a>
       <a href="my-bookings.html">My Trips</a>
-      <a href="host-signup.html" style="background:var(--accent);color:#fff;font-weight:600;">List Stays</a>
+      <a href="signup.html" style="background:var(--accent);color:#fff;font-weight:600;">List Stays</a>
       <a href="guest-login.html">Sign In</a>
     </div>
   </nav>
@@ -131,6 +131,7 @@
   <script src="config.js"></script>
   <script src="api.js"></script>
   <script src="session.js"></script>
+  <script src="auth-nav.js?v=1"></script>
   <script>
     const params = new URLSearchParams(location.search);
     const carId = params.get('id');

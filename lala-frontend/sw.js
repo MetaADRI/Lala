@@ -1,5 +1,5 @@
-const CACHE_NAME = 'lala-v3';
-const DATA_CACHE_NAME = 'lala-data-v3';
+const CACHE_NAME = 'lala-v4';
+const DATA_CACHE_NAME = 'lala-data-v4';
 const ASSETS = [
   '/',
   '/search.html',
@@ -70,6 +70,21 @@ self.addEventListener('fetch', event => {
   // api.js and config.js - Always network (no cache)
   if (url.pathname.endsWith('/api.js') || url.pathname.endsWith('/config.js')) {
     event.respondWith(fetch(request));
+    return;
+  }
+
+  // CSS - Network first, cache fallback. Prevents a stale cached stylesheet
+  // from mismatching newer HTML class names (the "unstyled first load" bug).
+  if (url.pathname.endsWith('.css')) {
+    event.respondWith(
+      fetch(request).then(response => {
+        if (response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+        }
+        return response;
+      }).catch(() => caches.match(request))
+    );
     return;
   }
 

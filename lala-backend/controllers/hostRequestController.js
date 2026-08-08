@@ -1,5 +1,6 @@
 const HostRequest = require('../models/HostRequest');
 const User = require('../models/User');
+const { notify } = require('../services/notificationService');
 const { asyncHandler, badRequest, notFound, forbidden, conflict } = require('../middleware/errorHandler');
 
 /**
@@ -7,8 +8,12 @@ const { asyncHandler, badRequest, notFound, forbidden, conflict } = require('../
  * Never promotes directly — the request must be approved by an admin.
  */
 exports.requestHost = asyncHandler(async (req, res) => {
-  const { name, phone } = req.body;
+  const { name, phone, propertyNumber, nationalIdNumber, idDocumentPhoto, proofOfOwnershipDocument } = req.body;
   if (!name || !name.trim()) throw badRequest('Name is required');
+  if (!nationalIdNumber || !String(nationalIdNumber).trim()) throw badRequest('National ID number is required');
+  if (!propertyNumber || !String(propertyNumber).trim()) throw badRequest('Property number is required');
+  if (!idDocumentPhoto) throw badRequest('A photo of your national ID is required');
+  if (!proofOfOwnershipDocument) throw badRequest('Proof of ownership (title deed or council letter) is required');
 
   const user = await User.findByPk(req.user.id);
   if (!user) throw notFound('User not found');
@@ -23,7 +28,11 @@ exports.requestHost = asyncHandler(async (req, res) => {
   const request = await HostRequest.create({
     userId: user.id,
     name: name.trim(),
-    phone: phone ? String(phone).trim() : (user.phone || null)
+    phone: phone ? String(phone).trim() : (user.phone || null),
+    propertyNumber: String(propertyNumber).trim(),
+    nationalIdNumber: String(nationalIdNumber).trim(),
+    idDocumentPhoto,
+    proofOfOwnershipDocument
   });
 
   res.status(201).json({ message: 'Host application submitted for review', request });
@@ -59,6 +68,9 @@ const review = async (req, res, decision) => {
   if (!request) throw notFound('Host application not found');
   if (request.status !== 'pending') throw conflict('This application has already been reviewed');
 
+  const admin = await User.findByPk(req.user.id);
+  if (!admin || admin.role !== 'admin') throw forbidden('Only admins can review host applications');
+
   if (decision === 'approve') {
     const user = await User.findByPk(request.userId);
     if (!user) throw notFound('Applicant account no longer exists');
@@ -67,10 +79,15 @@ const review = async (req, res, decision) => {
     if (!user.phone && request.phone) user.phone = request.phone;
     await user.save();
     request.status = 'approved';
+    notify(user.id, 'host_approved', 'You are now a host!', 'Your application to become a host was approved. Sign in again to start listing your property.', 'host-dashboard.html');
   } else {
+    const reason = req.body && req.body.rejectionReason ? String(req.body.rejectionReason).trim() : '';
     request.status = 'rejected';
+    request.rejectionReason = reason || null;
+    notify(request.userId, 'host_rejected', 'Host application not approved', reason ? `Your application was not approved: ${reason}` : 'Your application to become a host was not approved. You may apply again.', 'become-host.html');
   }
   request.reviewedAt = new Date();
+  request.reviewedBy = req.user.id;
   await request.save();
 
   res.json({

@@ -192,6 +192,124 @@ img { max-width: 100%; }
 
 .nav-cta:hover { background: var(--accent-hover) !important; }
 
+/* ========================= ACCOUNT CHIP (nav) ======================= */
+.account-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface-strong);
+  border: 1px solid var(--hairline);
+  border-radius: var(--rpill);
+  padding: 3px 5px 3px 4px;
+  margin: 0;
+}
+
+.account-chip-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  padding: 3px 6px 3px 2px;
+  border-radius: var(--rpill);
+  transition: background 0.2s;
+}
+.account-chip-link:hover { background: #fff; }
+
+.account-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.account-avatar-txt { font-size: 12px; font-weight: 700; }
+.account-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+
+.account-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  text-align: left;
+}
+.account-name {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--ink);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.account-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--g-dark);
+  background: var(--g-light);
+  border-radius: var(--rpill);
+  padding: 1px 8px;
+  align-self: flex-start;
+}
+.account-chip[data-role="host"] .account-badge {
+  color: #7B4F00;
+  background: var(--gold-lt);
+}
+.account-chip[data-role="admin"] .account-badge {
+  color: var(--blue);
+  background: #E8F0FE;
+}
+
+.account-signout {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+.account-signout:hover { background: var(--red-light); color: var(--red); }
+
+.account-bell {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 17px;
+  transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+.account-bell:hover { background: var(--surface-soft); color: var(--g-mid); }
+.account-bell-badge {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  border-radius: var(--rpill);
+  background: var(--red);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 15px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--surface-strong);
+}
+
 /* ============================= BUTTONS ============================= */
 .btn {
   display: inline-flex;

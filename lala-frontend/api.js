@@ -11,7 +11,13 @@ const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, name, phone, role })
     });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      return { error: `Server responded with ${res.status}. Please try again.` };
+    }
+    if (!res.ok && !data.error) data.error = `Request failed (${res.status})`;
     if (data.token) {
       localStorage.setItem('lala_token', data.token);
       localStorage.setItem('lala_user', JSON.stringify(data.user));
@@ -25,7 +31,14 @@ const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      // Backend down / proxy returned non-JSON (e.g. HTML 502). Keep the status.
+      return { error: `Server responded with ${res.status}. Please try again.` };
+    }
+    if (!res.ok && !data.error) data.error = `Request failed (${res.status})`;
     if (data.token) {
       localStorage.setItem('lala_token', data.token);
       localStorage.setItem('lala_user', JSON.stringify(data.user));
@@ -164,7 +177,6 @@ const api = {
     if (res.status === 401) api.logout();
     return res.json();
   },
-
   getMyHostRequest: async () => {
     const token = localStorage.getItem('lala_token');
     const res = await fetch(`${API_BASE}/host-requests/mine`, {
@@ -183,11 +195,72 @@ const api = {
     return res.json();
   },
 
-  reviewHostRequest: async (id, decision) => {
+  reviewHostRequest: async (id, decision, rejectionReason) => {
     const token = localStorage.getItem('lala_token');
     const res = await fetch(`${API_BASE}/host-requests/${id}/${decision}`, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(decision === 'reject' ? { rejectionReason } : {})
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  // ─── NOTIFICATIONS ──────────────────────────────────────────────────────
+  getNotifications: async () => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/notifications`, {
       headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  getUnreadCount: async () => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/notifications/unread-count`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  markNotificationRead: async (id) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/notifications/${id}/read`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  markAllNotificationsRead: async () => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/notifications/read-all`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  // ─── ADMIN: USER MANAGEMENT ─────────────────────────────────────────────
+  getUsers: async () => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/admin/users`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) api.logout();
+    return res.json();
+  },
+
+  setUserStatus: async (id, status) => {
+    const token = localStorage.getItem('lala_token');
+    const res = await fetch(`${API_BASE}/admin/users/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ status })
     });
     if (res.status === 401) api.logout();
     return res.json();

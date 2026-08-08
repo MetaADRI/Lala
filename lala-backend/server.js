@@ -21,6 +21,8 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const carRoutes = require('./routes/carRoutes');
 const carBookingRoutes = require('./routes/carBookingRoutes');
 const hostRequestRoutes = require('./routes/hostRequestRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Models (ensure they're loaded for associations)
 require('./models/Listing');
@@ -29,6 +31,7 @@ require('./models/Car');
 require('./models/CarBooking');
 require('./models/PasswordResetToken');
 require('./models/HostRequest');
+require('./models/Notification');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -56,6 +59,8 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/cars', carRoutes);
 app.use('/api/car-bookings', carBookingRoutes);
 app.use('/api/host-requests', hostRequestRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/', (req, res) => {

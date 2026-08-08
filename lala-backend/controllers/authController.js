@@ -7,7 +7,7 @@ const { Sequelize } = require('sequelize');
 
 const emailService = require('../services/email');
 const logger = require('../utils/logger');
-const { asyncHandler, AppError, badRequest, notFound, conflict } = require('../middleware/errorHandler');
+const { asyncHandler, AppError, badRequest, notFound, conflict, forbidden } = require('../middleware/errorHandler');
 
 const RESET_TOKEN_TTL_MS = 30 * 60 * 1000; // 30 minutes (kept from previous behavior)
 
@@ -24,11 +24,11 @@ function codeMatches(storedHash, code) {
 
 function signToken(user) {
   const token = jwt.sign(
-    { id: user.id, email: user.email, role: user.role, name: user.name },
+    { id: user.id, email: user.email, role: user.role, name: user.name, status: user.status },
     process.env.JWT_SECRET,
     { expiresIn: '24h' }
   );
-  return { token, user: { id: user.id, email: user.email, role: user.role, name: user.name } };
+  return { token, user: { id: user.id, email: user.email, role: user.role, name: user.name, status: user.status } };
 }
 
 exports.register = asyncHandler(async (req, res) => {
@@ -63,6 +63,9 @@ exports.login = asyncHandler(async (req, res) => {
   const user = await User.findOne({ where: { email } });
   if (!user) throw badRequest('Invalid email or password');
 
+  if (user.status === 'suspended') throw forbidden('Your account has been suspended. Contact support.');
+  if (user.status === 'paused') throw forbidden('Your account is paused. Contact support to reactivate it.');
+
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) throw badRequest('Invalid email or password');
 
@@ -82,21 +85,6 @@ exports.updateProfile = asyncHandler(async (req, res) => {
 
   const { token, user: userData } = signToken(user);
   res.json({ message: 'Profile updated', token, user: userData });
-});
-
-exports.setupHost = asyncHandler(async (req, res) => {
-  const { name } = req.body;
-  if (!name) throw badRequest('Name is required');
-
-  const user = await User.findByPk(req.user.id);
-  if (!user) throw notFound('User not found');
-
-  user.name = name;
-  user.role = 'host';
-  await user.save();
-
-  const { token, user: userData } = signToken(user);
-  res.json({ message: 'Host profile created', token, user: userData });
 });
 
 exports.forgotPassword = asyncHandler(async (req, res) => {

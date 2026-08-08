@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="common.css?v=4">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
@@ -53,6 +53,12 @@
     .hbadge.pending { background: #FFF3E0; color: #E65100; }
     .hbadge.approved { background: #E8F5E9; color: #1B5E20; }
     .hbadge.rejected { background: #FFEBEE; color: #C62828; }
+    .hbadge.suspended { background: #FFEBEE; color: #C62828; }
+    .hbadge.paused { background: #FFF8E1; color: #8A6D00; }
+    .hbadge.guest { background: #E8F0FE; color: #1A56DB; }
+    .hbadge.host { background: #FFF8E1; color: #8A6D00; }
+    .hbadge.admin { background: #F3E8FF; color: #6D28D9; }
+    .hbadge.role-badge { background: #ECEFF1; color: #455A64; }
 
     .hcard {
       background: #fff; border-radius: 12px; border: 1px solid #E0E0E0; padding: 18px 20px;
@@ -63,6 +69,8 @@
     .hcard .hinfo { flex: 1; min-width: 220px; }
     .hcard .hinfo h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
     .hcard .hmeta { font-size: 12.5px; color: #666; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+    .hcard .hmeta.doc-link { color: var(--g-mid); cursor: pointer; text-decoration: none; display: inline-flex; }
+    .hcard .hmeta.doc-link:hover { text-decoration: underline; }
     .hcard .hdate { font-size: 11.5px; color: #999; margin-top: 6px; }
 
     .pthumbs { display: flex; gap: 8px; margin-top: 12px; align-items: stretch; flex-wrap: wrap; }
@@ -111,6 +119,7 @@
     <div style="display: flex; gap: 20px; align-items: center;">
       <a href="host-dashboard.html" style="color: #fff; text-decoration: none; font-size: 13px; font-weight: 500;">Dashboard</a>
       <a href="admin-bookings.html" style="color: #fff; text-decoration: none; font-size: 13px; font-weight: 500;">Bookings</a>
+      <span id="adminRoleBadge" style="font-size: 11px; font-weight: 700; padding: 3px 12px; border-radius: 9999px; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.35); display: none;"></span>
       <button onclick="logout()" style="background:transparent; border:1px solid rgba(255,255,255,0.3); color:#fff; font-size:12px; padding: 6px 12px; border-radius: 4px; cursor:pointer;">Logout</button>
     </div>
   </div>
@@ -124,6 +133,9 @@
       </button>
       <button class="admin-tab" id="tabHosts" onclick="switchTab('hosts')">
         Host Requests <span id="hostCount" class="tab-count">0</span>
+      </button>
+      <button class="admin-tab" id="tabUsers" onclick="switchTab('users')">
+        Users
       </button>
     </div>
 
@@ -158,6 +170,22 @@
         </div>
       </div>
     </section>
+
+    <!-- USERS -->
+    <section id="sectionUsers" style="display: none;">
+      <div class="flex-between" style="margin-bottom: 24px;">
+        <h2 class="sora" style="font-size: 16px;">All Users</h2>
+        <div id="userCount" class="pbadge">0 Users</div>
+      </div>
+
+      <div id="userList">
+        <!-- Users will be injected here -->
+        <div class="empty-state">
+          <i class="ti ti-loader animate-spin"></i>
+          <p>Loading users...</p>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script src="config.js"></script>
@@ -167,6 +195,12 @@
     const user = JSON.parse(localStorage.getItem('lala_user'));
     if (!user || user.role !== 'admin') {
       window.location.href = 'index.html';
+    }
+
+    const adminBadge = document.getElementById('adminRoleBadge');
+    if (adminBadge) {
+      adminBadge.textContent = `${user.name || 'Admin'} · Admin Account`;
+      adminBadge.style.display = 'inline-block';
     }
 
     // ── Toast ───────────────────────────────────────────────────────────
@@ -299,16 +333,24 @@
 
     // ── TABS ──────────────────────────────────────────────────────────────
     let hostsLoaded = false;
+    let usersLoaded = false;
 
     function switchTab(name) {
       const listingActive = name === 'listings';
+      const usersActive = name === 'users';
       document.getElementById('sectionListings').style.display = listingActive ? '' : 'none';
-      document.getElementById('sectionHosts').style.display = listingActive ? 'none' : '';
+      document.getElementById('sectionHosts').style.display = usersActive || listingActive ? 'none' : '';
+      document.getElementById('sectionUsers').style.display = usersActive ? '' : 'none';
       document.getElementById('tabListings').classList.toggle('active', listingActive);
-      document.getElementById('tabHosts').classList.toggle('active', !listingActive);
-      if (!listingActive && !hostsLoaded) {
+      document.getElementById('tabHosts').classList.toggle('active', !listingActive && !usersActive);
+      document.getElementById('tabUsers').classList.toggle('active', usersActive);
+      if (!listingActive && !hostsLoaded && !usersActive) {
         hostsLoaded = true;
         loadHostRequests();
+      }
+      if (usersActive && !usersLoaded) {
+        usersLoaded = true;
+        loadUsers();
       }
     }
 
@@ -346,11 +388,15 @@
           const email = r.user ? r.user.email : '';
           const badgeCls = r.status === 'pending' ? 'pending' : r.status;
           const date = new Date(r.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+          const reviewed = r.reviewedAt ? new Date(r.reviewedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
           const actions = r.status === 'pending' ? `
             <div class="action-btns">
               <button onclick="approveHostRequest('${r.id}')" class="btn-approve">Approve</button>
               <button onclick="rejectHostRequest('${r.id}')" class="btn-reject">Reject</button>
             </div>` : '';
+          const docs = [];
+          if (r.idDocumentPhoto) docs.push(`<a href="${r.idDocumentPhoto}" target="_blank" rel="noopener" class="hmeta doc-link"><i class="ti ti-id"></i> National ID</a>`);
+          if (r.proofOfOwnershipDocument) docs.push(`<a href="${r.proofOfOwnershipDocument}" target="_blank" rel="noopener" class="hmeta doc-link"><i class="ti ti-file-check"></i> Proof of ownership</a>`);
           listEl.insertAdjacentHTML('beforeend', `
             <div class="hcard fade-up visible">
               <div class="hinfo">
@@ -360,7 +406,12 @@
                 </h3>
                 <div class="hmeta"><i class="ti ti-mail"></i> ${esc(email)}</div>
                 ${r.phone ? `<div class="hmeta"><i class="ti ti-phone"></i> ${esc(r.phone)}</div>` : ''}
+                ${r.nationalIdNumber ? `<div class="hmeta"><i class="ti ti-id"></i> NRC ${esc(r.nationalIdNumber)}</div>` : ''}
+                ${r.propertyNumber ? `<div class="hmeta"><i class="ti ti-building-estate"></i> ${esc(r.propertyNumber)}</div>` : ''}
+                ${docs.join('')}
                 <div class="hdate"><i class="ti ti-calendar"></i> Requested ${date}</div>
+                ${r.status !== 'pending' && reviewed ? `<div class="hdate"><i class="ti ti-check"></i> Reviewed ${reviewed}</div>` : ''}
+                ${r.status === 'rejected' && r.rejectionReason ? `<div class="hmeta"><i class="ti ti-alert-triangle"></i> Reason: ${esc(r.rejectionReason)}</div>` : ''}
               </div>
               ${actions}
             </div>
@@ -386,13 +437,74 @@
 
     async function rejectHostRequest(id) {
       if (!confirm('Reject this host application?')) return;
+      const rejectionReason = prompt('Reason for rejection (shown to the applicant):');
+      if (rejectionReason === null) return; // cancelled
       try {
-        const data = await api.reviewHostRequest(id, 'reject');
+        const data = await api.reviewHostRequest(id, 'reject', rejectionReason.trim());
         if (data.error) { toast(data.error, 'err'); return; }
         loadHostRequests();
         toast('Host application rejected.');
       } catch (err) {
         toast('Failed to reject application', 'err');
+      }
+    }
+
+    async function loadUsers() {
+      const listEl = document.getElementById('userList');
+      const countEl = document.getElementById('userCount');
+      try {
+        const users = await api.getUsers();
+        if (!Array.isArray(users)) throw new Error('bad response');
+        countEl.innerText = `${users.length} Users`;
+        listEl.innerHTML = '';
+        if (users.length === 0) {
+          listEl.innerHTML = '<div class="empty-state"><p>No users yet.</p></div>';
+          return;
+        }
+        users.forEach(u => {
+          const isSelf = u.id === user.id;
+          const actions = [];
+          if (u.status !== 'active') {
+            actions.push(`<button class="btn-approve" onclick="setUserStatus('${u.id}', 'active')">Activate</button>`);
+          }
+          if (u.status === 'active') {
+            actions.push(`<button class="btn-approve" onclick="setUserStatus('${u.id}', 'paused')">Pause</button>`);
+            actions.push(`<button class="btn-reject" onclick="setUserStatus('${u.id}', 'suspended')">Suspend</button>`);
+          }
+          if (u.status === 'paused') {
+            actions.push(`<button class="btn-reject" onclick="setUserStatus('${u.id}', 'suspended')">Suspend</button>`);
+          }
+          listEl.insertAdjacentHTML('beforeend', `
+            <div class="hcard fade-up visible">
+              <div class="hinfo">
+                <h3>
+                  <span>${esc(u.name || u.email)} ${isSelf ? '<span class="hbadge role-badge">You</span>' : ''}</span>
+                  <span class="hbadge ${u.status}">${esc(u.status)}</span>
+                  <span class="hbadge ${u.role}">${esc(u.role)}</span>
+                </h3>
+                <div class="hmeta"><i class="ti ti-mail"></i> ${esc(u.email)}</div>
+                ${u.phone ? `<div class="hmeta"><i class="ti ti-phone"></i> ${esc(u.phone)}</div>` : ''}
+              </div>
+              ${u.role === 'admin' && !isSelf ? '' : actions.length ? `<div class="action-btns">${actions.join('')}</div>` : ''}
+            </div>
+          `);
+        });
+      } catch (err) {
+        console.error(err);
+        listEl.innerHTML = '<div class="empty-state"><p>Couldn\'t load users.</p><button class="btn-outline" style="margin-top:12px;" onclick="loadUsers()">Retry</button></div>';
+      }
+    }
+
+    async function setUserStatus(id, status) {
+      const action = status === 'suspended' ? 'suspend' : status === 'paused' ? 'pause' : 'activate';
+      if (!confirm(`Are you sure you want to ${action} this account?`)) return;
+      try {
+        const data = await api.setUserStatus(id, status);
+        if (data.error) { toast(data.error, 'err'); return; }
+        loadUsers();
+        toast(`User ${status}.`);
+      } catch (err) {
+        toast('Failed to update user status', 'err');
       }
     }
 

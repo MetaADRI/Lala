@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="common.css?v=4">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
@@ -29,6 +29,37 @@
       border-radius: 8px;
     }
     .feat-mini i { color: var(--g-dark); font-size: 14px; }
+
+    /* ── Role selector ──────────────────────────────────────────── */
+    .role-select {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .role-card {
+      text-align: left;
+      padding: 14px;
+      border: 2px solid var(--g-light);
+      border-radius: var(--r);
+      background: var(--g-light);
+      cursor: pointer;
+      transition: border-color 0.2s ease, background 0.2s ease, transform 0.1s ease;
+    }
+    .role-card:active { transform: scale(0.98); }
+    .role-card i { font-size: 20px; color: var(--g-mid); display: block; margin-bottom: 8px; }
+    .role-card-title { display: block; font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+    .role-card-sub { display: block; font-size: 11px; line-height: 1.35; color: var(--muted); }
+    .role-card.selected {
+      border-color: var(--g-dark);
+      background: #fff;
+      box-shadow: var(--shadow-btn);
+    }
+    .role-card.selected i { color: var(--g-dark); }
+
+    @media (max-width: 480px) {
+      .role-select { grid-template-columns: 1fr; }
+    }
 
     /* ── Success Overlay ───────────────────────────────────────── */
     .success-overlay {
@@ -123,6 +154,19 @@
         <span id="errorText">Something went wrong</span>
       </div>
 
+      <div class="role-select" id="roleSelect">
+        <button type="button" class="role-card selected" data-role="guest" onclick="selectRole(this)">
+          <i class="ti ti-calendar-event"></i>
+          <span class="role-card-title">I'm booking a stay</span>
+          <span class="role-card-sub">Browse and book stays across Zambia</span>
+        </button>
+        <button type="button" class="role-card" data-role="host" onclick="selectRole(this)">
+          <i class="ti ti-building-estate"></i>
+          <span class="role-card-title">I'm listing a property</span>
+          <span class="role-card-sub">Host travellers and earn with Lala</span>
+        </button>
+      </div>
+
       <div class="fg">
         <label>Full name</label>
         <div class="icon-field">
@@ -208,12 +252,17 @@
       }
     }
 
-    function showSuccess(email) {
+    function showSuccess(email, role) {
+      const isHost = role === 'host';
       document.getElementById('successEmail').textContent = email;
+      if (isHost) {
+        document.querySelector('.success-title').textContent = 'Host Account Created!';
+        document.querySelector('.success-sub').textContent = 'Welcome aboard — start listing your property';
+      }
       document.getElementById('successOverlay').classList.add('show');
       spawnConfetti();
       setTimeout(() => {
-        window.location.href = 'index.html';
+        window.location.href = isHost ? 'host-dashboard.html' : 'index.html';
       }, 3000);
     }
     function togglePassword() {
@@ -238,6 +287,14 @@
       document.getElementById('errorMsg').classList.remove('visible');
     }
 
+    let selectedRole = 'guest';
+
+    function selectRole(card) {
+      document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedRole = card.getAttribute('data-role');
+    }
+
     async function handleSignup() {
       hideError();
 
@@ -256,7 +313,7 @@
       btn.innerHTML = '<span class="btn-spinner"></span> Creating account...';
 
       try {
-        const data = await api.register(email, password, name, phone || undefined);
+        const data = await api.register(email, password, name, phone || undefined, selectedRole);
         if (data.error) {
           showError(data.error);
           btn.disabled = false;
@@ -264,7 +321,7 @@
           return;
         }
 
-        showSuccess(email);
+        showSuccess(email, data.user && data.user.role);
       } catch (err) {
         showError('Failed to connect. Is the backend running?');
         console.error(err);
