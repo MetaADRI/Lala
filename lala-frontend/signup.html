@@ -1,17 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala — Create Account</title>
+  <title>Lala â€” Create Account</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="common.css?v=4">
+  <link rel="stylesheet" href="common.css?v=6">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
-    /* ── Page-specific: signup only ─────────────────────────────── */
+    /* â”€â”€ Page-specific: signup only â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .features-mini {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -30,7 +30,7 @@
     }
     .feat-mini i { color: var(--g-dark); font-size: 14px; }
 
-    /* ── Role selector ──────────────────────────────────────────── */
+    /* â”€â”€ Role selector â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .role-select {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -61,7 +61,7 @@
       .role-select { grid-template-columns: 1fr; }
     }
 
-    /* ── Success Overlay ───────────────────────────────────────── */
+    /* â”€â”€ Success Overlay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .success-overlay {
       position: fixed; inset: 0; z-index: 9999;
       display: none; align-items: center; justify-content: center;
@@ -225,7 +225,7 @@
     <div class="success-card">
       <div class="success-check"><i class="ti ti-check"></i></div>
       <div class="success-title">Account Created!</div>
-      <div class="success-sub">Welcome to Lala — your stay in Zambia starts here</div>
+      <div class="success-sub">Welcome to Lala â€” your stay in Zambia starts here</div>
       <div class="success-email" id="successEmail">you@example.com</div>
       <div class="success-loader"><div class="success-loader-bar"></div></div>
       <div style="margin-top: 16px; font-size: 12px; color: rgba(255,255,255,0.4);">Taking you to Lala...</div>
@@ -257,7 +257,7 @@
       document.getElementById('successEmail').textContent = email;
       if (isHost) {
         document.querySelector('.success-title').textContent = 'Host Account Created!';
-        document.querySelector('.success-sub').textContent = 'Welcome aboard — start listing your property';
+        document.querySelector('.success-sub').textContent = 'Welcome aboard â€” start listing your property';
       }
       document.getElementById('successOverlay').classList.add('show');
       spawnConfetti();

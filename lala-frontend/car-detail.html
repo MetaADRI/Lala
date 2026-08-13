@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala — Book Transfer</title>
+  <title>Lala â€” Book Transfer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="common.css?v=4">
+  <link rel="stylesheet" href="common.css?v=6">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
@@ -42,7 +42,7 @@
 </head>
 <body>
   <nav class="nav">
-    <a href="index.html" class="logo">
+    <a href="index.html" class="nav-logo">
       <img src="logo-removebg-preview.png" alt="Lala Logo" class="logo-img">
     </a>
     <div class="nav-links">
@@ -53,6 +53,30 @@
       <a href="signup.html" style="background:var(--accent);color:#fff;font-weight:600;">List Stays</a>
       <a href="guest-login.html">Sign In</a>
     </div>
+    <button class="hamburger" onclick="document.getElementById('mobileMenu').classList.toggle('open')" aria-label="Menu">
+      <i class="ti ti-menu-2"></i>
+    </button>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="search.html">Stays</a>
+    <a href="transfers.html">Transfers</a>
+    <a href="my-bookings.html">My Trips</a>
+    <a href="signup.html" class="nav-cta">List Your Property</a>
+    <a href="guest-login.html">Sign In</a>
+  </div>
+
+  <!-- BOTTOM NAV (mobile) -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a href="index.html"><i class="ti ti-home"></i> Home</a>
+      <a href="search.html"><i class="ti ti-search"></i> Search</a>
+      <a href="transfers.html"><i class="ti ti-car"></i> Rides</a>
+      <a href="my-bookings.html"><i class="ti ti-heart"></i> Saved</a>
+      <a href="guest-login.html"><i class="ti ti-user"></i> Profile</a>
+    </div>
   </nav>
 
   <div class="detail-wrap">
@@ -61,7 +85,7 @@
     </a>
 
     <div class="car-card" id="detail">
-      <div class="car-img" id="carImg">🚗</div>
+      <div class="car-img" id="carImg">ðŸš—</div>
       <div class="car-body">
         <div class="car-model" id="carModel">Loading...</div>
         <div class="car-info" id="carInfo"></div>
@@ -145,8 +169,8 @@
       try {
         car = await api.getCar(carId);
         document.getElementById('carModel').textContent = car.model;
-        document.getElementById('carInfo').textContent = `👤 ${car.driverName} · ${car.plateNumber} · ${car.seats} seats · ${car.city}`;
-        document.getElementById('carImg').innerHTML = car.photos && car.photos[0] ? `<img src="${car.photos[0]}" alt="">` : '🚗';
+        document.getElementById('carInfo').textContent = `ðŸ‘¤ ${car.driverName} Â· ${car.plateNumber} Â· ${car.seats} seats Â· ${car.city}`;
+        document.getElementById('carImg').innerHTML = car.photos && car.photos[0] ? `<img src="${car.photos[0]}" alt="">` : 'ðŸš—';
         let html = '';
         if (car.airportPrice) html += `<div class="price-box"><div class="lbl">Airport</div><div class="val">K${car.airportPrice}</div></div>`;
         if (car.pricePerKm) html += `<div class="price-box"><div class="lbl">Per km</div><div class="val">K${car.pricePerKm}</div></div>`;

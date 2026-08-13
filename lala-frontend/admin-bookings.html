@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala — All Bookings</title>
+  <title>Lala â€” All Bookings</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="common.css?v=4">
+  <link rel="stylesheet" href="common.css?v=6">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
@@ -21,9 +21,12 @@
     .empty-state { text-align: center; padding: 60px 20px; color: #888; }
     .empty-state i { font-size: 48px; color: #DDD; margin-bottom: 16px; }
     @media (max-width: 768px) {
+      .admin-nav { flex-wrap: wrap; gap: 8px 12px; padding: 12px 14px; }
+      .admin-container { margin: 20px auto; padding: 0 12px; }
       table { font-size: 12px; }
       th, td { padding: 8px 6px; }
       .hide-mobile { display: none; }
+      .flex-between { flex-direction: column; align-items: flex-start; gap: 10px; }
     }
   </style>
 </head>
@@ -41,7 +44,7 @@
   </div>
 
   <div class="admin-container">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <div class="flex-between" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
       <h1 class="sora" style="font-size: 20px;">Booking Records</h1>
       <select id="statusFilter" onchange="loadBookings()" style="padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:12px;">
         <option value="">All Statuses</option>
@@ -113,9 +116,9 @@
                   <tr>
                     <td><strong>${b.listingName || 'Unknown'}</strong></td>
                     <td>${(b.guest && b.guest.name) || (b.guest && b.guest.phone) || 'Guest'}</td>
-                    <td class="hide-mobile">${new Date(b.checkIn).toLocaleDateString()} — ${new Date(b.checkOut).toLocaleDateString()}</td>
+                    <td class="hide-mobile">${new Date(b.checkIn).toLocaleDateString()} â€” ${new Date(b.checkOut).toLocaleDateString()}</td>
                     <td><strong>K${b.totalAmount}</strong></td>
-                    <td class="hide-mobile">${b.provider || '—'}</td>
+                    <td class="hide-mobile">${b.provider || 'â€”'}</td>
                     <td>${statusBadge(b.status)}</td>
                   </tr>
                 `).join('')}

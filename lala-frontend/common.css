@@ -83,7 +83,7 @@
 /* ============================= BASE ============================= */
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 
 body {
   margin: 0;
@@ -511,6 +511,7 @@ img { max-width: 100%; }
 /* ============================= AUTH ============================= */
 .auth-shell {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -518,6 +519,7 @@ img { max-width: 100%; }
   padding: var(--s5);
   position: relative;
   overflow-x: hidden;
+  overflow-x: clip;
 }
 .auth-shell::before {
   content: '';
@@ -1086,12 +1088,108 @@ img { max-width: 100%; }
   transform: translateY(0);
 }
 
+/* ============================= MOBILE NAV ============================= */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: var(--ink);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 72px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  z-index: 99;
+  padding: var(--s6);
+  flex-direction: column;
+  gap: var(--s2);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu a {
+  font-family: var(--font);
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--ink);
+  text-decoration: none;
+  padding: 14px 16px;
+  border-radius: 12px;
+  transition: background 0.2s;
+}
+.mobile-menu a:hover { background: var(--surface-soft); }
+.mobile-menu a.nav-cta {
+  background: var(--accent) !important;
+  color: #fff !important;
+  text-align: center;
+  margin-top: var(--s2);
+}
+
+/* Bottom tab bar (mobile) */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--hairline);
+  z-index: 100;
+  padding: 6px 0 env(safe-area-inset-bottom, 8px);
+}
+.bottom-nav-inner {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.bottom-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+.bottom-nav a i { font-size: 22px; }
+.bottom-nav a.active { color: var(--accent); font-weight: 600; }
+@media (max-width: 768px) {
+  .bottom-nav { display: block; }
+  .hamburger { display: inline-flex; }
+  .mobile-menu { top: 56px; }
+  body:has(.bottom-nav) { padding-bottom: 72px; }
+}
+
 /* ============================= RESPONSIVE ============================= */
 @media (max-width: 768px) {
   .container { padding: 0 var(--s4); }
   .flex-mobile-column { flex-direction: column; }
   .nav { padding: 0 var(--s4); }
-  .nav-links a:not([href="index.html"]):not(.nav-cta) { display: none; }
+  /* Hide secondary links on phones; keep the CTA + account chip visible so
+     signed-in users keep avatar/name/notifications access. The chip itself is a
+     div child, so it is unaffected by this rule. */
+  .nav-links > a:not(.nav-cta) { display: none; }
+  .nav-links { min-width: 0; }
+  .account-chip-link { min-width: 0; }
+  .account-name { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .form-row { flex-direction: column; gap: 0; }
   .listings-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--s4); }
+  .table-wrap { overflow-x: auto; }
 }

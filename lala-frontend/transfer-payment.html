@@ -1,19 +1,19 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala — Secure Transfer Payment</title>
+  <title>Lala â€” Secure Transfer Payment</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="common.css?v=4">
+  <link rel="stylesheet" href="common.css?v=6">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
     body { background: var(--bg); padding-bottom: 20px; }
 
-    /* ── GOLD HEADER ──────────────────────────────────────────────────── */
+    /* â”€â”€ GOLD HEADER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .gold-hdr {
       background: linear-gradient(135deg, #F9A825, #E65100);
       padding: 18px 18px 28px; position: relative;
@@ -31,12 +31,12 @@
     .pay-meta { font-size: 12px; color: rgba(62,39,0,0.65); margin-top: 4px; }
     .pay-dates { font-size: 11px; color: rgba(62,39,0,0.55); margin-top: 2px; }
 
-    /* ── BODY ─────────────────────────────────────────────────────────── */
+    /* â”€â”€ BODY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .payment-body { padding: 20px 18px; display: flex; flex-direction: column; gap: 16px; }
 
     .section-title { font-weight: 600; font-size: 14px; color: var(--text); }
 
-    /* ── PROVIDER CARDS ───────────────────────────────────────────────── */
+    /* â”€â”€ PROVIDER CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .pprov {
       background: var(--card); border: 2px solid var(--border); border-radius: var(--r);
       padding: 14px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer;
@@ -57,7 +57,7 @@
     .pchk  { color: var(--g-dark); font-size: 22px; margin-left: auto; display: none; }
     .pprov.on .pchk { display: block; }
 
-    /* ── PHONE INPUT ──────────────────────────────────────────────────── */
+    /* â”€â”€ PHONE INPUT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .phone-box {
       background: var(--card); border: 1.5px solid var(--border); border-radius: var(--r);
       padding: 0; overflow: hidden; display: flex; align-items: center;
@@ -76,7 +76,7 @@
     }
     .phone-input::placeholder { color: var(--muted); font-weight: 400; letter-spacing: 0; }
 
-    /* ── INFO BOX ─────────────────────────────────────────────────────── */
+    /* â”€â”€ INFO BOX â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .info-box {
       background: var(--g-light); border-radius: 12px; padding: 14px;
       font-size: 12px; color: var(--g-mid); line-height: 1.7;
@@ -84,7 +84,7 @@
     }
     .info-box strong { color: var(--g-dark); }
 
-    /* ── PAY BUTTON & STATES ──────────────────────────────────────────── */
+    /* â”€â”€ PAY BUTTON & STATES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     #payBtn {
       padding: 16px; font-size: 15px; position: relative;
       transition: all 0.3s;
@@ -93,7 +93,7 @@
       opacity: 0.6; cursor: not-allowed; transform: none !important;
     }
 
-    /* ── USSD WAITING SCREEN ─────────────────────────────────────────── */
+    /* â”€â”€ USSD WAITING SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .ussd-screen {
       display: none;
       background: var(--card); border-radius: var(--r); border: 1px solid var(--border);
@@ -123,7 +123,7 @@
     </div>
     <div class="pay-summary">
       <div style="font-size:11px; color:rgba(62,39,0,0.6); margin-bottom:4px;">Total to pay</div>
-      <div class="pay-amount" id="displayAmount">K—</div>
+      <div class="pay-amount" id="displayAmount">Kâ€”</div>
       <div class="pay-meta" id="displayMeta">Loading...</div>
       <div class="pay-dates" id="displayDates"></div>
       <div class="pay-dates" id="displayFeeNote" style="margin-top:4px;"></div>
@@ -141,7 +141,7 @@
         <div class="plogo mtn"><img src="MTN-Logo.png" alt="MTN"></div>
         <div>
           <div class="pname">MTN Mobile Money</div>
-          <div class="psub">Fast USSD push · ~50% market share</div>
+          <div class="psub">Fast USSD push Â· ~50% market share</div>
         </div>
         <i class="ti ti-circle-check-filled pchk"></i>
       </div>
@@ -150,7 +150,7 @@
         <div class="plogo airtel"><img src="Airtel-logo-500x281-removebg-preview.png" alt="Airtel"></div>
         <div>
           <div class="pname">Airtel Money</div>
-          <div class="psub">Fast USSD push · Airtel Zambia</div>
+          <div class="psub">Fast USSD push Â· Airtel Zambia</div>
         </div>
         <i class="ti ti-circle-check-filled pchk"></i>
       </div>
@@ -159,7 +159,7 @@
         <div class="plogo zamtel"><img src="zamtel_logo-removebg-preview.png" alt="Zamtel"></div>
         <div>
           <div class="pname">Zamtel Money</div>
-          <div class="psub">Secure USSD push · Zamtel network</div>
+          <div class="psub">Secure USSD push Â· Zamtel network</div>
         </div>
         <i class="ti ti-circle-check-filled pchk"></i>
       </div>
@@ -208,7 +208,7 @@
       <div style="font-size:11px; color:var(--muted); margin-top:12px;">Waiting for confirmation...</div>
       <div class="msg err" id="pollError" role="alert" style="display:none;"></div>
       <button class="btn-outline" style="margin-top:20px; width:100%;" onclick="simulateConfirm()">
-        <i class="ti ti-refresh"></i> I've paid — check status
+        <i class="ti ti-refresh"></i> I've paid â€” check status
       </button>
     </div>
 
@@ -218,7 +218,7 @@
   <script src="api.js"></script>
   <script src="session.js"></script>
   <script>
-    // ── Read URL params passed from car-detail.html ────────────────────────
+    // â”€â”€ Read URL params passed from car-detail.html â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const params = new URLSearchParams(window.location.search);
     const carId          = params.get('carId')       || '';
     const model          = params.get('model')       || 'Your Driver';
@@ -238,11 +238,11 @@
     let selectedProvider = 'MTN';
     let createdBookingId = null;
 
-    // ── Populate header summary ─────────────────────────────────────────
-    document.getElementById('displayAmount').textContent = total ? `K${Number(total).toLocaleString()}` : 'K—';
-    document.getElementById('displayMeta').textContent = `${tripType === 'airport' ? '✈️ Airport' : '📍 City'} transfer · ${model}`;
+    // â”€â”€ Populate header summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    document.getElementById('displayAmount').textContent = total ? `K${Number(total).toLocaleString()}` : 'Kâ€”';
+    document.getElementById('displayMeta').textContent = `${tripType === 'airport' ? 'âœˆï¸ Airport' : 'ðŸ“ City'} transfer Â· ${model}`;
     if (pickupDate && pickupTime) {
-      document.getElementById('displayDates').textContent = `${pickupDate} at ${pickupTime} · ${pickupLocation} → ${dropoffLocation}`;
+      document.getElementById('displayDates').textContent = `${pickupDate} at ${pickupTime} Â· ${pickupLocation} â†’ ${dropoffLocation}`;
     }
     const feeNote = document.getElementById('displayFeeNote');
     if (feeNote && price) {
@@ -261,17 +261,17 @@
       document.getElementById('phoneInput').value = phone;
     }
 
-    // ── Provider selection ───────────────────────────────────────────────
+    // â”€â”€ Provider selection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     function selectProvider(name) {
       selectedProvider = name;
       document.querySelectorAll('.pprov').forEach(p => p.classList.remove('on'));
       document.getElementById(`prov-${name}`).classList.add('on');
-      document.getElementById('payBtnText').textContent = `Pay K${total ? parseFloat(total).toLocaleString() : '—'} via ${name}`;
+      document.getElementById('payBtnText').textContent = `Pay K${total ? parseFloat(total).toLocaleString() : 'â€”'} via ${name}`;
     }
     // Init button text
     selectProvider('MTN');
 
-    // ── Initiate payment ─────────────────────────────────────────────────
+    // â”€â”€ Initiate payment â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const payError = document.getElementById('payError');
     const pollError = document.getElementById('pollError');
 
@@ -362,7 +362,7 @@
       }
     }
 
-    // ── Poll payment status (triggers Lenco verify + settle on success) ──
+    // â”€â”€ Poll payment status (triggers Lenco verify + settle on success) â”€â”€
     let pollInterval = null;
     let pollAttempts = 0;
 
@@ -379,7 +379,7 @@
           clearInterval(pollInterval);
           showPollError(
             "We haven't confirmed your payment yet. If you completed the USSD prompt on your phone, " +
-            "tap \"I've paid — check status\" below. Your transfer is still reserved."
+            "tap \"I've paid â€” check status\" below. Your transfer is still reserved."
           );
           return;
         }
@@ -399,12 +399,12 @@
           }
         } catch (err) {
           console.error('[poll] status check failed:', err);
-          showPollError('Could not reach the payment service. Tap "I\'ve paid — check status" to retry.');
+          showPollError('Could not reach the payment service. Tap "I\'ve paid â€” check status" to retry.');
         }
       }, 3000);
     }
 
-    // ── Manual re-check (same path as auto-poll — uses real Lenco status) ──
+    // â”€â”€ Manual re-check (same path as auto-poll â€” uses real Lenco status) â”€â”€
     async function simulateConfirm() {
       if (!createdBookingId) return;
       clearPollError();

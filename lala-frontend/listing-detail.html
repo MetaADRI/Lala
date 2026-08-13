@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala — Listing Details</title>
+  <title>Lala â€” Listing Details</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="common.css?v=4">
+  <link rel="stylesheet" href="common.css?v=6">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
@@ -174,14 +174,22 @@
 
     @media (max-width: 768px) {
       .detail-wrap { padding: 0 16px; }
-      .action-bar { padding: 12px 16px 20px; }
+      .name-row { flex-direction: column; gap: 4px; }
+      .listing-title { font-size: 18px; }
+      .price-block { text-align: left; }
+      .dates-row { flex-direction: column; }
+      .date-field { width: 100%; }
+      .action-bar {
+        z-index: 110;
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+      }
     }
   </style>
 </head>
 <body>
   <!-- NAV -->
   <nav class="nav">
-    <a href="index.html" class="logo">
+    <a href="index.html" class="nav-logo">
       <img src="logo-removebg-preview.png" alt="Lala Logo" class="logo-img">
     </a>
     <div class="nav-links">
@@ -191,6 +199,30 @@
       <a href="my-bookings.html">My Trips</a>
       <a href="signup.html" class="nav-cta">List Stays</a>
       <a href="guest-login.html">Sign In</a>
+    </div>
+    <button class="hamburger" onclick="document.getElementById('mobileMenu').classList.toggle('open')" aria-label="Menu">
+      <i class="ti ti-menu-2"></i>
+    </button>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="search.html">Stays</a>
+    <a href="transfers.html">Transfers</a>
+    <a href="my-bookings.html">My Trips</a>
+    <a href="signup.html" class="nav-cta">List Your Property</a>
+    <a href="guest-login.html">Sign In</a>
+  </div>
+
+  <!-- BOTTOM NAV (mobile) -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a href="index.html"><i class="ti ti-home"></i> Home</a>
+      <a href="search.html"><i class="ti ti-search"></i> Search</a>
+      <a href="transfers.html"><i class="ti ti-car"></i> Rides</a>
+      <a href="my-bookings.html"><i class="ti ti-heart"></i> Saved</a>
+      <a href="guest-login.html"><i class="ti ti-user"></i> Profile</a>
     </div>
   </nav>
 
@@ -233,7 +265,7 @@
         <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;" id="badgeRow"></div>
       </div>
       <div class="price-block">
-        <div class="price-main" id="listingPrice">K—</div>
+        <div class="price-main" id="listingPrice">Kâ€”</div>
         <div class="price-sub" id="priceSubLabel">/night</div>
       </div>
     </div>
@@ -252,9 +284,9 @@
         </div>
       </div>
       <div class="price-summary" id="priceSummary">
-        <div class="ps-row"><span class="ps-label" id="nightsLabel">— nights</span><span class="ps-value" id="subtotalPrice">K—</span></div>
-        <div class="ps-row"><span class="ps-label">Service fee (10%)</span><span class="ps-value" id="serviceFeePrice">K—</span></div>
-        <div class="ps-total-row"><span class="ps-total-label">Total</span><span class="ps-total" id="totalPrice">K—</span></div>
+        <div class="ps-row"><span class="ps-label" id="nightsLabel">â€” nights</span><span class="ps-value" id="subtotalPrice">Kâ€”</span></div>
+        <div class="ps-row"><span class="ps-label">Service fee (10%)</span><span class="ps-value" id="serviceFeePrice">Kâ€”</span></div>
+        <div class="ps-total-row"><span class="ps-total-label">Total</span><span class="ps-total" id="totalPrice">Kâ€”</span></div>
       </div>
     </div>
 
@@ -302,11 +334,11 @@
           <div style="margin-bottom: 14px;">
             <label style="display:block; font-size:12px; font-weight:600; margin-bottom: 6px; color:var(--muted);">Overall Rating</label>
             <div class="star-rating" style="display:flex; gap:8px; font-size:28px; color:#ccc; cursor:pointer;">
-              <span data-val="1" onclick="setRating(1)" onmouseover="highlightStars(1)" onmouseout="resetStars()">★</span>
-              <span data-val="2" onclick="setRating(2)" onmouseover="highlightStars(2)" onmouseout="resetStars()">★</span>
-              <span data-val="3" onclick="setRating(3)" onmouseover="highlightStars(3)" onmouseout="resetStars()">★</span>
-              <span data-val="4" onclick="setRating(4)" onmouseover="highlightStars(4)" onmouseout="resetStars()">★</span>
-              <span data-val="5" onclick="setRating(5)" onmouseover="highlightStars(5)" onmouseout="resetStars()">★</span>
+              <span data-val="1" onclick="setRating(1)" onmouseover="highlightStars(1)" onmouseout="resetStars()">â˜…</span>
+              <span data-val="2" onclick="setRating(2)" onmouseover="highlightStars(2)" onmouseout="resetStars()">â˜…</span>
+              <span data-val="3" onclick="setRating(3)" onmouseover="highlightStars(3)" onmouseout="resetStars()">â˜…</span>
+              <span data-val="4" onclick="setRating(4)" onmouseover="highlightStars(4)" onmouseout="resetStars()">â˜…</span>
+              <span data-val="5" onclick="setRating(5)" onmouseover="highlightStars(5)" onmouseout="resetStars()">â˜…</span>
             </div>
             <input type="hidden" id="reviewRating" name="rating" value="">
           </div>
@@ -314,28 +346,28 @@
             <div>
               <label style="font-size:10px; font-weight:600; color:var(--muted); display:block; margin-bottom:3px;">Cleanliness</label>
               <div class="cat-stars" data-cat="cleanliness" style="display:flex; gap:4px; font-size:18px; color:#ccc; cursor:pointer;">
-                <span data-val="1">★</span><span data-val="2">★</span><span data-val="3">★</span><span data-val="4">★</span><span data-val="5">★</span>
+                <span data-val="1">â˜…</span><span data-val="2">â˜…</span><span data-val="3">â˜…</span><span data-val="4">â˜…</span><span data-val="5">â˜…</span>
               </div>
               <input type="hidden" id="reviewCleanliness" value="">
             </div>
             <div>
               <label style="font-size:10px; font-weight:600; color:var(--muted); display:block; margin-bottom:3px;">Comfort</label>
               <div class="cat-stars" data-cat="comfort" style="display:flex; gap:4px; font-size:18px; color:#ccc; cursor:pointer;">
-                <span data-val="1">★</span><span data-val="2">★</span><span data-val="3">★</span><span data-val="4">★</span><span data-val="5">★</span>
+                <span data-val="1">â˜…</span><span data-val="2">â˜…</span><span data-val="3">â˜…</span><span data-val="4">â˜…</span><span data-val="5">â˜…</span>
               </div>
               <input type="hidden" id="reviewComfort" value="">
             </div>
             <div>
               <label style="font-size:10px; font-weight:600; color:var(--muted); display:block; margin-bottom:3px;">Location</label>
               <div class="cat-stars" data-cat="location" style="display:flex; gap:4px; font-size:18px; color:#ccc; cursor:pointer;">
-                <span data-val="1">★</span><span data-val="2">★</span><span data-val="3">★</span><span data-val="4">★</span><span data-val="5">★</span>
+                <span data-val="1">â˜…</span><span data-val="2">â˜…</span><span data-val="3">â˜…</span><span data-val="4">â˜…</span><span data-val="5">â˜…</span>
               </div>
               <input type="hidden" id="reviewLocation" value="">
             </div>
             <div>
               <label style="font-size:10px; font-weight:600; color:var(--muted); display:block; margin-bottom:3px;">Value</label>
               <div class="cat-stars" data-cat="value" style="display:flex; gap:4px; font-size:18px; color:#ccc; cursor:pointer;">
-                <span data-val="1">★</span><span data-val="2">★</span><span data-val="3">★</span><span data-val="4">★</span><span data-val="5">★</span>
+                <span data-val="1">â˜…</span><span data-val="2">â˜…</span><span data-val="3">â˜…</span><span data-val="4">â˜…</span><span data-val="5">â˜…</span>
               </div>
               <input type="hidden" id="reviewValue" value="">
             </div>
@@ -415,10 +447,10 @@
       }
       const nights = Math.max(1, Math.ceil((new Date(checkOutEl.value) - ciDate) / (1000 * 60 * 60 * 24)));
       const subtotal = nights * pricePerNight;
-      // Platform service fee = 10% of stay (e.g. K90 → K9 fee → K99 total)
+      // Platform service fee = 10% of stay (e.g. K90 â†’ K9 fee â†’ K99 total)
       const serviceFee = Math.round(subtotal * 0.10);
       const total = subtotal + serviceFee;
-      document.getElementById('nightsLabel').textContent = `${nights} night${nights > 1 ? 's' : ''} × K${pricePerNight}`;
+      document.getElementById('nightsLabel').textContent = `${nights} night${nights > 1 ? 's' : ''} Ã— K${pricePerNight}`;
       document.getElementById('subtotalPrice').textContent = `K${subtotal.toLocaleString()}`;
       document.getElementById('serviceFeePrice').textContent = `K${serviceFee.toLocaleString()}`;
       document.getElementById('totalPrice').textContent = `K${total.toLocaleString()}`;
@@ -548,7 +580,7 @@
         listing = detail;
         if (loadingEl) loadingEl.style.display = 'none';
         pricePerNight = listing.price;
-        document.title = `Lala — ${listing.name}`;
+        document.title = `Lala â€” ${listing.name}`;
         const saved = new Set(JSON.parse(localStorage.getItem('lala_saved') || '[]'));
         isSaved = saved.has(listing.id);
         if (isSaved) {
@@ -581,7 +613,7 @@
         const hostSince = listing.createdAt ? new Date(listing.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '';
         document.getElementById('hostPhone').innerHTML = hostPhone ? `+${hostPhone}${hostSince ? `<br><span style="font-size:10px;color:#999;">Host since ${hostSince}</span>` : ''}` : 'Contact via WhatsApp';
         document.getElementById('hostCard').style.display = 'block';
-        const reviewText = listing.reviewCount > 0 ? ` — ${listing.ratingAverage.toFixed(1)} avg (${listing.reviewCount} review${listing.reviewCount !== 1 ? 's' : ''})` : ' — No reviews yet';
+        const reviewText = listing.reviewCount > 0 ? ` â€” ${listing.ratingAverage.toFixed(1)} avg (${listing.reviewCount} review${listing.reviewCount !== 1 ? 's' : ''})` : ' â€” No reviews yet';
         document.getElementById('ratingBadge').textContent = reviewText;
         document.getElementById('reviewsSection').style.display = 'block';
         await loadReviews();
@@ -683,7 +715,7 @@
                   <div class="rav">${initials}</div>
                   <div>
                     <div style="font-weight:600; font-size:13px;">${guestName}</div>
-                    <div class="rstars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+                    <div class="rstars">${'â˜…'.repeat(r.rating)}${'â˜†'.repeat(5 - r.rating)}</div>
                   </div>
                   <div style="margin-left:auto; font-size:10px; color:var(--muted-soft);">${new Date(r.createdAt).toLocaleDateString()}</div>
                 </div>

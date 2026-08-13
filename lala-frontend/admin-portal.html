@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala — Admin Verification</title>
+  <title>Lala â€” Admin Verification</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="common.css?v=4">
+  <link rel="stylesheet" href="common.css?v=6">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
@@ -108,6 +108,20 @@
     .lb-prev { left: 18px; }
     .lb-next { right: 18px; }
     .lb-count { position: absolute; bottom: 22px; color: #fff; font-size: 13px; font-weight: 600; background: rgba(0,0,0,0.5); padding: 4px 12px; border-radius: 14px; }
+
+    /* ---- MOBILE ---- */
+    @media (max-width: 768px) {
+      .admin-nav { flex-wrap: wrap; gap: 8px 12px; padding: 12px 14px; }
+      .admin-container { margin: 20px auto; padding: 0 12px; }
+      .admin-tabs { overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+      .admin-tabs::-webkit-scrollbar { display: none; }
+      .admin-tab { flex-shrink: 0; }
+      .pcard { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; }
+      .action-btns { width: 100%; }
+      .action-btns button { flex: 1; padding: 12px 16px; }
+      .pthumbs .lead { width: 64px; }
+      .empty-thumb { flex-wrap: wrap; }
+    }
   </style>
 </head>
 <body>
@@ -199,11 +213,11 @@
 
     const adminBadge = document.getElementById('adminRoleBadge');
     if (adminBadge) {
-      adminBadge.textContent = `${user.name || 'Admin'} · Admin Account`;
+      adminBadge.textContent = `${user.name || 'Admin'} Â· Admin Account`;
       adminBadge.style.display = 'inline-block';
     }
 
-    // ── Toast ───────────────────────────────────────────────────────────
+    // â”€â”€ Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     let toastTimer;
     window.toast = function (msg, type) {
       let t = document.getElementById('toastBox');
@@ -257,7 +271,7 @@
                 <h3>${esc(l.name)}</h3>
                 <div class="ploc"><i class="ti ti-map-pin"></i> ${esc(l.district)}, ${esc(l.city)}</div>
                 <div class="pdetails">
-                  Type: <strong>${esc(l.type)}</strong> · Price: <strong>K${esc(l.price)}</strong> · Host: <strong>${esc((l.hostId || '?').split('-')[0])}</strong>
+                  Type: <strong>${esc(l.type)}</strong> Â· Price: <strong>K${esc(l.price)}</strong> Â· Host: <strong>${esc((l.hostId || '?').split('-')[0])}</strong>
                 </div>
                 ${thumbHtml}
               </div>
@@ -275,7 +289,7 @@
       }
     }
 
-    // ── Lightbox (photo review) ───────────────────────────────────────────
+    // â”€â”€ Lightbox (photo review) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     let lbPhotos = [];
     let lbIndex = 0;
 
@@ -331,7 +345,7 @@
       }
     }
 
-    // ── TABS ──────────────────────────────────────────────────────────────
+    // â”€â”€ TABS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     let hostsLoaded = false;
     let usersLoaded = false;
 
@@ -354,7 +368,7 @@
       }
     }
 
-    // ── HOST REQUESTS ─────────────────────────────────────────────────────
+    // â”€â”€ HOST REQUESTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     function esc(value) {
       return String(value == null ? '' : value)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')

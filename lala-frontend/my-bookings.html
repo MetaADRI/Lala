@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala — My Bookings</title>
+  <title>Lala â€” My Bookings</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="common.css?v=4">
+  <link rel="stylesheet" href="common.css?v=6">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
@@ -80,6 +80,13 @@
     .provider-Zamtel { background: #E8F5E9; color: #2E7D32; }
 
     .ref-code { font-size: 10px; color: var(--muted); font-family: monospace; }
+
+    @media (max-width: 480px) {
+      .bcard-bottom { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .bookings-container { padding: 12px 12px; }
+      .bcard-top { padding: 12px; }
+      .bcard-bottom { padding: 10px 12px; }
+    }
   </style>
 </head>
 <body>
@@ -189,7 +196,7 @@
               <div class="bcard-name">${b.listingName}</div>
               <div class="bcard-city"><i class="ti ti-map-pin"></i> ${b.listingCity || ''}</div>
               <div class="bcard-dates">
-                <i class="ti ti-calendar"></i> ${formatDate(b.checkIn)} — ${formatDate(b.checkOut)}
+                <i class="ti ti-calendar"></i> ${formatDate(b.checkIn)} â€” ${formatDate(b.checkOut)}
               </div>
               ${b.transactionRef ? `<div class="ref-code">Ref: ${b.transactionRef}</div>` : ''}
             </div>
@@ -219,7 +226,7 @@
       const badge = document.getElementById('guestRoleBadge');
       if (badge && u) {
         const label = u.role === 'host' ? 'Host Account' : u.role === 'admin' ? 'Admin Account' : 'Guest Account';
-        badge.textContent = `${u.name || 'My Account'} · ${label}`;
+        badge.textContent = `${u.name || 'My Account'} Â· ${label}`;
         badge.style.display = 'inline-block';
       }
 
@@ -273,7 +280,7 @@
 
     window.cancelBooking = cancelBooking;
 
-    // ── Toast ───────────────────────────────────────────────────────────
+    // â”€â”€ Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     let toastTimer;
     window.toast = function (msg, type) {
       let t = document.getElementById('toastBox');
@@ -289,7 +296,7 @@
       toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
     };
 
-    // ── Transfers ──────────────────────────────────────────────────────
+    // â”€â”€ Transfers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     async function loadTransfers() {
       try {
         const bookings = await api.getGuestCarBookings();
@@ -317,11 +324,11 @@
           <div style="background:var(--card);border-radius:var(--r);border:1px solid var(--border);padding:14px;">
             <div style="display:flex;justify-content:space-between;align-items:start;">
               <div>
-                <strong style="font-size:13px;">${b.tripType === 'airport' ? '✈️ Airport' : '📍 City'} — ${b.pickupLocation} → ${b.dropoffLocation}</strong>
+                <strong style="font-size:13px;">${b.tripType === 'airport' ? 'âœˆï¸ Airport' : 'ðŸ“ City'} â€” ${b.pickupLocation} â†’ ${b.dropoffLocation}</strong>
                 <div style="font-size:11px;color:var(--muted);margin:2px 0;">
-                  ${b.pickupDate} at ${b.pickupTime} · ${b.passengerCount} pax · K${b.totalAmount}
+                  ${b.pickupDate} at ${b.pickupTime} Â· ${b.passengerCount} pax Â· K${b.totalAmount}
                 </div>
-                ${b.car ? `<div style="font-size:11px;color:var(--muted);">${b.car.model} · ${b.car.driverName}</div>` : ''}
+                ${b.car ? `<div style="font-size:11px;color:var(--muted);">${b.car.model} Â· ${b.car.driverName}</div>` : ''}
               </div>
               ${transBadge(b)}
             </div>

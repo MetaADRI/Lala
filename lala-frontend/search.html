@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala — Search Stays</title>
+  <title>Lala â€” Search Stays</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="common.css?v=4">
+  <link rel="stylesheet" href="common.css?v=6">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
   <style>
@@ -15,9 +15,13 @@
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       transition: transform 0.3s ease;
+      background: var(--canvas);
     }
     nav.hidden { transform: translateY(-100%); }
-    @media (max-width: 768px) { nav { padding: 0 16px; } }
+    @media (max-width: 768px) {
+      nav { padding: 0 16px; }
+      .nav-links > a:not(.nav-cta) { display: none; }
+    }
 
     /* ---- SEARCH HEADER ---- */
     .search-header {
@@ -85,7 +89,7 @@
       font-family: 'Inter', sans-serif; font-weight: 500;
       padding: 8px 14px; border-radius: 9999px;
       border: 1px solid var(--hairline);
-      transition: all 0.2s;
+      transition: all 0.2s; white-space: nowrap;
     }
     .price-toggle:hover { border-color: var(--ink); }
 
@@ -193,13 +197,23 @@
       .listings-grid { grid-template-columns: 1fr; }
       .search-header-inner { flex-direction: column; align-items: stretch; }
       .sort-select { width: 100%; }
+      /* Price + sort move out of the horizontal chip scroller onto their own row */
+      .filter-bar { flex-wrap: wrap; }
+      .filter-actions { width: 100%; margin-left: 0; }
+      .filter-actions .price-toggle { flex: 1; justify-content: center; }
+      .filter-actions .sort-select { flex: 1; }
+      /* Price panel wraps instead of overflowing */
+      .price-panel-inner { flex-wrap: wrap; gap: 10px; }
+      .price-group input { width: 100%; min-width: 0; }
+      .price-group { flex: 1; min-width: 0; }
+      .price-apply { width: 100%; margin-left: 0; }
     }
   </style>
 </head>
 <body>
   <!-- NAV -->
-  <nav>
-    <a href="index.html" class="logo">
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">
       <img src="logo-removebg-preview.png" alt="Lala Logo" class="logo-img">
     </a>
     <div class="nav-links">
@@ -209,6 +223,30 @@
       <a href="my-bookings.html">My Trips</a>
       <a href="signup.html" class="nav-cta">List Stays</a>
       <a href="guest-login.html">Sign In</a>
+    </div>
+    <button class="hamburger" onclick="document.getElementById('mobileMenu').classList.toggle('open')" aria-label="Menu">
+      <i class="ti ti-menu-2"></i>
+    </button>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="search.html">Stays</a>
+    <a href="transfers.html">Transfers</a>
+    <a href="my-bookings.html">My Trips</a>
+    <a href="signup.html" class="nav-cta">List Your Property</a>
+    <a href="guest-login.html">Sign In</a>
+  </div>
+
+  <!-- BOTTOM NAV (mobile) -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a href="index.html"><i class="ti ti-home"></i> Home</a>
+      <a href="search.html" class="active"><i class="ti ti-search"></i> Search</a>
+      <a href="transfers.html"><i class="ti ti-car"></i> Rides</a>
+      <a href="my-bookings.html"><i class="ti ti-heart"></i> Saved</a>
+      <a href="guest-login.html"><i class="ti ti-user"></i> Profile</a>
     </div>
   </nav>
 
@@ -438,11 +476,17 @@
     }
     loadListings();
 
-    /* ---- NAV HIDE ON SCROLL ---- */
+    /* ---- NAV HIDE ON SCROLL (desktop only; on phones keep header visible) ---- */
     let lastScroll = 0;
     const nav = document.querySelector('nav');
     const searchHeader = document.querySelector('.search-header');
+    const isPhone = () => window.innerWidth <= 768;
     window.addEventListener('scroll', () => {
+      if (isPhone()) {
+        nav.classList.remove('hidden');
+        searchHeader.classList.remove('hidden');
+        return;
+      }
       const currentScroll = window.scrollY;
       if (currentScroll > lastScroll && currentScroll > 80) {
         nav.classList.add('hidden');
