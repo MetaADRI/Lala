@@ -3,7 +3,10 @@ require('dotenv').config();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM = 'Lala <onboarding@resend.dev>';
+// Resend only accepts senders from a verified domain or the sandbox
+// (onboarding@resend.dev). Configure RESEND_FROM once a custom domain
+// (e.g. no-reply@lalazm.com) is verified in the Resend dashboard.
+const FROM = process.env.RESEND_FROM || 'Lala Support <onboarding@resend.dev>';
 
 exports.sendPasswordResetCode = async (to, code) => {
   const { data, error } = await resend.emails.send({

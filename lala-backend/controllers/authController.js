@@ -114,7 +114,13 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
     throw new AppError(502, 'Failed to send reset code. Please try again.');
   }
 
-  res.json({ message: 'Reset code sent to your email', expiresIn: '30 minutes' });
+  const payload = { message: 'Reset code sent to your email', expiresIn: '30 minutes' };
+  // Dev convenience only: expose the code in non-production so local testing
+  // doesn't depend on email delivery. NEVER returned in production.
+  if (process.env.NODE_ENV !== 'production') {
+    payload.resetCode = resetCode;
+  }
+  res.json(payload);
 });
 
 exports.resetPassword = asyncHandler(async (req, res) => {
