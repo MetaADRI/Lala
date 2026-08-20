@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala â€” Notifications</title>
+  <title>Lala — Notifications</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -103,7 +103,7 @@
           listEl.innerHTML = `
             <div class="empty-state">
               <i class="ti ti-bell-off" style="color:#2E7D32;"></i>
-              <p>You're all caught up â€” no notifications yet.</p>
+              <p>You're all caught up — no notifications yet.</p>
               <a href="index.html" class="btn-outline" style="margin-top:12px;">Back to home</a>
             </div>`;
           return;
@@ -119,7 +119,7 @@
               <div class="nbody">
                 <div class="ntitle">${esc(n.title)}</div>
                 <div class="nmsg">${esc(n.message)}</div>
-                <div class="ntime"><i class="ti ti-clock"></i> ${timeAgo(n.createdAt)}${unread ? ' Â· Unread' : ''}</div>
+                <div class="ntime"><i class="ti ti-clock"></i> ${timeAgo(n.createdAt)}${unread ? ' · Unread' : ''}</div>
               </div>
             </div>
           `);

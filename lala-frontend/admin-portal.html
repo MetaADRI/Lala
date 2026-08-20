@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala â€” Admin Verification</title>
+  <title>Lala — Admin Verification</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -213,7 +213,7 @@
 
     const adminBadge = document.getElementById('adminRoleBadge');
     if (adminBadge) {
-      adminBadge.textContent = `${user.name || 'Admin'} Â· Admin Account`;
+      adminBadge.textContent = `${user.name || 'Admin'} · Admin Account`;
       adminBadge.style.display = 'inline-block';
     }
 
@@ -271,7 +271,7 @@
                 <h3>${esc(l.name)}</h3>
                 <div class="ploc"><i class="ti ti-map-pin"></i> ${esc(l.district)}, ${esc(l.city)}</div>
                 <div class="pdetails">
-                  Type: <strong>${esc(l.type)}</strong> Â· Price: <strong>K${esc(l.price)}</strong> Â· Host: <strong>${esc((l.hostId || '?').split('-')[0])}</strong>
+                  Type: <strong>${esc(l.type)}</strong> · Price: <strong>K${esc(l.price)}</strong> · Host: <strong>${esc((l.hostId || '?').split('-')[0])}</strong>
                 </div>
                 ${thumbHtml}
               </div>

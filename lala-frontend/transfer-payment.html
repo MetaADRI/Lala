@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala â€” Secure Transfer Payment</title>
+  <title>Lala — Secure Transfer Payment</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -123,7 +123,7 @@
     </div>
     <div class="pay-summary">
       <div style="font-size:11px; color:rgba(62,39,0,0.6); margin-bottom:4px;">Total to pay</div>
-      <div class="pay-amount" id="displayAmount">Kâ€”</div>
+      <div class="pay-amount" id="displayAmount">K—</div>
       <div class="pay-meta" id="displayMeta">Loading...</div>
       <div class="pay-dates" id="displayDates"></div>
       <div class="pay-dates" id="displayFeeNote" style="margin-top:4px;"></div>
@@ -141,7 +141,7 @@
         <div class="plogo mtn"><img src="MTN-Logo.png" alt="MTN"></div>
         <div>
           <div class="pname">MTN Mobile Money</div>
-          <div class="psub">Fast USSD push Â· ~50% market share</div>
+          <div class="psub">Fast USSD push · ~50% market share</div>
         </div>
         <i class="ti ti-circle-check-filled pchk"></i>
       </div>
@@ -150,7 +150,7 @@
         <div class="plogo airtel"><img src="Airtel-logo-500x281-removebg-preview.png" alt="Airtel"></div>
         <div>
           <div class="pname">Airtel Money</div>
-          <div class="psub">Fast USSD push Â· Airtel Zambia</div>
+          <div class="psub">Fast USSD push · Airtel Zambia</div>
         </div>
         <i class="ti ti-circle-check-filled pchk"></i>
       </div>
@@ -159,7 +159,7 @@
         <div class="plogo zamtel"><img src="zamtel_logo-removebg-preview.png" alt="Zamtel"></div>
         <div>
           <div class="pname">Zamtel Money</div>
-          <div class="psub">Secure USSD push Â· Zamtel network</div>
+          <div class="psub">Secure USSD push · Zamtel network</div>
         </div>
         <i class="ti ti-circle-check-filled pchk"></i>
       </div>
@@ -208,7 +208,7 @@
       <div style="font-size:11px; color:var(--muted); margin-top:12px;">Waiting for confirmation...</div>
       <div class="msg err" id="pollError" role="alert" style="display:none;"></div>
       <button class="btn-outline" style="margin-top:20px; width:100%;" onclick="simulateConfirm()">
-        <i class="ti ti-refresh"></i> I've paid â€” check status
+        <i class="ti ti-refresh"></i> I've paid — check status
       </button>
     </div>
 
@@ -239,10 +239,10 @@
     let createdBookingId = null;
 
     // â”€â”€ Populate header summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    document.getElementById('displayAmount').textContent = total ? `K${Number(total).toLocaleString()}` : 'Kâ€”';
-    document.getElementById('displayMeta').textContent = `${tripType === 'airport' ? 'âœˆï¸ Airport' : 'ðŸ“ City'} transfer Â· ${model}`;
+    document.getElementById('displayAmount').textContent = total ? `K${Number(total).toLocaleString()}` : 'K—';
+    document.getElementById('displayMeta').textContent = `${tripType === 'airport' ? 'âœˆï¸ Airport' : 'ðŸ“ City'} transfer · ${model}`;
     if (pickupDate && pickupTime) {
-      document.getElementById('displayDates').textContent = `${pickupDate} at ${pickupTime} Â· ${pickupLocation} â†’ ${dropoffLocation}`;
+      document.getElementById('displayDates').textContent = `${pickupDate} at ${pickupTime} · ${pickupLocation} â†’ ${dropoffLocation}`;
     }
     const feeNote = document.getElementById('displayFeeNote');
     if (feeNote && price) {
@@ -266,7 +266,7 @@
       selectedProvider = name;
       document.querySelectorAll('.pprov').forEach(p => p.classList.remove('on'));
       document.getElementById(`prov-${name}`).classList.add('on');
-      document.getElementById('payBtnText').textContent = `Pay K${total ? parseFloat(total).toLocaleString() : 'â€”'} via ${name}`;
+      document.getElementById('payBtnText').textContent = `Pay K${total ? parseFloat(total).toLocaleString() : '—'} via ${name}`;
     }
     // Init button text
     selectProvider('MTN');
@@ -379,7 +379,7 @@
           clearInterval(pollInterval);
           showPollError(
             "We haven't confirmed your payment yet. If you completed the USSD prompt on your phone, " +
-            "tap \"I've paid â€” check status\" below. Your transfer is still reserved."
+            "tap \"I've paid — check status\" below. Your transfer is still reserved."
           );
           return;
         }
@@ -399,12 +399,12 @@
           }
         } catch (err) {
           console.error('[poll] status check failed:', err);
-          showPollError('Could not reach the payment service. Tap "I\'ve paid â€” check status" to retry.');
+          showPollError('Could not reach the payment service. Tap "I\'ve paid — check status" to retry.');
         }
       }, 3000);
     }
 
-    // â”€â”€ Manual re-check (same path as auto-poll â€” uses real Lenco status) â”€â”€
+    // â”€â”€ Manual re-check (same path as auto-poll — uses real Lenco status) â”€â”€
     async function simulateConfirm() {
       if (!createdBookingId) return;
       clearPollError();

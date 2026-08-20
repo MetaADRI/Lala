@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala â€” Booking Confirmed!</title>
+  <title>Lala — Booking Confirmed!</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -143,7 +143,7 @@
     <!-- Booking Reference -->
     <div class="ref-box">
       <div class="ref-label">Booking Reference</div>
-      <div class="ref-code" id="refCode">LALAâ€“XXXXXX</div>
+      <div class="ref-code" id="refCode">LALA–XXXXXX</div>
     </div>
 
     <!-- Property Details -->
@@ -153,15 +153,15 @@
     </div>
     <div class="detail-row">
       <div class="dr-label"><i class="ti ti-calendar-event"></i> Check-in</div>
-      <div class="dr-value" id="detailCheckIn">â€”</div>
+      <div class="dr-value" id="detailCheckIn">—</div>
     </div>
     <div class="detail-row">
       <div class="dr-label"><i class="ti ti-calendar-x"></i> Check-out</div>
-      <div class="dr-value" id="detailCheckOut">â€”</div>
+      <div class="dr-value" id="detailCheckOut">—</div>
     </div>
     <div class="detail-row">
       <div class="dr-label"><i class="ti ti-moon"></i> Nights</div>
-      <div class="dr-value" id="detailNights">â€”</div>
+      <div class="dr-value" id="detailNights">—</div>
     </div>
     <div class="detail-row">
       <div class="dr-label"><i class="ti ti-device-mobile"></i> Payment</div>
@@ -171,7 +171,7 @@
     </div>
     <div class="detail-row">
       <div class="dr-label"><i class="ti ti-coin"></i> Amount Paid</div>
-      <div class="dr-value" id="detailAmount" style="color:var(--g-dark); font-size:16px;">Kâ€”</div>
+      <div class="dr-value" id="detailAmount" style="color:var(--g-dark); font-size:16px;">K—</div>
     </div>
 
     <!-- Actions -->
@@ -220,7 +220,7 @@
 
   <div class="conf-footer">
     <img src="logo-removebg-preview.png" alt="Lala" style="height:28px; opacity:0.6;">
-    <div style="font-size:11px; color:var(--muted); margin-top:8px;">Lala Â· Affordable Stays in Zambia</div>
+    <div style="font-size:11px; color:var(--muted); margin-top:8px;">Lala · Affordable Stays in Zambia</div>
   </div>
 
   <script src="config.js"></script>
@@ -248,10 +248,10 @@
     // â”€â”€ Populate booking card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     document.getElementById('detailProperty').textContent  = listingName;
     document.getElementById('detailNights').textContent    = `${nights} night${nights !== 1 ? 's' : ''}`;
-    document.getElementById('detailAmount').textContent    = total ? `K${parseFloat(total).toLocaleString()}` : 'Kâ€”';
+    document.getElementById('detailAmount').textContent    = total ? `K${parseFloat(total).toLocaleString()}` : 'K—';
 
     const fmt = d => {
-      if (!d) return 'â€”';
+      if (!d) return '—';
       return new Date(d + 'T00:00:00').toLocaleDateString('en-ZM', { weekday:'short', day:'numeric', month:'long', year:'numeric' });
     };
     document.getElementById('detailCheckIn').textContent  = fmt(checkIn);
@@ -265,7 +265,7 @@
     badge.innerHTML = `<img src="${provLogo[provider] || 'MTN-Logo.png'}" alt=""> ${provider} Mobile Money`;
 
     // Page title
-    document.title = `Lala â€” ${listingName} Confirmed!`;
+    document.title = `Lala — ${listingName} Confirmed!`;
 
     // â”€â”€ WhatsApp host message â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     function shareViaWhatsApp() {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala â€” Host Dashboard</title>
+  <title>Lala — Host Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -643,7 +643,7 @@
     </div>
     <div class="stat-card">
       <div class="stat-icon gld"><i class="ti ti-star"></i></div>
-      <div class="stat-value" id="hostRating">â€”</div>
+      <div class="stat-value" id="hostRating">—</div>
       <div class="stat-label">Rating</div>
     </div>
   </div>
@@ -1032,7 +1032,7 @@
 
         document.getElementById('bookingCount').innerText = bookings.length;
         document.getElementById('hostRating').innerText =
-          ratingData.ratingAverage > 0 ? `${ratingData.ratingAverage}â˜…` : 'â€”';
+          ratingData.ratingAverage > 0 ? `${ratingData.ratingAverage}â˜…` : '—';
 
         const totalRev = bookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
         document.getElementById('totalRevenue').innerText = `K${totalRev}`;
@@ -1054,7 +1054,7 @@
                 <div class="li-avatar">${initials}</div>
                 <div class="li-info">
                   <div class="li-title">${guestName}</div>
-                  <div class="li-meta">${new Date(b.checkIn).toLocaleDateString()} Â· K${b.totalAmount} Â· ${b.id.split('-')[0]}</div>
+                  <div class="li-meta">${new Date(b.checkIn).toLocaleDateString()} · K${b.totalAmount} · ${b.id.split('-')[0]}</div>
                 </div>
                 <div class="li-badge ${b.status === 'confirmed' ? 'conf' : 'pend'}">${b.status}</div>
               </div>
@@ -1080,7 +1080,7 @@
       try {
         const listings = await api.getMyListings();
         if (!Array.isArray(listings) || !listings.length) {
-          listEl.innerHTML = '<div class="empty-state"><i class="ti ti-message-off"></i><p>No listings yet â€” add one first</p></div>';
+          listEl.innerHTML = '<div class="empty-state"><i class="ti ti-message-off"></i><p>No listings yet — add one first</p></div>';
           return;
         }
         let allReviews = [];
@@ -1105,7 +1105,7 @@
                 <div class="li-avatar">${initials}</div>
                 <div class="li-info">
                   <div class="li-title">${r.listingName}</div>
-                  <div class="li-meta">${guestName} Â· ${new Date(r.createdAt).toLocaleDateString()}</div>
+                  <div class="li-meta">${guestName} · ${new Date(r.createdAt).toLocaleDateString()}</div>
                   <div class="stars">${stars}</div>
                 </div>
               </div>
@@ -1165,7 +1165,7 @@
               <div class="li-avatar" style="background:#E3F2FD;color:#1565C0;"><i class="ti ti-building"></i></div>
               <div class="li-info">
                 <div class="li-title">${l.name}</div>
-                <div class="li-meta">${l.city} Â· K${l.price}/night Â· ${l.type}</div>
+                <div class="li-meta">${l.city} · K${l.price}/night · ${l.type}</div>
               </div>
               <div class="li-badge ${l.isApproved ? 'conf' : 'pend'}">${l.isApproved ? 'approved' : 'pending'}</div>
             </div>
@@ -1468,7 +1468,7 @@
             <div style="display:flex;justify-content:space-between;align-items:start;">
               <div>
                 <strong style="font-size:14px;">${c.model}</strong>
-                <div style="font-size:12px;color:var(--muted);">ðŸ‘¤ ${c.driverName} Â· ${c.plateNumber} Â· ${c.seats} seats Â· ${c.city}</div>
+                <div style="font-size:12px;color:var(--muted);">ðŸ‘¤ ${c.driverName} · ${c.plateNumber} · ${c.seats} seats · ${c.city}</div>
                 <div style="display:flex;gap:8px;margin-top:6px;">
                   ${c.airportPrice ? `<span style="font-size:11px;background:#E8F5E9;padding:2px 8px;border-radius:99px;">Airport K${c.airportPrice}</span>` : ''}
                   ${c.pricePerKm ? `<span style="font-size:11px;background:#E3F2FD;padding:2px 8px;border-radius:99px;">K${c.pricePerKm}/km</span>` : ''}
@@ -1537,11 +1537,11 @@
           <div style="background:var(--card);border-radius:var(--rsm);border:1px solid var(--border);padding:12px 14px;margin-bottom:10px;">
             <div style="display:flex;justify-content:space-between;align-items:start;">
               <div>
-                <strong style="font-size:13px;">${b.tripType === 'airport' ? 'âœˆï¸ Airport' : 'ðŸ“ City'} â€” ${b.car ? b.car.model : 'Car'}</strong>
+                <strong style="font-size:13px;">${b.tripType === 'airport' ? 'âœˆï¸ Airport' : 'ðŸ“ City'} — ${b.car ? b.car.model : 'Car'}</strong>
                 <div style="font-size:12px;color:var(--muted);margin:2px 0;">
-                  ${b.pickupLocation} â†’ ${b.dropoffLocation} Â· ${b.pickupDate} ${b.pickupTime}
+                  ${b.pickupLocation} â†’ ${b.dropoffLocation} · ${b.pickupDate} ${b.pickupTime}
                 </div>
-                <div style="font-size:12px;color:var(--muted);">K${b.totalAmount} Â· ${b.passengerCount} pax</div>
+                <div style="font-size:12px;color:var(--muted);">K${b.totalAmount} · ${b.passengerCount} pax</div>
               </div>
               ${statusBadge(b)}
             </div>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala â€” All Bookings</title>
+  <title>Lala — All Bookings</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -116,9 +116,9 @@
                   <tr>
                     <td><strong>${b.listingName || 'Unknown'}</strong></td>
                     <td>${(b.guest && b.guest.name) || (b.guest && b.guest.phone) || 'Guest'}</td>
-                    <td class="hide-mobile">${new Date(b.checkIn).toLocaleDateString()} â€” ${new Date(b.checkOut).toLocaleDateString()}</td>
+                    <td class="hide-mobile">${new Date(b.checkIn).toLocaleDateString()} — ${new Date(b.checkOut).toLocaleDateString()}</td>
                     <td><strong>K${b.totalAmount}</strong></td>
-                    <td class="hide-mobile">${b.provider || 'â€”'}</td>
+                    <td class="hide-mobile">${b.provider || '—'}</td>
                     <td>${statusBadge(b.status)}</td>
                   </tr>
                 `).join('')}
