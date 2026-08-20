@@ -3,16 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lala â€” Sign In</title>
+  <title>Lala — Sign In</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="common.css?v=6">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link rel="icon" type="image/png" href="logo-removebg-preview.png">
+  <style>
+    .login-step { display: none; }
+    .login-step.active { display: block; }
+    .otp-header { text-align: center; margin-bottom: 20px; }
+    .otp-email-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--g-light); padding: 6px 14px; border-radius: 20px;
+      font-size: 13px; color: var(--g-dark); font-weight: 500; margin-top: 8px;
+    }
+    .otp-resend { text-align: center; margin-top: 12px; }
+    .otp-resend button {
+      background: none; border: none; color: var(--g-dark); font-size: 12px;
+      cursor: pointer; text-decoration: underline; font-weight: 600;
+    }
+    .otp-resend button:disabled { color: var(--muted); cursor: default; text-decoration: none; }
+  </style>
 </head>
 <body class="auth-shell">
-  <div class="auth-card" id="loginCard">
+  <!-- STEP 1: Email + Password -->
+  <div class="auth-card login-step active" id="step1Card">
     <div class="auth-head">
       <a href="index.html" class="auth-logo">
         <img src="logo-removebg-preview.png" alt="Lala">
@@ -23,9 +40,9 @@
     </div>
 
     <div class="auth-body">
-      <div class="auth-err" id="errorMsg">
+      <div class="auth-err" id="errorMsg1">
         <i class="ti ti-alert-circle"></i>
-        <span id="errorText">Something went wrong</span>
+        <span id="errorText1">Something went wrong</span>
       </div>
 
       <div class="fg">
@@ -66,9 +83,54 @@
     </div>
   </div>
 
+  <!-- STEP 2: OTP Verification -->
+  <div class="auth-card login-step" id="step2Card">
+    <div class="auth-head">
+      <a href="index.html" class="auth-logo">
+        <img src="logo-removebg-preview.png" alt="Lala">
+        <span>lala</span>
+      </a>
+      <div class="auth-title">Enter Verification Code</div>
+      <div class="otp-header">
+        <div class="auth-sub">We sent a 6-digit code to</div>
+        <div class="otp-email-badge"><i class="ti ti-mail"></i> <span id="otpEmailDisplay"></span></div>
+      </div>
+    </div>
+
+    <div class="auth-body">
+      <div class="auth-err" id="errorMsg2">
+        <i class="ti ti-alert-circle"></i>
+        <span id="errorText2">Something went wrong</span>
+      </div>
+
+      <div class="fg">
+        <label>Verification Code</label>
+        <div class="icon-field">
+          <i class="ti ti-key"></i>
+          <input type="text" id="otpInput" placeholder="000000" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" style="letter-spacing:6px;font-size:18px;font-weight:700;text-align:center;">
+        </div>
+      </div>
+
+      <button class="btn-login" id="otpBtn" onclick="handleOTP()">
+        <i class="ti ti-check"></i>
+        <span id="otpBtnText">Verify & Sign In</span>
+      </button>
+
+      <div class="otp-resend">
+        <button id="resendOtpBtn" onclick="handleResendOTP()">Didn't get the code? Resend</button>
+      </div>
+
+      <div style="text-align:center;margin-top:12px;">
+        <a href="guest-login.html" style="font-size:12px;color:var(--muted);text-decoration:none;">Back to sign in</a>
+      </div>
+    </div>
+  </div>
+
   <script src="config.js?v=2"></script>
   <script src="api.js?v=2"></script>
   <script>
+    let loginEmail = '';
+
     function togglePassword() {
       const input = document.getElementById('passwordInput');
       const icon = document.getElementById('togglePw');
@@ -81,61 +143,131 @@
       }
     }
 
-    function showError(msg) {
-      const el = document.getElementById('errorMsg');
-      document.getElementById('errorText').textContent = msg;
+    function showError(step, msg) {
+      const el = document.getElementById('errorMsg' + step);
+      document.getElementById('errorText' + step).textContent = msg;
       el.classList.add('visible');
     }
 
-    function hideError() {
-      document.getElementById('errorMsg').classList.remove('visible');
+    function hideError(step) {
+      document.getElementById('errorMsg' + step).classList.remove('visible');
+    }
+
+    function showStep(n) {
+      document.querySelectorAll('.login-step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step' + n + 'Card').classList.add('active');
     }
 
     async function handleLogin() {
-      hideError();
-
-      const email = document.getElementById('emailInput').value.trim().toLowerCase();
+      hideError(1);
+      loginEmail = document.getElementById('emailInput').value.trim().toLowerCase();
       const password = document.getElementById('passwordInput').value;
 
-      if (!email) return showError('Please enter your email address');
-      if (!password) return showError('Please enter your password');
+      if (!loginEmail) return showError(1, 'Please enter your email address');
+      if (!password) return showError(1, 'Please enter your password');
 
       const btn = document.getElementById('loginBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="btn-spinner"></span> Signing in...';
 
       try {
-        const data = await api.login(email, password);
+        const data = await api.login(loginEmail, password);
         if (data.error) {
-          showError(data.error);
+          showError(1, data.error);
           btn.disabled = false;
           btn.innerHTML = '<i class="ti ti-login"></i> Sign In';
           return;
         }
 
-        // Check for redirect
-        const urlParams = new URLSearchParams(window.location.search);
-        const redirect = urlParams.get('redirect');
-
-        if (redirect) {
-          window.location.href = decodeURIComponent(redirect);
-        } else if (data.user && data.user.role === 'host') {
-          window.location.href = 'host-dashboard.html';
-        } else if (data.user && data.user.role === 'admin') {
-          window.location.href = 'admin-portal.html';
+        if (data.requiresOTP) {
+          // Show step 2
+          document.getElementById('otpEmailDisplay').textContent = loginEmail;
+          showStep(2);
+          document.getElementById('otpInput').focus();
+          btn.disabled = false;
+          btn.innerHTML = '<i class="ti ti-login"></i> Sign In';
         } else {
-          window.location.href = 'index.html';
+          redirectAfterLogin(data);
         }
       } catch (err) {
-        showError('Failed to connect. Is the backend running?');
+        showError(1, 'Failed to connect. Is the backend running?');
         console.error(err);
         btn.disabled = false;
         btn.innerHTML = '<i class="ti ti-login"></i> Sign In';
       }
     }
 
+    async function handleOTP() {
+      hideError(2);
+      const code = document.getElementById('otpInput').value.trim();
+
+      if (!code || code.length !== 6) return showError(2, 'Please enter the 6-digit code');
+
+      const btn = document.getElementById('otpBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-spinner"></span> Verifying...';
+
+      try {
+        const data = await api.verifyLoginOTP(loginEmail, code);
+        if (data.error) {
+          showError(2, data.error);
+          btn.disabled = false;
+          btn.innerHTML = '<i class="ti ti-check"></i> Verify & Sign In';
+          return;
+        }
+
+        redirectAfterLogin(data);
+      } catch (err) {
+        showError(2, 'Failed to connect. Is the backend running?');
+        console.error(err);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ti ti-check"></i> Verify & Sign In';
+      }
+    }
+
+    async function handleResendOTP() {
+      const btn = document.getElementById('resendOtpBtn');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      try {
+        const data = await api.login(loginEmail, document.getElementById('passwordInput').value);
+        if (data.error) {
+          btn.textContent = data.error;
+          setTimeout(() => { btn.textContent = "Didn't get the code? Resend"; btn.disabled = false; }, 3000);
+        } else {
+          btn.textContent = 'Code sent! Check your inbox.';
+          setTimeout(() => { btn.textContent = "Didn't get the code? Resend"; btn.disabled = false; }, 3000);
+        }
+      } catch (err) {
+        btn.textContent = 'Failed to send. Try again.';
+        setTimeout(() => { btn.textContent = "Didn't get the code? Resend"; btn.disabled = false; }, 3000);
+      }
+    }
+
+    function redirectAfterLogin(data) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirect = urlParams.get('redirect');
+
+      if (redirect) {
+        window.location.href = decodeURIComponent(redirect);
+      } else if (data.user && data.user.role === 'host') {
+        window.location.href = 'host-dashboard.html';
+      } else if (data.user && data.user.role === 'admin') {
+        window.location.href = 'admin-portal.html';
+      } else {
+        window.location.href = 'index.html';
+      }
+    }
+
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') handleLogin();
+      if (e.key === 'Enter') {
+        if (document.getElementById('step2Card').classList.contains('active')) {
+          handleOTP();
+        } else {
+          handleLogin();
+        }
+      }
     });
   </script>
 </body>

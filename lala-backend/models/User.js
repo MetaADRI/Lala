@@ -36,6 +36,11 @@ const User = sequelize.define('User', {
   avatar: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  emailConfirmed: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: false
   }
 });
 

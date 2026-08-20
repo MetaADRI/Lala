@@ -30,6 +30,7 @@ require('./models/SavedListing');
 require('./models/Car');
 require('./models/CarBooking');
 require('./models/PasswordResetToken');
+require('./models/EmailConfirmToken');
 require('./models/HostRequest');
 require('./models/Notification');
 

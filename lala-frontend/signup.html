@@ -221,50 +221,48 @@
   </div>
 
   <div class="success-overlay" id="successOverlay">
-    <div class="confetti-container" id="confettiContainer"></div>
     <div class="success-card">
-      <div class="success-check"><i class="ti ti-check"></i></div>
-      <div class="success-title">Account Created!</div>
-      <div class="success-sub">Welcome to Lala â€” your stay in Zambia starts here</div>
+      <div class="success-check" style="animation:none;background:linear-gradient(135deg,#1B5E20,#43A047);"><i class="ti ti-mail"></i></div>
+      <div class="success-title">Check Your Email</div>
+      <div class="success-sub">We've sent a confirmation link to</div>
       <div class="success-email" id="successEmail">you@example.com</div>
-      <div class="success-loader"><div class="success-loader-bar"></div></div>
-      <div style="margin-top: 16px; font-size: 12px; color: rgba(255,255,255,0.4);">Taking you to Lala...</div>
+      <p style="font-size:13px;color:rgba(255,255,255,0.6);margin:0 0 20px;">Click the link in the email to activate your account.<br>The link expires in 24 hours.</p>
+      <a href="guest-login.html" style="display:inline-block;background:rgba(255,255,255,0.15);color:#fff;text-decoration:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:16px;">Go to Sign In</a>
+      <div>
+        <button onclick="handleResendSignup()" id="resendSignupBtn" style="background:none;border:none;color:var(--gold);font-size:12px;cursor:pointer;text-decoration:underline;">Didn't get the email? Resend</button>
+      </div>
     </div>
+  </div>
   </div>
 
   <script src="config.js?v=2"></script>
   <script src="api.js?v=2"></script>
   <script>
-    function spawnConfetti() {
-      const container = document.getElementById('confettiContainer');
-      const colors = ['#F9A825','#43A047','#66BB6A','#fff','#E53935','#1E88E5','#8E24AA','#FB8C00'];
-      for (let i = 0; i < 60; i++) {
-        const piece = document.createElement('div');
-        piece.className = 'confetti-piece';
-        piece.style.left = Math.random() * 100 + '%';
-        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.width = (4 + Math.random() * 6) + 'px';
-        piece.style.height = (4 + Math.random() * 6) + 'px';
-        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-        piece.style.animationDuration = (2 + Math.random() * 2) + 's';
-        piece.style.animationDelay = Math.random() * 0.5 + 's';
-        container.appendChild(piece);
-      }
-    }
-
     function showSuccess(email, role) {
       const isHost = role === 'host';
       document.getElementById('successEmail').textContent = email;
       if (isHost) {
         document.querySelector('.success-title').textContent = 'Host Account Created!';
-        document.querySelector('.success-sub').textContent = 'Welcome aboard â€” start listing your property';
+        document.querySelector('.success-sub').textContent = 'We\'ve sent a confirmation link to';
       }
       document.getElementById('successOverlay').classList.add('show');
-      spawnConfetti();
-      setTimeout(() => {
-        window.location.href = isHost ? 'host-dashboard.html' : 'index.html';
-      }, 3000);
+      window._signupEmail = email;
     }
+
+    async function handleResendSignup() {
+      const btn = document.getElementById('resendSignupBtn');
+      if (!window._signupEmail) return;
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+      try {
+        await api.resendConfirmation(window._signupEmail);
+        btn.textContent = 'Email sent! Check your inbox.';
+      } catch (err) {
+        btn.textContent = err.message || 'Failed to send. Try again.';
+        btn.disabled = false;
+      }
+    }
+
     function togglePassword() {
       const input = document.getElementById('passwordInput');
       const icon = document.getElementById('togglePw');
@@ -321,7 +319,7 @@
           return;
         }
 
-        showSuccess(email, data.user && data.user.role);
+        showSuccess(email, selectedRole);
       } catch (err) {
         showError('Failed to connect. Is the backend running?');
         console.error(err);

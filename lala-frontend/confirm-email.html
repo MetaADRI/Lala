@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lala — Confirm Email</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="common.css?v=6">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="icon" type="image/png" href="logo-removebg-preview.png">
+  <style>
+    .confirm-state { display: none; text-align: center; }
+    .confirm-state.active { display: block; }
+    .confirm-icon {
+      width: 80px; height: 80px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px; font-size: 36px;
+    }
+    .confirm-icon.loading {
+      background: var(--g-light);
+      color: var(--g-dark);
+      animation: spin 1s linear infinite;
+    }
+    .confirm-icon.success {
+      background: linear-gradient(135deg, #43A047, #66BB6A);
+      color: #fff;
+    }
+    .confirm-icon.error {
+      background: #FEE2E2;
+      color: #DC2626;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .confirm-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .confirm-sub { font-size: 14px; color: var(--muted); line-height: 1.5; margin-bottom: 24px; }
+  </style>
+</head>
+<body class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-head">
+      <a href="index.html" class="auth-logo">
+        <img src="logo-removebg-preview.png" alt="Lala">
+        <span>lala</span>
+      </a>
+    </div>
+
+    <div class="auth-body">
+      <!-- Loading state -->
+      <div class="confirm-state active" id="stateLoading">
+        <div class="confirm-icon loading"><i class="ti ti-loader"></i></div>
+        <div class="confirm-title">Confirming your email...</div>
+        <div class="confirm-sub">Please wait a moment.</div>
+      </div>
+
+      <!-- Success state -->
+      <div class="confirm-state" id="stateSuccess">
+        <div class="confirm-icon success"><i class="ti ti-check"></i></div>
+        <div class="confirm-title">Email Confirmed!</div>
+        <div class="confirm-sub">Your account is now active. You can sign in to start booking.</div>
+        <a href="guest-login.html" class="btn-login" style="text-decoration:none;text-align:center;display:block;">
+          <i class="ti ti-login"></i> Sign In
+        </a>
+      </div>
+
+      <!-- Error state -->
+      <div class="confirm-state" id="stateError">
+        <div class="confirm-icon error"><i class="ti ti-x"></i></div>
+        <div class="confirm-title">Confirmation Failed</div>
+        <div class="confirm-sub" id="errorMsg">This link is invalid or has expired.</div>
+        <a href="signup.html" class="btn-login" style="text-decoration:none;text-align:center;display:block;">
+          <i class="ti ti-user-plus"></i> Create a New Account
+        </a>
+      </div>
+
+      <!-- Resend state (after link expired) -->
+      <div class="confirm-state" id="stateResend">
+        <div class="confirm-icon loading"><i class="ti ti-mail"></i></div>
+        <div class="confirm-title">Need a new link?</div>
+        <div class="confirm-sub">Enter your email and we'll send a fresh confirmation link.</div>
+        <div class="fg">
+          <div class="icon-field">
+            <i class="ti ti-mail"></i>
+            <input type="email" id="resendEmail" placeholder="you@example.com" autocomplete="email">
+          </div>
+        </div>
+        <button class="btn-login" id="resendBtn" onclick="handleResend()">
+          <i class="ti ti-send"></i> <span id="resendBtnText">Send Confirmation Email</span>
+        </button>
+        <div class="auth-err" id="resendError">
+          <i class="ti ti-alert-circle"></i>
+          <span id="resendErrorText"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js?v=2"></script>
+  <script src="api.js?v=2"></script>
+  <script>
+    function showState(id) {
+      document.querySelectorAll('.confirm-state').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    async function handleResend() {
+      const email = document.getElementById('resendEmail').value.trim().toLowerCase();
+      if (!email) { document.getElementById('resendErrorText').textContent = 'Please enter your email'; document.getElementById('resendError').classList.add('visible'); return; }
+      const btn = document.getElementById('resendBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-spinner"></span> Sending...';
+      try {
+        const data = await api.resendConfirmation(email);
+        btn.innerHTML = '<i class="ti ti-check"></i> Email Sent!';
+        btn.style.background = '#43A047';
+        document.getElementById('resendError').classList.remove('visible');
+      } catch (err) {
+        document.getElementById('resendErrorText').textContent = err.message || 'Failed to send email';
+        document.getElementById('resendError').classList.add('visible');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ti ti-send"></i> Send Confirmation Email';
+      }
+    }
+
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+      if (!token) {
+        document.getElementById('errorMsg').textContent = 'No confirmation token found. Please check your email for the correct link.';
+        showState('stateError');
+        return;
+      }
+
+      try {
+        const data = await api.confirmEmail(token);
+        if (data.error) {
+          // Link expired or invalid — offer resend
+          document.getElementById('errorMsg').textContent = data.error;
+          showState('stateError');
+          // Pre-fill resend email from the error context if possible
+          showState('stateResend');
+        } else {
+          showState('stateSuccess');
+        }
+      } catch (err) {
+        document.getElementById('errorMsg').textContent = err.message || 'Confirmation failed. The link may have expired.';
+        showState('stateError');
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -35,7 +35,6 @@ const api = {
     try {
       data = await res.json();
     } catch (e) {
-      // Backend down / proxy returned non-JSON (e.g. HTML 502). Keep the status.
       return { error: `Server responded with ${res.status}. Please try again.` };
     }
     if (!res.ok && !data.error) data.error = `Request failed (${res.status})`;
@@ -43,6 +42,59 @@ const api = {
       localStorage.setItem('lala_token', data.token);
       localStorage.setItem('lala_user', JSON.stringify(data.user));
     }
+    return data;
+  },
+
+  verifyLoginOTP: async (email, code) => {
+    const res = await fetch(`${API_BASE}/auth/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code })
+    });
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      return { error: `Server responded with ${res.status}. Please try again.` };
+    }
+    if (!res.ok && !data.error) data.error = `Request failed (${res.status})`;
+    if (data.token) {
+      localStorage.setItem('lala_token', data.token);
+      localStorage.setItem('lala_user', JSON.stringify(data.user));
+    }
+    return data;
+  },
+
+  confirmEmail: async (token) => {
+    const res = await fetch(`${API_BASE}/auth/confirm-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      return { error: `Server responded with ${res.status}. Please try again.` };
+    }
+    if (!res.ok && !data.error) data.error = `Request failed (${res.status})`;
+    return data;
+  },
+
+  resendConfirmation: async (email) => {
+    const res = await fetch(`${API_BASE}/auth/resend-confirmation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      return { error: `Server responded with ${res.status}. Please try again.` };
+    }
+    if (!res.ok && !data.error) data.error = data.error || `Request failed (${res.status})`;
+    if (data.error) throw new Error(data.error);
     return data;
   },
 
