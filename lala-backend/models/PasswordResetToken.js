@@ -1,6 +1,3 @@
-// models/PasswordResetToken.js
-// Persisted password-reset tokens so they survive server restarts.
-// Only the SHA-256 hash of the code is stored (never the plaintext code).
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
@@ -14,9 +11,14 @@ const PasswordResetToken = sequelize.define('PasswordResetToken', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  token: {
+    type: DataTypes.STRING(64),
+    allowNull: true,
+    unique: true,
+  },
   codeHash: {
     type: DataTypes.STRING(64),
-    allowNull: false,
+    allowNull: true,
   },
   expiresAt: {
     type: DataTypes.DATE,
@@ -30,6 +32,7 @@ const PasswordResetToken = sequelize.define('PasswordResetToken', {
   tableName: 'PasswordResetTokens',
   indexes: [
     { fields: ['email'] },
+    { fields: ['token'] },
     { fields: ['expiresAt'] },
   ],
 });

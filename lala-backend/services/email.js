@@ -25,18 +25,22 @@ function wrap(title, bodyHtml) {
     </div>`;
 }
 
-exports.sendPasswordResetCode = async (to, code) => {
-  const html = wrap('Password Reset Code', `
+exports.sendPasswordResetLink = async (to, resetUrl) => {
+  const html = wrap('Reset Your Password', `
     <p style="font-size: 14px; color: #555; margin: 0 0 24px; line-height: 1.5;">
-      Use the code below to reset your password. It expires in 30 minutes.
+      Click the button below to reset your password. This link expires in 30 minutes.
     </p>
-    <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 16px; text-align: center; letter-spacing: 8px; font-size: 32px; font-weight: 700; color: #1B5E20;">
-      ${code}
+    <div style="text-align: center; margin: 0 0 24px;">
+      <a href="${resetUrl}" style="display: inline-block; background: #1B5E20; color: #fff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 15px; font-weight: 700;">Reset Password</a>
     </div>
+    <p style="font-size: 12px; color: #999; line-height: 1.5; margin: 0 0 0;">
+      If the button doesn't work, copy and paste this link into your browser:<br>
+      <a href="${resetUrl}" style="color: #1B5E20; word-break: break-all;">${resetUrl}</a>
+    </p>
     <p style="${FOOTER_STYLE}">If you didn't request this, you can safely ignore this email.</p>
   `);
 
-  const { data, error } = await resend.emails.send({ from: FROM, to: [to], subject: 'Lala — Password Reset Code', html });
+  const { data, error } = await resend.emails.send({ from: FROM, to: [to], subject: 'Lala — Reset Your Password', html });
   if (error) throw new Error(error.message);
   return data;
 };

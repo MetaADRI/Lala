@@ -98,6 +98,22 @@ const api = {
     return data;
   },
 
+  resetPassword: async (token, password) => {
+    const res = await fetch(`${API_BASE}/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, password })
+    });
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      return { error: `Server responded with ${res.status}. Please try again.` };
+    }
+    if (!res.ok && !data.error) data.error = `Request failed (${res.status})`;
+    return data;
+  },
+
   // ─── LISTINGS ──────────────────────────────────────────────────────────────
   getListings: async (filters = {}) => {
     const clean = Object.fromEntries(Object.entries(filters).filter(([_, v]) => v !== '' && v !== null && v !== undefined));

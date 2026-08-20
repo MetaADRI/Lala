@@ -245,8 +245,10 @@ exports.updateProfile = asyncHandler(async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// FORGOT PASSWORD (unchanged)
+// FORGOT PASSWORD — sends a link (not a code)
 // ─────────────────────────────────────────────────────────────────────────────
+const MAX_PASSWORD_RESETS = 3;
+
 exports.forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
   if (!email) throw badRequest('Email is required');
@@ -254,58 +256,70 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
   const user = await User.findOne({ where: { email } });
   if (!user) throw notFound('No account found with this email');
 
-  const resetCode = crypto.randomInt(100000, 999999).toString();
+  if (user.passwordResets >= MAX_PASSWORD_RESETS) {
+    throw forbidden('You have reached the maximum number of password resets. Please contact support.');
+  }
 
+  const token = crypto.randomBytes(32).toString('hex');
   await PasswordResetToken.destroy({ where: { email } });
   await PasswordResetToken.create({
     email,
-    codeHash: sha256(resetCode),
+    token,
     expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS),
   });
 
+  const resetUrl = `${frontendUrl()}/reset-password.html?token=${token}`;
+
   try {
-    await emailService.sendPasswordResetCode(email, resetCode);
+    await emailService.sendPasswordResetLink(email, resetUrl);
   } catch (err) {
     logger.error('auth.reset-email.failed', { email, err: err.message });
-    throw new AppError(502, 'Failed to send reset code. Please try again.');
+    throw new AppError(502, 'Failed to send reset link. Please try again.');
   }
 
-  const payload = { message: 'Reset code sent to your email', expiresIn: '30 minutes' };
+  const payload = { message: 'Reset link sent to your email', expiresIn: '30 minutes' };
   if (process.env.NODE_ENV !== 'production') {
-    payload.resetCode = resetCode;
+    payload.devResetUrl = resetUrl;
+    payload.devToken = token;
   }
   res.json(payload);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// RESET PASSWORD (unchanged)
+// RESET PASSWORD — accepts a token + new password (max 3 lifetime resets)
 // ─────────────────────────────────────────────────────────────────────────────
 exports.resetPassword = asyncHandler(async (req, res) => {
-  const { email, code, password } = req.body;
-  if (!email || !code || !password) {
-    throw badRequest('Email, code, and new password are required');
+  const { token, password } = req.body;
+  if (!token || !password) {
+    throw badRequest('Token and new password are required');
   }
 
   const stored = await PasswordResetToken.findOne({
-    where: { email, used: false },
+    where: { token, used: false },
     order: [['createdAt', 'DESC']],
   });
-  if (!stored) throw badRequest('No reset code requested for this email');
+  if (!stored) throw badRequest('Invalid or already-used reset link');
   if (Date.now() > new Date(stored.expiresAt).getTime()) {
     await stored.destroy();
-    throw badRequest('Reset code has expired');
-  }
-  if (!codeMatches(stored.codeHash, code)) {
-    throw badRequest('Invalid reset code');
+    throw badRequest('Reset link has expired. Please request a new one.');
   }
 
-  const user = await User.findOne({ where: { email } });
+  const user = await User.findOne({ where: { email: stored.email } });
   if (!user) throw notFound('User not found');
 
+  if (user.passwordResets >= MAX_PASSWORD_RESETS) {
+    throw forbidden('You have reached the maximum number of password resets. Please contact support.');
+  }
+
   user.password = await bcrypt.hash(password, 10);
+  user.passwordResets = (user.passwordResets || 0) + 1;
   await user.save();
 
   await stored.destroy();
 
-  res.json({ message: 'Password reset successful. You can now log in with your new password.' });
+  const remaining = MAX_PASSWORD_RESETS - user.passwordResets;
+  res.json({
+    message: 'Password reset successful. You can now sign in with your new password.',
+    passwordResetsRemaining: remaining,
+  });
 });
